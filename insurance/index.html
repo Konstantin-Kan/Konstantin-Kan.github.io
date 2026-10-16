@@ -804,6 +804,17 @@ footer a{text-decoration:underline;text-underline-offset:3px}
 
   /* 6. карточки шагов уменьшаются, когда на них наезжает следующая */
   const steps = $$('.step');
+  /* карточка выше экрана: сначала докручивается до низа, потом прилипает */
+  function fitSteps(){
+    const vh = innerHeight, mobile = innerWidth < 900;
+    const base = Math.min(Math.max(72, vh * .1), 96), gap = mobile ? 110 : 24; // снизу место под кнопку «АГЕНТ» на телефоне
+    steps.forEach((s,i) => {
+      const top = base + i * 12;
+      s.style.top = Math.min(top, vh - s.offsetHeight - gap) + 'px';
+    });
+  }
+  fitSteps(); addEventListener('resize', fitSteps); addEventListener('load', fitSteps);
+  if (document.fonts) document.fonts.ready.then(fitSteps);
   function onSteps(){
     steps.forEach((s,i) => {
       const next = steps[i + 1]; if (!next) return;
