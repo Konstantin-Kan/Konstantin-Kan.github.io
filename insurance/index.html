@@ -345,6 +345,24 @@ footer a{text-decoration:underline;text-underline-offset:3px}
   .steps-head{margin-bottom:2rem}
 }
 </style>
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','1118977800855176');
+fbq('track','PageView');
+/* нажал любую кнопку «АГЕНТ» → событие Lead (один раз за визит) */
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href*="t.me/Constantine_Kan"]');
+  if(!a||window.__leadSent)return; window.__leadSent=true;
+  fbq('track','Lead',{content_name:'insurance'});
+},true);
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1118977800855176&ev=PageView&noscript=1"/></noscript>
+<!-- /Meta Pixel -->
 </head>
 <body>
 
