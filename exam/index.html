@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Шпаргалка Samsung Life</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Noto+Sans+KR:wght@400;700;900&display=swap">
+<style>
+/* Layout: one reading column, sticky chip-nav, rows "ключ → ответ"; цвет = смысл (зелёный верно, красный ловушка, жёлтый цифра) */
+:root{
+  --bg:#f3f5fa; --card:#ffffff; --fg:#14182b; --muted:#5d6480; --line:#dde1ec;
+  --accent:#1f4fd6; --accent-soft:#e3ebff;
+  --ok:#0f7a45; --ok-bg:#dcf5e7;
+  --no:#c2263a; --no-bg:#fde3e6;
+  --num:#8a5a00; --num-bg:#ffefc2;
+  --warn-bg:#fff6dc;
+  --f-body:"Manrope","Noto Sans KR",system-ui,sans-serif;
+  --f-kr:"Noto Sans KR","Manrope",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1120; --card:#171b2e; --fg:#e8ebf7; --muted:#9aa1bd; --line:#2a3050;
+  --accent:#7ea2ff; --accent-soft:#1f2a52;
+  --ok:#5fe0a0; --ok-bg:#123726; --no:#ff7d8c; --no-bg:#3d1720;
+  --num:#ffcf5c; --num-bg:#3a2e0d; --warn-bg:#2c2610; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1120; --card:#171b2e; --fg:#e8ebf7; --muted:#9aa1bd; --line:#2a3050;
+  --accent:#7ea2ff; --accent-soft:#1f2a52;
+  --ok:#5fe0a0; --ok-bg:#123726; --no:#ff7d8c; --no-bg:#3d1720;
+  --num:#ffcf5c; --num-bg:#3a2e0d; --warn-bg:#2c2610; color-scheme:dark}
+
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+h1{font-family:var(--f-kr);font-weight:900;font-size:1.7rem;line-height:1.2;margin:8px 0 4px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 14px}
+h2{font-size:1.25rem;font-weight:800;margin:0 0 4px;text-wrap:balance}
+h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 0 8px}
+.hint{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.chips a{flex:none;text-decoration:none;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:.85rem;font-weight:600}
+.chips a.hot{background:var(--no-bg);color:var(--no);border-color:transparent}
+.tools{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+button{font:inherit;font-weight:800;border:0;border-radius:10px;padding:9px 14px;background:var(--accent);color:#fff;cursor:pointer}
+button.ghost{background:var(--accent-soft);color:var(--accent)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:.82rem}
+
+section{margin-bottom:34px;scroll-margin-top:120px}
+.list{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.list li{display:grid;grid-template-columns:2.2em 1fr;gap:4px 10px;padding:12px 14px;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.list li .n{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.list li .body{min-width:0}
+.list.nonum li{grid-template-columns:1fr}
+.q{font-family:var(--f-kr);font-weight:700}
+.a{display:block;margin-top:3px}
+.mine{background:var(--warn-bg)}
+.mine .n{color:var(--no)}
+
+.ok{background:var(--ok-bg);color:var(--ok);font-weight:800;padding:0 5px;border-radius:5px;font-family:var(--f-kr)}
+.no{background:var(--no-bg);color:var(--no);text-decoration:line-through;text-decoration-thickness:2px;padding:0 5px;border-radius:5px;font-family:var(--f-kr)}
+.num{background:var(--num-bg);color:var(--num);font-weight:800;padding:0 5px;border-radius:5px;font-variant-numeric:tabular-nums}
+.kr{font-family:var(--f-kr)}
+.check{display:inline-block;font-size:.75rem;font-weight:800;background:var(--num-bg);color:var(--num);border-radius:5px;padding:1px 6px;margin-left:4px;vertical-align:1px}
+
+.traps{display:grid;gap:10px}
+.trap{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.trap b{display:block;margin-bottom:2px}
+
+.tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+tr:first-child td{border-top:0}
+td:first-child{font-family:var(--f-kr);font-weight:700;white-space:nowrap}
+
+/* режим самопроверки: ответы скрыты, тап — показать */
+body.quiz .a{filter:blur(7px);cursor:pointer;user-select:none;transition:filter .15s}
+body.quiz .a.shown{filter:none}
+@media (prefers-reduced-motion:reduce){body.quiz .a{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>삼성생명 등록시험</h1>
+  <p class="sub">공통 1–20 и 생명보험 21–30. Ответы взяты из официальных разборов пробников и твоих записей.</p>
+
+  <div class="bar">
+    <nav class="chips" aria-label="Разделы">
+      <a href="#traps">Ловушки</a>
+      <a href="#mine" class="hot">Мои ошибки</a>
+      <a href="#t21-c">2-1 공통</a>
+      <a href="#t21-l">2-1 생명</a>
+      <a href="#oct">Пробник 10월</a>
+      <a href="#notes">Из тетради</a>
+      <a href="#nums">Цифры</a>
+      <a href="#dict">Словарь</a>
+    </nav>
+    <div class="tools">
+      <button id="quizBtn" type="button">Скрыть ответы</button>
+      <button id="showAll" type="button" class="ghost" hidden>Показать все</button>
+      <div class="legend"><span class="ok">верно</span><span class="no">ловушка</span><span class="num">цифра</span></div>
+    </div>
+  </div>
+
+  <section id="traps">
+    <h2>Ловушки</h2>
+    <p class="hint">Эти правила срабатывают на любом вопросе. Прочитай их перед экзаменом.</p>
+    <div class="traps">
+      <div class="trap"><b>Обведи слово в вопросе</b><span class="kr">틀린 · 아닌 · 해당하지 않는 · 거리가 먼</span> = ищем <b style="display:inline">неправильный</b> вариант.</div>
+      <div class="trap"><b>Подменили одно слово</b><span class="no">있어야</span> ↔ <span class="ok">없어야</span>, <span class="no">높다</span> ↔ <span class="ok">낮다</span>, <span class="no">근로</span> ↔ <span class="ok">사업</span>. Читай вариант до последнего слова.</div>
+      <div class="trap"><b>Подменили цифру</b><span class="num">1년 ↔ 2년</span> <span class="num">3개월 ↔ 6개월</span> <span class="num">2영업일 ↔ 3영업일</span></div>
+      <div class="trap"><b>Подменили, кто делает</b><span class="kr">보험회사 · 계약자 · 금융위원회 · 생명보험협회 · 금감원</span> — проверь, кто должен быть.</div>
+      <div class="trap"><b>만 · 모두 · 항상</b>Часто ошибка: «정액 클레임업무<span class="no">만</span>». Но <span class="kr">타인의 사망 → <span class="ok">반드시</span> 서면동의</span> — правда. Слово-ловушка — повод перечитать, а не готовый ответ.</div>
+    </div>
+  </section>
+
+  <section id="mine">
+    <h2>Мои ошибки в 2-1</h2>
+    <p class="hint">У тебя было 공통 9/20, 생명 6/10. Учи этот блок первым и повтори завтра в перерывах.</p>
+    <ul class="list">
+      <li class="mine"><span class="n">2</span><div class="body"><span class="q">피보험자 수</span><span class="a">Застрахованных может быть <span class="ok">2인 이상</span>, ограничения нет. <span class="no">1인으로 제한</span></span></div></li>
+      <li class="mine"><span class="n">6</span><div class="body"><span class="q">계약 전 알릴 의무</span><span class="a">보장개시 후 <span class="num">2년</span> без случая → расторгнуть нельзя. <span class="no">1년</span></span></div></li>
+      <li class="mine"><span class="n">7</span><div class="body"><span class="q">보험나이 재계산</span><span class="a">Каждый год по <span class="ok">계약해당일</span>. <span class="no">생일</span></span></div></li>
+      <li class="mine"><span class="n">10</span><div class="body"><span class="q">보험사기 인과관계</span><span class="a">기망·착오·처분행위 — 인과관계 <span class="ok">있어야</span>. <span class="no">없어야</span></span></div></li>
+      <li class="mine"><span class="n">11</span><div class="body"><span class="q">교차모집설계사</span><span class="a">Сказать клиенту «я 교차모집설계사» = <span class="ok">можно</span> (это 고지의무)</span></div></li>
+      <li class="mine"><span class="n">15</span><div class="body"><span class="q">광고심의</span><span class="a"><span class="ok">브랜드광고 — без 심의</span>. <span class="no">사전심의 원칙</span></span></div></li>
+      <li class="mine"><span class="n">16</span><div class="body"><span class="q">정기공시</span><span class="a">결산공시 <span class="num">3개월</span>, 분기 임시결산 <span class="num">2개월</span>. <span class="no">6개월 / 3개월</span></span></div></li>
+      <li class="mine"><span class="n">17</span><div class="body"><span class="q">금감원 민원 현황</span><span class="a">По <span class="ok">всем финансам</span> (은행, 금융투자…). <span class="no">보험업만</span></span></div></li>
+      <li class="mine"><span class="n">18</span><div class="body"><span class="q">월적립식 비과세 선납기간</span><span class="a"><span class="num">6개월</span> 이내. <span class="no">3개월</span></span></div></li>
+      <li class="mine"><span class="n">20</span><div class="body"><span class="q">기납부세액 공제</span><span class="a">В зачёт идёт <span class="ok">원천징수된 세액</span>. <span class="no">모집수당</span></span></div></li>
+      <li class="mine"><span class="n">22</span><div class="body"><span class="q">고지의무 — на ком?</span><span class="a">На <span class="ok">보험계약자</span>. <span class="no">보험회사</span></span></div></li>
+      <li class="mine"><span class="n">24</span><div class="body"><span class="q">금액이 계약시 확정</span><span class="a">= <span class="ok">정액보험</span></span></div></li>
+      <li class="mine"><span class="n">26</span><div class="body"><span class="q">장애인 가입</span><span class="a">Критерии <span class="ok">동일하다</span> (<span class="no">다르다</span>). Отказ без причины → <span class="ok">наказание</span> по 장애인차별금지법</span></div></li>
+      <li class="mine"><span class="n">27</span><div class="body"><span class="q">세제적격 연금저축</span><span class="a"><span class="ok">Возраст без ограничений</span>. 납입 <span class="num">5년</span>, лимит <span class="num">1,800만원</span>, <span class="ok">세액공제</span></span></div></li>
+    </ul>
+  </section>
+
+  <section id="t21-c">
+    <h2>Пробник 2-1 · 공통</h2>
+    <p class="hint">По официальному разбору. Жёлтая строка — там, где ты ошибся.</p>
+    <h3>보험이론 및 윤리 · 1–10</h3>
+    <ul class="list">
+      <li><span class="n">1</span><div class="body"><span class="q">Активы → чтобы хватило на выплаты</span><span class="a"><span class="ok">안정성</span> (보험업법 104조)</span></div></li>
+      <li class="mine"><span class="n">2</span><div class="body"><span class="q">보험계약 관계자</span><span class="a">계약자 и 피보험자 — <span class="ok">без ограничения числа</span>. 타인의 사망 = <span class="ok">반드시 서면동의</span>. Бизнес = 허가 금융위원회</span></div></li>
+      <li><span class="n">3</span><div class="body"><span class="q">무진단 + 1회 보험료 → 30일 молчат</span><span class="a"><span class="ok">승낙</span> 간주 (<span class="no">거절</span>). При 승낙 выдают 보험증권</span></div></li>
+      <li><span class="n">4</span><div class="body"><span class="q">보험금 지급기일</span><span class="a">Документы → <span class="num">3영업일</span> (<span class="no">2</span>) · проверка → <span class="num">10영업일</span> · дольше → <span class="num">30영업일</span></span></div></li>
+      <li><span class="n">5</span><div class="body"><span class="q">Сложный случай, до 50% заранее</span><span class="a"><span class="ok">보험금 가지급제도</span></span></div></li>
+      <li class="mine"><span class="n">6</span><div class="body"><span class="q">알릴 의무 위반 → 해지 불가</span><span class="a">보장개시 후 <span class="num">2년</span> без случая</span></div></li>
+      <li class="mine"><span class="n">7</span><div class="body"><span class="q">보험나이</span><span class="a">По <span class="ok">계약해당일</span>. 15세 미만 사망보험 = 무효. 6개월 미만 버림</span></div></li>
+      <li><span class="n">8</span><div class="body"><span class="q">체감성 위험</span><span class="a"><span class="ok">보험금 삭감</span> <span class="hint">(체<b>감</b> → 삭<b>감</b>)</span></span></div></li>
+      <li><span class="n">9</span><div class="body"><span class="q">3대 기본지키기</span><span class="a"><span class="ok">약관 교부·중요 내용 설명</span> + 청약서 부본 전달 + 자필서명</span></div></li>
+      <li class="mine"><span class="n">10</span><div class="body"><span class="q">보험사기 객관적 요건</span><span class="a">인과관계 <span class="ok">있어야</span></span></div></li>
+    </ul>
+    <h3>보험법규 · 11–20</h3>
+    <ul class="list">
+      <li class="mine"><span class="n">11</span><div class="body"><span class="q">교차모집 — НЕ запрещено</span><span class="a"><span class="ok">Сообщить, что ты 교차모집설계사</span></span></div></li>
+      <li><span class="n">12</span><div class="body"><span class="q">금융기관보험대리점 — нельзя</span><span class="a"><span class="ok">겸영여신업자</span>. Банк и 농협은행 — можно</span></div></li>
+      <li><span class="n">13</span><div class="body"><span class="q">특별이익 — подарок</span><span class="a">Меньшее из: <span class="num">10%</span> взносов за 1-й год или <span class="num">3만원</span>. 10만×12 = 120만 → 12만 vs 3만 → <span class="ok">3만원 законно</span></span></div></li>
+      <li><span class="n">14</span><div class="body"><span class="q">우수인증설계사</span><span class="a">법인대리점 — <span class="ok">не подходит</span>. Заявка <span class="ok">через 보험회사</span>. 유지율 <span class="num">89%</span> → <span class="ok">не проходит</span></span></div></li>
+      <li class="mine"><span class="n">15</span><div class="body"><span class="q">광고심의</span><span class="a"><span class="ok">브랜드광고 — без 심의</span></span></div></li>
+      <li class="mine"><span class="n">16</span><div class="body"><span class="q">정기공시</span><span class="a">결산공시 <span class="num">3개월</span> · 분기 <span class="num">2개월</span></span></div></li>
+      <li class="mine"><span class="n">17</span><div class="body"><span class="q">금감원 민원</span><span class="a"><span class="ok">Весь финансовый рынок</span></span></div></li>
+      <li class="mine"><span class="n">18</span><div class="body"><span class="q">월적립식 비과세</span><span class="a"><span class="num">5년</span> 이상 · 기본보험료 <span class="ok">균등</span> · 선납 <span class="num">6개월</span></span></div></li>
+      <li><span class="n">19</span><div class="body"><span class="q">5,000만 ~ 8,800만 원</span><span class="a"><span class="num">24%</span></span></div></li>
+      <li class="mine"><span class="n">20</span><div class="body"><span class="q">Налоги агента</span><span class="a">모집수당 <span class="num">3%</span> 원천징수 · <span class="num">5월</span> 신고, 사업+근로 <span class="ok">합산</span> · зачёт = <span class="ok">원천징수 세액</span></span></div></li>
+    </ul>
+  </section>
+
+  <section id="t21-l">
+    <h2>Пробник 2-1 · 생명보험</h2>
+    <ul class="list">
+      <li><span class="n">21</span><div class="body"><span class="q">보험업법 2조 보험상품</span><span class="a"><span class="ok">위험보장</span></span></div></li>
+      <li class="mine"><span class="n">22</span><div class="body"><span class="q">Юр. свойства договора</span><span class="a">고지의무 — на <span class="ok">계약자</span>. 불요식 → на деле 요식화 · 사행계약 · взнос ≠ условие заключения</span></div></li>
+      <li><span class="n">23</span><div class="body"><span class="q">기초서류</span><span class="a"><span class="ok">사업방법서 + 약관 + 보험료·해약환급금 산출방법서</span> — все три</span></div></li>
+      <li class="mine"><span class="n">24</span><div class="body"><span class="q">Виды страхования</span><span class="a">Сумма известна → <span class="ok">정액</span> · выплаты &gt; взносов → <span class="ok">저축성</span> · срок + смерть → <span class="ok">정기</span> · только если дожил → <span class="ok">생존보험</span></span></div></li>
+      <li><span class="n">25</span><div class="body"><span class="q">종신보험 보험료</span><span class="a"><span class="ok">비싸다</span> (<span class="no">저렴하다</span>)</span></div></li>
+      <li class="mine"><span class="n">26</span><div class="body"><span class="q">장애인</span><span class="a">Можно и в <span class="ok">обычное</span> · критерии <span class="ok">동일</span> · наказание за отказ · центр жалоб — <span class="ok">생명보험협회</span> (<span class="no">금융위원회</span>)</span></div></li>
+      <li class="mine"><span class="n">27</span><div class="body"><span class="q">연금저축</span><span class="a"><span class="num">5년</span> (<span class="no">7년</span>) · <span class="num">1,800만</span> (<span class="no">1,200만</span>) · <span class="ok">세액공제</span> · возраст без ограничений</span></div></li>
+      <li><span class="n">28</span><div class="body"><span class="q">퇴직연금</span><span class="a"><span class="ok">DB</span> = выплата известна заранее · <span class="ok">DC</span> = зависит от доходности · 자영업자 тоже</span></div></li>
+      <li><span class="n">29</span><div class="body"><span class="q">추가납입 + 중도인출 + 펀드</span><span class="a"><span class="ok">변액유니버설보험</span></span></div></li>
+      <li><span class="n">30</span><div class="body"><span class="q">연금계좌</span><span class="a"><span class="ok">세액공제</span> (<span class="no">소득공제</span>) до <span class="num">900만</span> с 퇴직연금 · 1주택 고령가구 추가납입 <span class="num">1억</span></span></div></li>
+    </ul>
+  </section>
+
+  <section id="oct">
+    <h2>Пробник 10월</h2>
+    <ul class="list nonum">
+      <li><div class="body"><span class="q">종신형 연금 보험차익 비과세 한도</span><span class="a"><span class="ok">한도 없음</span></span></div></li>
+      <li><div class="body"><span class="q">보험나이 ( ) 합</span><span class="a"><span class="num">6</span> + <span class="num">6</span> + <span class="num">1</span> = <span class="num">13</span></span></div></li>
+      <li><div class="body"><span class="q">위험의 ( ): 인수 여부 / 요율 분류</span><span class="a"><span class="ok">선택</span> · <span class="ok">분류</span></span></div></li>
+      <li><div class="body"><span class="q">상품 신고 → куда</span><span class="a"><span class="ok">금융위원회</span> (<span class="no">생명보험협회</span>)</span></div></li>
+      <li><div class="body"><span class="q">연금전환특약</span><span class="a"><span class="ok">Без доплаты</span>, 제도성특약</span></div></li>
+      <li><div class="body"><span class="q">장애인전용보험 단체보험</span><span class="a"><span class="ok">Нет</span>. Бывает 보장성 и 저축성</span></div></li>
+      <li><div class="body"><span class="q">생존시 지급 없음</span><span class="a"><span class="ok">순수보장성</span></span></div></li>
+      <li><div class="body"><span class="q">Не добавляет покрытие</span><span class="a"><span class="ok">우량체할인특약</span></span></div></li>
+      <li><div class="body"><span class="q">퇴직연금사업자 — нет</span><span class="a"><span class="ok">우체국</span></span></div></li>
+      <li><div class="body"><span class="q">클레임</span><span class="a">정액 <span class="ok">и</span> 실손. <span class="no">정액만</span></span></div></li>
+      <li><div class="body"><span class="q">보험사기</span><span class="a"><span class="num">10년</span> 징역 или <span class="num">5천만원</span> · 광고 → <span class="num">3천만원</span></span></div></li>
+      <li><div class="body"><span class="q">주관적 요건 (не объективный)</span><span class="a"><span class="ok">고의 · 불법영득의사</span></span></div></li>
+      <li><div class="body"><span class="q">위촉 / 해촉</span><span class="a">Оба — с <span class="ok">보험회사</span> (<span class="no">보험협회</span>)</span></div></li>
+      <li><div class="body"><span class="q">교차모집 회사 — можно</span><span class="a"><span class="ok">자사 상품 교육</span></span></div></li>
+      <li><div class="body"><span class="q">상속순위</span><span class="a"><span class="ok">자녀·손자 → 부모·조부모 → 형제자매 → 4촌</span>. 배우자 вместе с 1-м или 2-м</span></div></li>
+      <li><div class="body"><span class="q">설계사 소득</span><span class="a"><span class="ok">사업소득</span> (<span class="no">근로소득</span>)</span></div></li>
+      <li><div class="body"><span class="q">작성자 불이익 원칙</span><span class="a">Спор → <span class="ok">против 보험회사</span></span></div></li>
+      <li><div class="body"><span class="q">피보험이익</span><span class="a"><span class="ok">Только вещи</span> (손해보험). <span class="no">사람</span></span></div></li>
+      <li><div class="body"><span class="q">상해보험 재해사망</span><span class="a"><span class="ok">Покрывает</span></span></div></li>
+      <li><div class="body"><span class="q">특화 질병보험 보험료</span><span class="a"><span class="ok">낮다</span> (<span class="no">높다</span>)</span></div></li>
+      <li><div class="body"><span class="q">암 입원 — срок закончился</span><span class="a">Лечение <span class="ok">продолжают оплачивать</span>. Осложнения — нет</span></div></li>
+      <li><div class="body"><span class="q">4세대 실손</span><span class="a"><span class="num">2021.7.1</span> (<span class="no">2018</span>) · <span class="ok">주계약 = 급여, 특약 = 비급여</span> · 도수치료 — в 특약</span></div></li>
+    </ul>
+  </section>
+
+  <section id="notes">
+    <h2>Из твоей тетради</h2>
+    <ul class="list nonum">
+      <li><div class="body"><span class="q">제도성 특약</span><span class="a">Запоминалка <span class="ok">전·연·우</span> = 전환, 연금전환, 우량체할인. <span class="no">휴일재해보장특약</span> — это покрытие</span></div></li>
+      <li><div class="body"><span class="q">종신보험 + 질병·간병</span><span class="a">Это <span class="ok">제3보험</span></span></div></li>
+      <li><div class="body"><span class="q">변액유니버설</span><span class="a">Ловушка была в слове <span class="no">않더라도</span></span></div></li>
+      <li><div class="body"><span class="q">IRP</span><span class="a">Открыть <span class="ok">можно</span> (<span class="no">불가</span>)</span></div></li>
+      <li><div class="body"><span class="q">퇴직연금사업자</span><span class="a"><span class="ok">금융투자회사 · 근로복지공단</span> — да. <span class="no">우체국</span></span></div></li>
+      <li><div class="body"><span class="q">언더라이팅 4 вида риска</span><span class="a"><span class="ok">신체적</span> возраст, болезни · <span class="ok">환경적</span> работа, алкоголь, курение · <span class="ok">도덕적</span> · <span class="ok">재정적</span> доход</span></div></li>
+      <li><div class="body"><span class="q">장애인 비과세 лимит в год</span><span class="a">У тебя записано <span class="num">3천만원</span>, по моим данным <span class="num">4천만원</span><span class="check">сверь</span></span></div></li>
+      <li><div class="body"><span class="q">Какой закон</span><span class="a">Договор — <span class="ok">상법</span>, работа компаний и агентов — <span class="ok">보험업법</span><span class="check">сверь</span></span></div></li>
+    </ul>
+  </section>
+
+  <section id="nums">
+    <h2>Цифры</h2>
+    <p class="hint">Верхние — из пробников. С пометкой «сверь» — по памяти, проверь в учебнике.</p>
+    <div class="tbl"><table>
+      <tr><td>지급기일</td><td><span class="num">3 / 10 / 30</span> 영업일</td></tr>
+      <tr><td>알릴 의무 해지 불가</td><td><span class="num">2년</span> без случая</td></tr>
+      <tr><td>승낙 간주</td><td><span class="num">30일</span></td></tr>
+      <tr><td>가지급</td><td>до <span class="num">50%</span></td></tr>
+      <tr><td>특별이익</td><td><span class="num">10%</span> или <span class="num">3만원</span> — меньшее</td></tr>
+      <tr><td>공시</td><td>결산 <span class="num">3개월</span> · 분기 <span class="num">2개월</span></td></tr>
+      <tr><td>월적립식 비과세</td><td><span class="num">5년</span> · 선납 <span class="num">6개월</span> · <span class="num">150만원</span>/월</td></tr>
+      <tr><td>일시납 비과세</td><td><span class="num">1억</span></td></tr>
+      <tr><td>연금저축</td><td><span class="num">5년</span> · <span class="num">1,800만</span> · 공제 <span class="num">900만</span></td></tr>
+      <tr><td>세율</td><td>5,000만~8,800만 → <span class="num">24%</span></td></tr>
+      <tr><td>모집수당 원천징수</td><td><span class="num">3%</span></td></tr>
+      <tr><td>4세대 실손</td><td><span class="num">2021.7.1</span></td></tr>
+      <tr><td>보험사기</td><td><span class="num">10년</span> / <span class="num">5천만원</span></td></tr>
+      <tr><td>청약철회</td><td><span class="num">15일</span> / <span class="num">30일</span><span class="check">сверь</span></td></tr>
+      <tr><td>품질보증해지</td><td><span class="num">3개월</span><span class="check">сверь</span></td></tr>
+      <tr><td>납입최고</td><td><span class="num">14일</span><span class="check">сверь</span></td></tr>
+      <tr><td>부활</td><td><span class="num">3년</span><span class="check">сверь</span></td></tr>
+      <tr><td>자살 면책</td><td><span class="num">2년</span><span class="check">сверь</span></td></tr>
+      <tr><td>소멸시효</td><td><span class="num">3년</span><span class="check">сверь</span></td></tr>
+      <tr><td>보장성 세액공제</td><td><span class="num">100만</span> · <span class="num">12%</span><span class="check">сверь</span></td></tr>
+    </table></div>
+  </section>
+
+  <section id="dict">
+    <h2>Словарь</h2>
+    <div class="tbl"><table>
+      <tr><td>틀린 / 맞는 / 아닌</td><td>неверное / верное / не является</td></tr>
+      <tr><td>해당하지 않는</td><td>не относится</td></tr>
+      <tr><td>거리가 먼</td><td>далёкое от сути</td></tr>
+      <tr><td>있어야 / 없어야</td><td>должно быть / не должно быть</td></tr>
+      <tr><td>불가 / 가능</td><td>нельзя / можно</td></tr>
+      <tr><td>이내 / 이상 / 미만 / 초과</td><td>в пределах / от и больше / меньше / свыше</td></tr>
+      <tr><td>정액 / 실손</td><td>фиксированная сумма / фактический ущерб</td></tr>
+      <tr><td>주계약 / 특약</td><td>основной договор / доп. условие</td></tr>
+      <tr><td>계약자 / 피보험자 / 수익자</td><td>страхователь / застрахованный / получатель</td></tr>
+      <tr><td>청약 / 승낙 / 거절 / 철회</td><td>заявка / принятие / отказ / отзыв</td></tr>
+      <tr><td>해지 / 부활 / 갱신</td><td>расторжение / восстановление / продление</td></tr>
+      <tr><td>고지의무</td><td>обязанность сообщить правду</td></tr>
+      <tr><td>원천징수</td><td>налог удержан сразу</td></tr>
+      <tr><td>세액공제 / 소득공제</td><td>вычет из налога / вычет из дохода</td></tr>
+      <tr><td>비과세 / 과세</td><td>без налога / облагается</td></tr>
+      <tr><td>기납입보험료</td><td>уже уплаченные взносы</td></tr>
+      <tr><td>해약환급금</td><td>возврат при расторжении</td></tr>
+      <tr><td>책임준비금</td><td>резерв на выплаты</td></tr>
+      <tr><td>기초서류</td><td>основные документы продукта</td></tr>
+    </table></div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var body=document.body, btn=document.getElementById('quizBtn'), all=document.getElementById('showAll');
+  function set(on){
+    body.classList.toggle('quiz',on);
+    btn.textContent=on?'Показать ответы':'Скрыть ответы';
+    all.hidden=!on;
+    if(!on) document.querySelectorAll('.a.shown').forEach(function(e){e.classList.remove('shown')});
+    try{localStorage.setItem('quiz',on?'1':'0')}catch(e){}
+  }
+  btn.addEventListener('click',function(){set(!body.classList.contains('quiz'))});
+  all.addEventListener('click',function(){document.querySelectorAll('.a').forEach(function(e){e.classList.add('shown')})});
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('.a'); if(a&&body.classList.contains('quiz')) a.classList.toggle('shown');
+  });
+  try{ if(localStorage.getItem('quiz')==='1') set(true) }catch(e){}
+})();
+</script>
+</body>
+</html>
