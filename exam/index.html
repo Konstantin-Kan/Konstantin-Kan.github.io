@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Noto+Sans+KR:wght@400;700;900&display=swap">
 <style>
-/* Layout: one reading column, sticky chip-nav, rows "ключ → ответ"; цвет = смысл (зелёный верно, красный ловушка, жёлтый цифра) */
+/* Layout: одна колонка карточек. В карточке: тип вопроса → корейский → перевод → ответ (кор. + рус.) → почему */
 :root{
   --bg:#f3f5fa; --card:#ffffff; --fg:#14182b; --muted:#5d6480; --line:#dde1ec;
   --accent:#1f4fd6; --accent-soft:#e3ebff;
@@ -21,421 +21,408 @@
   --f-kr:"Noto Sans KR","Manrope",system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0e1120; --card:#171b2e; --fg:#e8ebf7; --muted:#9aa1bd; --line:#2a3050;
+  --bg:#0e1120; --card:#171b2e; --fg:#e8ebf7; --muted:#a3aac6; --line:#2a3050;
   --accent:#7ea2ff; --accent-soft:#1f2a52;
-  --ok:#5fe0a0; --ok-bg:#123726; --no:#ff7d8c; --no-bg:#3d1720;
+  --ok:#5fe0a0; --ok-bg:#123726; --no:#ff8a98; --no-bg:#3d1720;
   --num:#ffcf5c; --num-bg:#3a2e0d; --warn-bg:#2c2610; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0e1120; --card:#171b2e; --fg:#e8ebf7; --muted:#9aa1bd; --line:#2a3050;
+  --bg:#0e1120; --card:#171b2e; --fg:#e8ebf7; --muted:#a3aac6; --line:#2a3050;
   --accent:#7ea2ff; --accent-soft:#1f2a52;
-  --ok:#5fe0a0; --ok-bg:#123726; --no:#ff7d8c; --no-bg:#3d1720;
+  --ok:#5fe0a0; --ok-bg:#123726; --no:#ff8a98; --no-bg:#3d1720;
   --num:#ffcf5c; --num-bg:#3a2e0d; --warn-bg:#2c2610; color-scheme:dark}
 
-body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.55}
-.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
-h1{font-family:var(--f-kr);font-weight:900;font-size:1.7rem;line-height:1.2;margin:8px 0 4px;text-wrap:balance}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:17px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+h1{font-size:1.6rem;font-weight:800;line-height:1.2;margin:8px 0 4px;text-wrap:balance}
 .sub{color:var(--muted);margin:0 0 14px}
-h2{font-size:1.25rem;font-weight:800;margin:0 0 4px;text-wrap:balance}
-h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 0 8px}
-.hint{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+h2{font-size:1.3rem;font-weight:800;margin:0 0 6px;text-wrap:balance}
+h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:22px 0 8px}
+.hint{color:var(--muted);font-size:.95rem;margin:0 0 12px}
 
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:18px}
 .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 .chips a{flex:none;text-decoration:none;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:.85rem;font-weight:600}
-.chips a.hot{background:var(--no-bg);color:var(--no);border-color:transparent}
-.tools{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
-button{font:inherit;font-weight:800;border:0;border-radius:10px;padding:9px 14px;background:var(--accent);color:#fff;cursor:pointer}
+.tools{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+button{font:inherit;font-size:.9rem;font-weight:800;border:0;border-radius:10px;padding:9px 14px;background:var(--accent);color:#fff;cursor:pointer}
 button.ghost{background:var(--accent-soft);color:var(--accent)}
+button.on{background:var(--no);color:#fff}
 button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:.82rem}
 
-section{margin-bottom:34px;scroll-margin-top:120px}
-.list{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.list li{display:grid;grid-template-columns:2.2em 1fr;gap:4px 10px;padding:12px 14px;border-top:1px solid var(--line)}
-.list li:first-child{border-top:0}
-.list li .n{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
-.list li .body{min-width:0}
-.list.nonum li{grid-template-columns:1fr}
-.q{font-family:var(--f-kr);font-weight:700}
-.a{display:block;margin-top:3px}
-.why{display:block;color:var(--muted);font-size:.9rem;margin-top:3px}
-.unsure{display:inline-block;font-size:.75rem;font-weight:800;background:var(--no-bg);color:var(--no);border-radius:5px;padding:1px 6px;margin-left:4px;vertical-align:1px}
-.mine{background:var(--warn-bg)}
-.mine .n{color:var(--no)}
+section{margin-bottom:36px;scroll-margin-top:130px}
+.cards{display:grid;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0}
+.card.mine{background:var(--warn-bg)}
+.top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.no-n{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.tag{font-size:.75rem;font-weight:800;border-radius:6px;padding:2px 8px;letter-spacing:.02em}
+.t-wrong{background:var(--no-bg);color:var(--no)}
+.t-right{background:var(--ok-bg);color:var(--ok)}
+.t-not{background:var(--num-bg);color:var(--num)}
+.t-fill{background:var(--accent-soft);color:var(--accent)}
+.t-mine{background:var(--no);color:#fff}
+.t-unsure{background:var(--line);color:var(--muted)}
+.kr{font-family:var(--f-kr);font-weight:700;font-size:1.05rem}
+.ru{color:var(--muted);margin-top:2px}
+.ans{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.lbl{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.akr{font-family:var(--f-kr);font-weight:800;color:var(--ok);font-size:1.05rem}
+.card[data-t="wrong"] .akr{color:var(--no)}
+.aru{font-weight:600}
+.why{margin-top:6px;font-size:.95rem}
 
-.ok{background:var(--ok-bg);color:var(--ok);font-weight:800;padding:0 5px;border-radius:5px;font-family:var(--f-kr)}
-.no{background:var(--no-bg);color:var(--no);text-decoration:line-through;text-decoration-thickness:2px;padding:0 5px;border-radius:5px;font-family:var(--f-kr)}
-.num{background:var(--num-bg);color:var(--num);font-weight:800;padding:0 5px;border-radius:5px;font-variant-numeric:tabular-nums}
-.kr{font-family:var(--f-kr)}
-.check{display:inline-block;font-size:.75rem;font-weight:800;background:var(--num-bg);color:var(--num);border-radius:5px;padding:1px 6px;margin-left:4px;vertical-align:1px}
-
-.traps{display:grid;gap:10px}
-.trap{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
-.trap b{display:block;margin-bottom:2px}
-
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.rules{display:grid;gap:10px}
 .tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
 table{border-collapse:collapse;width:100%;font-size:.95rem}
 td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
 tr:first-child td{border-top:0}
-td:first-child{font-family:var(--f-kr);font-weight:700;white-space:nowrap}
+td:first-child{font-family:var(--f-kr);font-weight:700}
+td.num{font-weight:800;color:var(--num);white-space:nowrap;font-variant-numeric:tabular-nums}
 
-/* режим самопроверки: ответы скрыты, тап — показать */
-body.quiz .a{filter:blur(7px);cursor:pointer;user-select:none;transition:filter .15s}
-body.quiz .a.shown{filter:none}
-@media (prefers-reduced-motion:reduce){body.quiz .a{transition:none}}
+body.quiz .ans{filter:blur(8px);cursor:pointer;user-select:none;transition:filter .15s}
+body.quiz .ans.shown{filter:none}
+body.onlymine .card:not(.mine){display:none}
+body.onlymine .nomine{display:none}
+@media (prefers-reduced-motion:reduce){body.quiz .ans{transition:none}}
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <h1>삼성생명 등록시험</h1>
-  <p class="sub">공통 1–20 и 생명보험 21–30. Ответы взяты из официальных разборов пробников и твоих записей.</p>
+  <h1>Шпаргалка к экзамену Samsung Life</h1>
+  <p class="sub">Общая часть (공통) 1–20 и страхование жизни (생명보험) 21–30. У каждого вопроса: корейский текст, как на экзамене, перевод, ответ и объяснение.</p>
 
   <div class="bar">
     <nav class="chips" aria-label="Разделы">
-      <a href="#traps">Ловушки</a>
-      <a href="#mine" class="hot">Мои ошибки</a>
-      <a href="#t21-c">2-1 공통</a>
-      <a href="#t21-l">2-1 생명</a>
-      <a href="#t9">9형</a>
-      <a href="#t17">17형</a>
-      <a href="#t18">18형</a>
-      <a href="#oct">Пробник 10월</a>
-      <a href="#notes">Из тетради</a>
-      <a href="#nums">Цифры</a>
+      <a href="#how">Как читать вопрос</a>
       <a href="#dict">Словарь</a>
+      <a href="#nums">Цифры</a>
+      <a href="#t21">Пробник 2-1</a>
+      <a href="#t9">Пробник 9형</a>
+      <a href="#t17">Пробник 17형</a>
+      <a href="#t18">Пробник 18형</a>
+      <a href="#oct">Пробник 10월</a>
     </nav>
     <div class="tools">
       <button id="quizBtn" type="button">Скрыть ответы</button>
-      <button id="showAll" type="button" class="ghost" hidden>Показать все</button>
-      <div class="legend"><span class="ok">верно</span><span class="no">ловушка</span><span class="num">цифра</span></div>
+      <button id="mineBtn" type="button" class="ghost">Только мои ошибки</button>
     </div>
   </div>
 
-  <section id="traps">
-    <h2>Ловушки</h2>
-    <p class="hint">Эти правила срабатывают на любом вопросе. Прочитай их перед экзаменом.</p>
-    <div class="traps">
-      <div class="trap"><b>Обведи слово в вопросе</b><span class="kr">틀린 · 아닌 · 해당하지 않는 · 거리가 먼</span> = ищем <b style="display:inline">неправильный</b> вариант.</div>
-      <div class="trap"><b>Подменили одно слово</b><span class="no">있어야</span> ↔ <span class="ok">없어야</span>, <span class="no">높다</span> ↔ <span class="ok">낮다</span>, <span class="no">근로</span> ↔ <span class="ok">사업</span>. Читай вариант до последнего слова.</div>
-      <div class="trap"><b>Подменили цифру</b><span class="num">1년 ↔ 2년</span> <span class="num">3개월 ↔ 6개월</span> <span class="num">2영업일 ↔ 3영업일</span></div>
-      <div class="trap"><b>Подменили, кто делает</b><span class="kr">보험회사 · 계약자 · 금융위원회 · 생명보험협회 · 금감원</span> — проверь, кто должен быть.</div>
-      <div class="trap"><b>만 · 모두 · 항상</b>Часто ошибка: «정액 클레임업무<span class="no">만</span>». Но <span class="kr">타인의 사망 → <span class="ok">반드시</span> 서면동의</span> — правда. Слово-ловушка — повод перечитать, а не готовый ответ.</div>
+  <section id="how" class="nomine">
+    <h2>Как читать вопрос</h2>
+    <p class="hint">Сначала найди в конце вопроса одно из этих слов. Оно говорит, что искать.</p>
+    <div class="tbl"><table>
+      <tr><td>틀린 것은?</td><td>Найди <b>НЕВЕРНОЕ</b> утверждение</td></tr>
+      <tr><td>잘못된 것은? · 옳지 않은 것은? · 맞지 않는 것은? · 바르지 못한 것은?</td><td>Тоже: найди <b>НЕВЕРНОЕ</b></td></tr>
+      <tr><td>맞는 것은? · 옳은 것은? · 알맞은 것은?</td><td>Найди <b>ВЕРНОЕ</b></td></tr>
+      <tr><td>아닌 것은? · 해당하지 않는 것은?</td><td>Найди то, что <b>НЕ относится</b></td></tr>
+      <tr><td>거리가 먼 것은?</td><td>Найди то, что <b>дальше всего</b> от сути</td></tr>
+      <tr><td>( ) 안에 들어갈 것은?</td><td>Что вставить <b>в скобки</b></td></tr>
+      <tr><td>합은?</td><td>Сложи числа — найди <b>сумму</b></td></tr>
+      <tr><td>모두 고른 것은?</td><td>Выбери <b>все</b> верные</td></tr>
+    </table></div>
+    <h3>Как ловят</h3>
+    <div class="rules">
+      <div class="box">Берут верную фразу и меняют <b>одно слово</b>: «должно быть» (있어야) на «не должно быть» (없어야), «дорого» (비싸다) на «дёшево» (저렴하다). Дочитывай вариант до конца.</div>
+      <div class="box">Меняют <b>цифру</b>: 2 года на 1 год, 6 месяцев на 3 месяца, 3 рабочих дня на 2.</div>
+      <div class="box">Меняют, <b>кто это делает</b>: страховая компания (보험회사), клиент (계약자), Комиссия по финансам (금융위원회), Ассоциация страховщиков (생명보험협회), Служба фин. надзора (금융감독원).</div>
+      <div class="box">Слова <b>«только»</b> (만), <b>«все»</b> (모두), <b>«всегда»</b> (항상) часто стоят в неверном варианте. Но не всегда: «обязательно (반드시) письменное согласие» — это правда.</div>
     </div>
   </section>
 
-  <section id="mine">
-    <h2>Мои ошибки в 2-1</h2>
-    <p class="hint">У тебя было 공통 9/20, 생명 6/10. Учи этот блок первым и повтори завтра в перерывах.</p>
-    <ul class="list">
-      <li class="mine"><span class="n">2</span><div class="body"><span class="q">피보험자 수</span><span class="a">Застрахованных может быть <span class="ok">2인 이상</span>, ограничения нет. <span class="no">1인으로 제한</span></span></div></li>
-      <li class="mine"><span class="n">6</span><div class="body"><span class="q">계약 전 알릴 의무</span><span class="a">보장개시 후 <span class="num">2년</span> без случая → расторгнуть нельзя. <span class="no">1년</span></span></div></li>
-      <li class="mine"><span class="n">7</span><div class="body"><span class="q">보험나이 재계산</span><span class="a">Каждый год по <span class="ok">계약해당일</span>. <span class="no">생일</span></span></div></li>
-      <li class="mine"><span class="n">10</span><div class="body"><span class="q">보험사기 인과관계</span><span class="a">기망·착오·처분행위 — 인과관계 <span class="ok">있어야</span>. <span class="no">없어야</span></span></div></li>
-      <li class="mine"><span class="n">11</span><div class="body"><span class="q">교차모집설계사</span><span class="a">Сказать клиенту «я 교차모집설계사» = <span class="ok">можно</span> (это 고지의무)</span></div></li>
-      <li class="mine"><span class="n">15</span><div class="body"><span class="q">광고심의</span><span class="a"><span class="ok">브랜드광고 — без 심의</span>. <span class="no">사전심의 원칙</span></span></div></li>
-      <li class="mine"><span class="n">16</span><div class="body"><span class="q">정기공시</span><span class="a">결산공시 <span class="num">3개월</span>, 분기 임시결산 <span class="num">2개월</span>. <span class="no">6개월 / 3개월</span></span></div></li>
-      <li class="mine"><span class="n">17</span><div class="body"><span class="q">금감원 민원 현황</span><span class="a">По <span class="ok">всем финансам</span> (은행, 금융투자…). <span class="no">보험업만</span></span></div></li>
-      <li class="mine"><span class="n">18</span><div class="body"><span class="q">월적립식 비과세 선납기간</span><span class="a"><span class="num">6개월</span> 이내. <span class="no">3개월</span></span></div></li>
-      <li class="mine"><span class="n">20</span><div class="body"><span class="q">기납부세액 공제</span><span class="a">В зачёт идёт <span class="ok">원천징수된 세액</span>. <span class="no">모집수당</span></span></div></li>
-      <li class="mine"><span class="n">22</span><div class="body"><span class="q">고지의무 — на ком?</span><span class="a">На <span class="ok">보험계약자</span>. <span class="no">보험회사</span></span></div></li>
-      <li class="mine"><span class="n">24</span><div class="body"><span class="q">금액이 계약시 확정</span><span class="a">= <span class="ok">정액보험</span></span></div></li>
-      <li class="mine"><span class="n">26</span><div class="body"><span class="q">장애인 가입</span><span class="a">Критерии <span class="ok">동일하다</span> (<span class="no">다르다</span>). Отказ без причины → <span class="ok">наказание</span> по 장애인차별금지법</span></div></li>
-      <li class="mine"><span class="n">27</span><div class="body"><span class="q">세제적격 연금저축</span><span class="a"><span class="ok">Возраст без ограничений</span>. 납입 <span class="num">5년</span>, лимит <span class="num">1,800만원</span>, <span class="ok">세액공제</span></span></div></li>
-    </ul>
-  </section>
-
-  <section id="t21-c">
-    <h2>Пробник 2-1 · 공통</h2>
-    <p class="hint">По официальному разбору. Жёлтая строка — там, где ты ошибся.</p>
-    <h3>보험이론 및 윤리 · 1–10</h3>
-    <ul class="list">
-      <li><span class="n">1</span><div class="body"><span class="q">Активы → чтобы хватило на выплаты</span><span class="a"><span class="ok">안정성</span> (보험업법 104조)</span></div></li>
-      <li class="mine"><span class="n">2</span><div class="body"><span class="q">보험계약 관계자</span><span class="a">계약자 и 피보험자 — <span class="ok">без ограничения числа</span>. 타인의 사망 = <span class="ok">반드시 서면동의</span>. Бизнес = 허가 금융위원회</span></div></li>
-      <li><span class="n">3</span><div class="body"><span class="q">무진단 + 1회 보험료 → 30일 молчат</span><span class="a"><span class="ok">승낙</span> 간주 (<span class="no">거절</span>). При 승낙 выдают 보험증권</span></div></li>
-      <li><span class="n">4</span><div class="body"><span class="q">보험금 지급기일</span><span class="a">Документы → <span class="num">3영업일</span> (<span class="no">2</span>) · проверка → <span class="num">10영업일</span> · дольше → <span class="num">30영업일</span></span></div></li>
-      <li><span class="n">5</span><div class="body"><span class="q">Сложный случай, до 50% заранее</span><span class="a"><span class="ok">보험금 가지급제도</span></span></div></li>
-      <li class="mine"><span class="n">6</span><div class="body"><span class="q">알릴 의무 위반 → 해지 불가</span><span class="a">보장개시 후 <span class="num">2년</span> без случая</span></div></li>
-      <li class="mine"><span class="n">7</span><div class="body"><span class="q">보험나이</span><span class="a">По <span class="ok">계약해당일</span>. 15세 미만 사망보험 = 무효. 6개월 미만 버림</span></div></li>
-      <li><span class="n">8</span><div class="body"><span class="q">체감성 위험</span><span class="a"><span class="ok">보험금 삭감</span> <span class="hint">(체<b>감</b> → 삭<b>감</b>)</span></span></div></li>
-      <li><span class="n">9</span><div class="body"><span class="q">3대 기본지키기</span><span class="a"><span class="ok">약관 교부·중요 내용 설명</span> + 청약서 부본 전달 + 자필서명</span></div></li>
-      <li class="mine"><span class="n">10</span><div class="body"><span class="q">보험사기 객관적 요건</span><span class="a">인과관계 <span class="ok">있어야</span></span></div></li>
-    </ul>
-    <h3>보험법규 · 11–20</h3>
-    <ul class="list">
-      <li class="mine"><span class="n">11</span><div class="body"><span class="q">교차모집 — НЕ запрещено</span><span class="a"><span class="ok">Сообщить, что ты 교차모집설계사</span></span></div></li>
-      <li><span class="n">12</span><div class="body"><span class="q">금융기관보험대리점 — нельзя</span><span class="a"><span class="ok">겸영여신업자</span>. Банк и 농협은행 — можно</span></div></li>
-      <li><span class="n">13</span><div class="body"><span class="q">특별이익 — подарок</span><span class="a">Меньшее из: <span class="num">10%</span> взносов за 1-й год или <span class="num">3만원</span>. 10만×12 = 120만 → 12만 vs 3만 → <span class="ok">3만원 законно</span></span></div></li>
-      <li><span class="n">14</span><div class="body"><span class="q">우수인증설계사</span><span class="a">법인대리점 — <span class="ok">не подходит</span>. Заявка <span class="ok">через 보험회사</span>. 유지율 <span class="num">89%</span> → <span class="ok">не проходит</span></span></div></li>
-      <li class="mine"><span class="n">15</span><div class="body"><span class="q">광고심의</span><span class="a"><span class="ok">브랜드광고 — без 심의</span></span></div></li>
-      <li class="mine"><span class="n">16</span><div class="body"><span class="q">정기공시</span><span class="a">결산공시 <span class="num">3개월</span> · 분기 <span class="num">2개월</span></span></div></li>
-      <li class="mine"><span class="n">17</span><div class="body"><span class="q">금감원 민원</span><span class="a"><span class="ok">Весь финансовый рынок</span></span></div></li>
-      <li class="mine"><span class="n">18</span><div class="body"><span class="q">월적립식 비과세</span><span class="a"><span class="num">5년</span> 이상 · 기본보험료 <span class="ok">균등</span> · 선납 <span class="num">6개월</span></span></div></li>
-      <li><span class="n">19</span><div class="body"><span class="q">5,000만 ~ 8,800만 원</span><span class="a"><span class="num">24%</span></span></div></li>
-      <li class="mine"><span class="n">20</span><div class="body"><span class="q">Налоги агента</span><span class="a">모집수당 <span class="num">3%</span> 원천징수 · <span class="num">5월</span> 신고, 사업+근로 <span class="ok">합산</span> · зачёт = <span class="ok">원천징수 세액</span></span></div></li>
-    </ul>
-  </section>
-
-  <section id="t21-l">
-    <h2>Пробник 2-1 · 생명보험</h2>
-    <ul class="list">
-      <li><span class="n">21</span><div class="body"><span class="q">보험업법 2조 보험상품</span><span class="a"><span class="ok">위험보장</span></span></div></li>
-      <li class="mine"><span class="n">22</span><div class="body"><span class="q">Юр. свойства договора</span><span class="a">고지의무 — на <span class="ok">계약자</span>. 불요식 → на деле 요식화 · 사행계약 · взнос ≠ условие заключения</span></div></li>
-      <li><span class="n">23</span><div class="body"><span class="q">기초서류</span><span class="a"><span class="ok">사업방법서 + 약관 + 보험료·해약환급금 산출방법서</span> — все три</span></div></li>
-      <li class="mine"><span class="n">24</span><div class="body"><span class="q">Виды страхования</span><span class="a">Сумма известна → <span class="ok">정액</span> · выплаты &gt; взносов → <span class="ok">저축성</span> · срок + смерть → <span class="ok">정기</span> · только если дожил → <span class="ok">생존보험</span></span></div></li>
-      <li><span class="n">25</span><div class="body"><span class="q">종신보험 보험료</span><span class="a"><span class="ok">비싸다</span> (<span class="no">저렴하다</span>)</span></div></li>
-      <li class="mine"><span class="n">26</span><div class="body"><span class="q">장애인</span><span class="a">Можно и в <span class="ok">обычное</span> · критерии <span class="ok">동일</span> · наказание за отказ · центр жалоб — <span class="ok">생명보험협회</span> (<span class="no">금융위원회</span>)</span></div></li>
-      <li class="mine"><span class="n">27</span><div class="body"><span class="q">연금저축</span><span class="a"><span class="num">5년</span> (<span class="no">7년</span>) · <span class="num">1,800만</span> (<span class="no">1,200만</span>) · <span class="ok">세액공제</span> · возраст без ограничений</span></div></li>
-      <li><span class="n">28</span><div class="body"><span class="q">퇴직연금</span><span class="a"><span class="ok">DB</span> = выплата известна заранее · <span class="ok">DC</span> = зависит от доходности · 자영업자 тоже</span></div></li>
-      <li><span class="n">29</span><div class="body"><span class="q">추가납입 + 중도인출 + 펀드</span><span class="a"><span class="ok">변액유니버설보험</span></span></div></li>
-      <li><span class="n">30</span><div class="body"><span class="q">연금계좌</span><span class="a"><span class="ok">세액공제</span> (<span class="no">소득공제</span>) до <span class="num">900만</span> с 퇴직연금 · 1주택 고령가구 추가납입 <span class="num">1억</span></span></div></li>
-    </ul>
-  </section>
-
-  <section id="t9">
-    <h2>Пробник 9형</h2>
-    <p class="hint">Официального разбора к этому пробнику нет, ответы мои. Где стоит <span class="unsure">не уверен</span>, сверь с учебником или спроси на курсе.</p>
-    <h3>공통 · 1–20</h3>
-    <ul class="list">
-      <li><span class="n">1</span><div class="body"><span class="q">톤틴연금 — верно</span><span class="a"><b>③</b> <span class="ok">Дал деньги государству → вместо процентов пожизненная пенсия</span><span class="why">Тонтину придумал итальянец Тонти, а не Паскаль. Взаимопомощь бедных — это другое (гильдии).</span></span></div></li>
-      <li><span class="n">2</span><div class="body"><span class="q">Не риск будущего (생애주기)</span><span class="a"><b>①</b> <span class="ok">물가하락</span><span class="why">Риск — это рост цен (물가상승). Болезнь и долгая жизнь (장수) — риски.</span></span></div></li>
-      <li><span class="n">3</span><div class="body"><span class="q">Расчёт 보험료 — верно</span><span class="a"><b>③</b> <span class="ok">현금흐름방식 сложнее и дороже</span><span class="why">Раньше считали по <span class="kr">3이원방식</span> (а в ① подставили 현금흐름). С 2010.4 ввели новый способ, но 3이원 <span class="no">не отменили полностью</span>.</span></span></div></li>
-      <li><span class="n">4</span><div class="body"><span class="q">보장개시일 обоих договоров</span><span class="a"><b>②</b> <span class="num">11월 9일</span><span class="why">Покрытие начинается с <span class="ok">1-го взноса</span>, даже если медосмотр позже. 무진단 — 8-го, 진단 — 9-го. Оба уже действуют 9-го.</span></span></div></li>
-      <li><span class="n">5</span><div class="body"><span class="q">한시장해 (временная инвалидность)</span><span class="a"><b>③</b> <span class="num">5년</span> 이상 → <span class="num">20%</span> от 장해지급률</span></div></li>
-      <li><span class="n">6</span><div class="body"><span class="q">납입최고 — верные</span><span class="a"><b>③</b> 가, 다, 라<span class="why">나 неверно: договор расторгается <span class="ok">на следующий день</span> после конца срока, а не в последний день. Срок: обычно <span class="num">14일</span>, договор до 1 года — <span class="num">7일</span>.</span></span></div></li>
-      <li><span class="n">7</span><div class="body"><span class="q">Изменение договора — верно</span><span class="a"><b>①</b> <span class="ok">Смена 수익자 — без согласия компании</span><span class="why">Смена 계약자 — <span class="no">нужно 승낙</span>. 보험종목 менять <span class="ok">можно</span>.</span></span></div></li>
-      <li><span class="n">8</span><div class="body"><span class="q">30년 11개월 — неверно</span><span class="a"><b>②</b> <span class="no">사망보험 무효</span><span class="why">보험나이 = <span class="num">31세</span> (11 месяцев ≥ 6 → +1 год). Недействительно только до 15 лет.</span></span></div></li>
-      <li><span class="n">9</span><div class="body"><span class="q">클레임 — неверно</span><span class="a"><b>③</b> <span class="no">Проверка дохода и образа жизни → 인수</span><span class="why">Это андеррайтинг, а не выплаты.</span></span></div></li>
-      <li><span class="n">10</span><div class="body"><span class="q">Вред от 보험사기 — неверно</span><span class="a"><b>②</b> <span class="no">공보험 не страдает</span><span class="why">Страдает: растут взносы, ухудшаются финансы гос. страхования, растут подражатели.</span></span></div></li>
-      <li><span class="n">11</span><div class="body"><span class="q">Регистрация агента — верно</span><span class="a"><b>②</b> <span class="ok">생명보험협회 по поручению 금융위원회</span><span class="why">Экзамен проводит <span class="ok">협회</span>, а не 금융위원회.</span></span></div></li>
-      <li><span class="n">12</span><div class="body"><span class="q">Регистрация/말소 — неверно</span><span class="a"><b>③</b> <span class="no">Сначала регистрация, потом обучение</span><span class="why">Порядок: <span class="ok">экзамен + обучение → регистрация</span>.</span></span></div></li>
-      <li><span class="n">13</span><div class="body"><span class="q">Банк-агент: НЕ запрещено</span><span class="a"><b>②</b> <span class="ok">Личные данные с согласия клиента</span><span class="why">Запрещено: продавать вне точки банка и включать взнос в кредит без согласия.</span></span></div></li>
-      <li><span class="n">14</span><div class="body"><span class="q">승환계약 — не наказывают</span><span class="a"><b>②</b> <span class="num">10건</span><span class="why">Исключения: <span class="ok">свой договор, супруг(а), родители</span> (4+3+3). Братья и сёстры — <span class="no">не исключение</span>.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">15</span><div class="body"><span class="q">우수인증 기준 — неверно</span><span class="a"><b>②</b> (подсчёт удержания)<span class="why">Точно верно: <span class="num">13회차 90%</span>, <span class="num">25회차 80%</span>, стаж в одной компании <span class="num">3년</span>.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">16</span><div class="body"><span class="q">광고심의 — неверно</span><span class="a"><b>③</b> <span class="no">Комиссия под 금감원</span><span class="why">광고심의위원회 находится в <span class="ok">생명보험협회</span>.</span></span></div></li>
-      <li><span class="n">17</span><div class="body"><span class="q">상품공시 — неверно</span><span class="a"><b>③</b> <span class="no">Состав 보험안내자료 — в 상법</span><span class="why">Это прописано в <span class="ok">보험업법</span>.</span></span></div></li>
-      <li><span class="n">18</span><div class="body"><span class="q">Вычет за 보장성 — неверно</span><span class="a"><b>③</b> <span class="no">14.5%</span><span class="why">Лимит <span class="num">100만원</span>: обычный — <span class="num">12%</span>, для инвалидов — <span class="num">15%</span>.</span></span></div></li>
-      <li><span class="n">19</span><div class="body"><span class="q">금융재산 상속공제, 3천만원</span><span class="a"><b>②</b> <span class="num">2,000만원</span><span class="why">До 2천만 — вычитают всё. От 2천만 до 1억 — <span class="num">2천만원</span>. Свыше — 20%.</span></span></div></li>
-      <li><span class="n">20</span><div class="body"><span class="q">Налоги агента — верные</span><span class="a"><b>③</b> (나), (다)<span class="why">(가) неверно: доход — <span class="ok">사업소득</span>, декларация в <span class="num">5월</span>.</span></span></div></li>
-    </ul>
-    <h3>생명보험 · 21–30</h3>
-    <ul class="list">
-      <li><span class="n">21</span><div class="body"><span class="q">Свойства договора — неверно</span><span class="a"><b>①</b> <span class="no">Срок короткий</span><span class="why">Страхование жизни — <span class="ok">долгосрочное</span>.</span></span></div></li>
-      <li><span class="n">22</span><div class="body"><span class="q">Свойства — верно</span><span class="a"><b>①</b> <span class="ok">사행계약성 — как лотерея</span><span class="why">편무 → <span class="ok">쌍무</span>; 부합 → защищают <span class="ok">계약자</span>; 요식 → <span class="ok">불요식</span>.</span></span></div></li>
-      <li><span class="n">23</span><div class="body"><span class="q">Особое условие с доплатой</span><span class="a"><b>③</b> <span class="ok">휴일재해보장특약</span><span class="why">Остальные — 제도성, бесплатные (전·연·우 + 선지급).</span></span></div></li>
-      <li><span class="n">24</span><div class="body"><span class="q">Выплаты ≤ взносов (보장성)</span><span class="a"><b>③</b> <span class="ok">상해보험</span></span></div></li>
-      <li><span class="n">25</span><div class="body"><span class="q">종신보험 — верно</span><span class="a"><b>③</b> <span class="ok">Много 특약 → 종합보장형</span><span class="why">종신 — <span class="no">не 저축성</span>, а 보장성. Срок задан — это 정기.</span></span></div></li>
-      <li><span class="n">26</span><div class="body"><span class="q">장애인전용 — неверно</span><span class="a"><b>②</b> <span class="no">Получил обычный вычет — второй нельзя</span><span class="why">Можно <span class="ok">оба</span>, каждый со своим лимитом.</span></span></div></li>
-      <li><span class="n">27</span><div class="body"><span class="q">연금보험 — неверно</span><span class="a"><b>①</b> <span class="no">Периоды пересекаются</span><span class="why">위험보장기간 и 연금지급기간 <span class="ok">разделены</span>.</span></span></div></li>
-      <li><span class="n">28</span><div class="body"><span class="q">세제적격 연금저축 — неверно</span><span class="a"><b>②</b> <span class="no">С 20 лет</span><span class="why">Возраст <span class="ok">без ограничений</span>. 5년, 세액공제, закон — <span class="ok">소득세법</span>.</span></span></div></li>
-      <li><span class="n">29</span><div class="body"><span class="q">변액유니버설 — неверно</span><span class="a"><b>②</b> <span class="no">После обязательного срока платить каждый месяц</span><span class="why">월대체보험료: взнос <span class="ok">списывают из накоплений</span>, договор живёт без платежей.</span></span></div></li>
-      <li><span class="n">30</span><div class="body"><span class="q">Продукты — неверно</span><span class="a"><b>④</b> <span class="no">기업형 IRP — до 5 человек</span><span class="why">Правильно: до <span class="num">10인 미만</span> (так в 17형 №28).</span></span></div></li>
-    </ul>
-  </section>
-
-  <section id="t17">
-    <h2>Пробник 17형</h2>
-    <p class="hint">Разбора нет, ответы мои.</p>
-    <h3>공통 · 1–20</h3>
-    <ul class="list">
-      <li><span class="n">1</span><div class="body"><span class="q">Не причина для 생명보험</span><span class="a"><b>①</b> <span class="no">Гос. соцзащиты достаточно</span><span class="why">Причины: её не хватает, 핵가족화, рост несчастных случаев и болезней.</span></span></div></li>
-      <li><span class="n">2</span><div class="body"><span class="q">Средний возраст (중년기)</span><span class="a"><b>①</b> <span class="ok">소득 &gt; 소비지출 → 잉여소득</span></span></div></li>
-      <li><span class="n">3</span><div class="body"><span class="q">단체취급 — неверно</span><span class="a"><b>②</b> <span class="no">3인 이상</span><span class="why">Обычно нужно <span class="num">5인 이상</span> из одной организации, один продукт.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">4</span><div class="body"><span class="q">약관 설명의무 — неверно</span><span class="a"><b>①</b> <span class="no">1년</span><span class="why">Не объяснили условия → отменить можно в течение <span class="num">3개월</span>.</span></span></div></li>
-      <li><span class="n">5</span><div class="body"><span class="q">알릴 의무 — неверно</span><span class="a"><b>③</b> <span class="no">계약자 + 수익자</span><span class="why">Обязаны: <span class="ok">계약자 + 피보험자</span>.</span></span></div></li>
-      <li><span class="n">6</span><div class="body"><span class="q">부당 계약전환 ( )+( )</span><span class="a"><b>①</b> <span class="num">1 + 1 = 2</span><span class="why">В пределах <span class="num">1개월</span> до или после — замена считается недобросовестной даже со сравнением.</span></span></div></li>
-      <li><span class="n">7</span><div class="body"><span class="q">Родился 2006.1.1 — неверно</span><span class="a"><b>①</b> <span class="no">С 2020.7.1 можно страховать смерть</span><span class="why">15 лет считают по <span class="ok">реальному возрасту</span>: 15 исполнится только 2021.1.1. 보험나이 15 — это неважно.</span></span></div></li>
-      <li><span class="n">8</span><div class="body"><span class="q">언더라이팅 — неверно</span><span class="a"><b>②</b> <span class="no">Медосмотр с работы не подходит</span><span class="why">Результат 건강검진 с работы <span class="ok">можно</span> использовать.</span></span></div></li>
-      <li><span class="n">9</span><div class="body"><span class="q">내부신고 — не нарушение</span><span class="a"><b>②</b> <span class="ok">Начальник велел проверить законность</span><span class="why">Требовать деньги и оплачивать клиенту взнос — нарушения.</span></span></div></li>
-      <li><span class="n">10</span><div class="body"><span class="q">Борьба с 보험사기 — неверно</span><span class="a"><b>①</b> (состав совета)<span class="why">Обучение и награды за сообщения — правда.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">11</span><div class="body"><span class="q">Регистрация — верно</span><span class="a"><b>②</b> <span class="ok">Опыт 1 год (за последние 3) + обучение</span><span class="why">Экзамен проводит <span class="no">не 금융위원회</span>.</span></span></div></li>
-      <li><span class="n">12</span><div class="body"><span class="q">Порядок регистрации</span><span class="a"><b>③</b> <span class="ok">экзамен + обучение → заявка в 협회 → регистрация + 위촉</span></span></div></li>
-      <li><span class="n">13</span><div class="body"><span class="q">Банк-агент — неверно</span><span class="a"><b>②</b> <span class="no">ВСЕ банки продают по телефону и с визитами</span><span class="why">Продают в точке банка (<span class="num">2인</span>) и через сайт. Телефон и визиты — только у карточных компаний.</span></span></div></li>
-      <li><span class="n">14</span><div class="body"><span class="q">공정경쟁 협정 — неверно</span><span class="a"><b>③</b> <span class="no">과태료</span><span class="why">Ассоциация берёт <span class="ok">제재금</span>. 과태료 выписывает государство.</span></span></div></li>
-      <li><span class="n">15</span><div class="body"><span class="q">Кто подходит под 우수인증</span><span class="a"><b>①</b> Доход <span class="num">4,000만원</span><span class="why">Нужно 0 случаев 불완전판매. 법인대리점 — не подходит.</span></span></div></li>
-      <li><span class="n">16</span><div class="body"><span class="q">광고심의 — неверно</span><span class="a"><b>②</b> <span class="no">금융위원회</span><span class="why">Проверяет <span class="ok">생명보험협회</span>.</span></span></div></li>
-      <li><span class="n">17</span><div class="body"><span class="q">상품공시 компании — неверно</span><span class="a"><b>②</b> (가격공시실)<span class="why">Сравнение цен ведёт <span class="ok">협회</span>, а не сама компания.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">18</span><div class="body"><span class="q">Сумма ставок вычета</span><span class="a"><b>②</b> <span class="num">12 + 15 = 27</span></span></div></li>
-      <li><span class="n">19</span><div class="body"><span class="q">Страховка умершего (он 계약자)</span><span class="a"><b>①</b> <span class="ok">상속재산</span></span></div></li>
-      <li><span class="n">20</span><div class="body"><span class="q">원천징수 агента</span><span class="a"><b>①</b> <span class="num">3%</span>, до <span class="num">10-го</span> следующего месяца</span></div></li>
-    </ul>
-    <h3>생명보험 · 21–30</h3>
-    <ul class="list">
-      <li><span class="n">21</span><div class="body"><span class="q">약관 и 상법</span><span class="a"><b>④</b> <span class="ok">표준약관, 확대</span><span class="why">Правила договора дают клиенту <span class="ok">больше</span> прав, чем 상법.</span></span></div></li>
-      <li><span class="n">22</span><div class="body"><span class="q">작성자 불이익 ← свойство</span><span class="a"><b>②</b> <span class="ok">부합계약성</span><span class="why">Текст пишет компания, клиент только присоединяется → спор толкуют против компании.</span></span></div></li>
-      <li><span class="n">23</span><div class="body"><span class="q">Без доплаты, для удобства</span><span class="a"><b>④</b> <span class="ok">제도성특약</span></span></div></li>
-      <li><span class="n">24</span><div class="body"><span class="q">НЕ 특별계정</span><span class="a"><b>④</b> <span class="ok">장기간병보험</span><span class="why">В 특별계정: 연금저축, 퇴직, 자산연계형, 변액.</span></span></div></li>
-      <li><span class="n">25</span><div class="body"><span class="q">종신보험 = ( ) + ( )</span><span class="a"><b>①</b> <span class="ok">사망, 보장성</span></span></div></li>
-      <li><span class="n">26</span><div class="body"><span class="q">НЕ нарушение 장애인차별금지법</span><span class="a"><b>③</b> <span class="ok">Отказ из-за рака за последние 2 года</span><span class="why">Это законная причина: отказ из-за здоровья, а не из-за инвалидности.</span></span></div></li>
-      <li><span class="n">27</span><div class="body"><span class="q">Сумма чисел</span><span class="a"><b>③</b> <span class="num">2 + 4 + 5 = 11</span><span class="why">연금지급기간 = 제<span class="num">2</span>보험기간 · инвалид-получатель: <span class="num">4천만원</span>/год без налога · 연금저축 10 → <span class="num">5</span>년.</span></span></div></li>
-      <li><span class="n">28</span><div class="body"><span class="q">퇴직연금 — неверно</span><span class="a"><b>④</b> <span class="no">공무원, 군인 — нельзя</span><span class="why">С 2017 года им <span class="ok">можно</span> открыть IRP. 기업형 IRP — до <span class="num">10인</span>.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">29</span><div class="body"><span class="q">변액 — верно</span><span class="a"><b>①</b> <span class="ok">Клиент сам выбирает фонд</span><span class="why">Фонд можно <span class="ok">менять</span>. Оценка <span class="ok">каждый день</span>, не раз в месяц.</span></span></div></li>
-      <li><span class="n">30</span><div class="body"><span class="q">Что зависит от доходности</span><span class="a"><b>②</b> <span class="ok">해약환급금, 보험금</span><span class="why">Взносы не меняются.</span></span></div></li>
-    </ul>
-  </section>
-
-  <section id="t18">
-    <h2>Пробник 18형</h2>
-    <p class="hint">Разбора нет, ответы мои.</p>
-    <h3>공통 · 1–20</h3>
-    <ul class="list">
-      <li><span class="n">1</span><div class="body"><span class="q">История — верно</span><span class="a"><b>②</b> <span class="ok">1998 — отозвали лицензии у 4 компаний</span><span class="why">Закон 금소법 — это <span class="num">2021</span>, то есть 2020-е.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">2</span><div class="body"><span class="q">Другое по смыслу</span><span class="a"><b>③</b> <span class="ok">납입기간</span><span class="why">위험기간 = 보험기간 — одно и то же.</span></span></div></li>
-      <li><span class="n">3</span><div class="body"><span class="q">НЕ условие для риска</span><span class="a"><b>③</b> <span class="ok">사업비 증액</span><span class="why">Условия: 보험금 삭감, 보험료 할증, 부담보.</span></span></div></li>
-      <li><span class="n">4</span><div class="body"><span class="q">НЕ недействительность</span><span class="a"><b>①</b> <span class="ok">Случай до 승낙</span><span class="why">Это просто отказ в выплате. 무효: до 15 лет, мошеннические цели.</span></span></div></li>
-      <li><span class="n">5</span><div class="body"><span class="q">Заявка на выплату — верно</span><span class="a"><b>②</b> <span class="ok">Право проверки в 약관, клиент помогает</span><span class="why">Справку дают и <span class="no">зарубежные</span> больницы. Требовать может и <span class="ok">представитель</span>.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">6</span><div class="body"><span class="q">통지의무 — неверно</span><span class="a"><b>②</b> <span class="no">Не сообщил адрес → компания не платит</span><span class="why">Уведомление на последний известный адрес <span class="ok">считается полученным</span>. От выплаты это не освобождает.</span></span></div></li>
-      <li><span class="n">7</span><div class="body"><span class="q">Изменение — верно</span><span class="a"><b>①</b> <span class="ok">수익자: без 승낙, но с письменным согласием 피보험자</span><span class="why">피보험자 менять <span class="no">нельзя</span>. Сумму менять <span class="ok">можно</span>.</span></span></div></li>
-      <li><span class="n">8</span><div class="body"><span class="q">Толкование 약관 — неверно</span><span class="a"><b>②</b> <span class="no">По-разному для разных клиентов</span><span class="why">Для всех <span class="ok">одинаково</span>.</span></span></div></li>
-      <li><span class="n">9</span><div class="body"><span class="q">클레임 — неверно</span><span class="a"><b>①</b> <span class="no">Ошибки почти не влияют на компанию</span></span></div></li>
-      <li><span class="n">10</span><div class="body"><span class="q">한국생명존중희망재단 — верно</span><span class="a"><b>③</b> <span class="ok">Учит замечать признаки суицида</span><span class="why">SOS-телефоны на мостах Ханган — это другой фонд (생보 사회공헌재단).</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">11</span><div class="body"><span class="q">Регистрацию отменяли 2+ раза</span><span class="a"><b>③</b> <span class="num">3년</span><span class="why">Один раз — <span class="num">2년</span>.</span></span></div></li>
-      <li><span class="n">12</span><div class="body"><span class="q">НЕ может быть банк-агентом</span><span class="a"><b>③</b> <span class="ok">우체국</span></span></div></li>
-      <li><span class="n">13</span><div class="body"><span class="q">공정경쟁 협정 — верно</span><span class="a"><b>①</b> <span class="ok">С разрешения 금융위원회</span><span class="why">Это 상호협정 между компаниями, на него нужен 인가.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">14</span><div class="body"><span class="q">우수인증 — верно</span><span class="a"><b>①</b> <span class="num">13회차 90%</span>, <span class="num">25회차 80%</span><span class="why">Сертификат даёт <span class="no">не 금융위원회</span>, а 협회.</span></span></div></li>
-      <li><span class="n">15</span><div class="body"><span class="q">금융분쟁조정 — неверно</span><span class="a"><b>③</b> <span class="no">Сильнее решения суда</span><span class="why">Если обе стороны согласились, это равно <span class="ok">재판상 화해</span>, а не выше суда. Срок составить 조정안 — <span class="num">60일</span>.</span></span></div></li>
-      <li><span class="n">16</span><div class="body"><span class="q">수시공시 — неверно</span><span class="a"><b>①</b> (раздача 보험안내자료)<span class="why">수시공시 — о крупных изменениях: имущество, долги, инвестиции. Рассылка буклетов — это 상품공시.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">17</span><div class="body"><span class="q">보험민원 — неверно</span><span class="a"><b>③</b> <span class="no">Жалобу подают в 생명보험협회</span><span class="why">Споры и жалобы рассматривает <span class="ok">금감원</span>.</span><span class="unsure">не уверен</span></span></div></li>
-      <li><span class="n">18</span><div class="body"><span class="q">연금보험 vs 연금저축 — неверно</span><span class="a"><b>③</b> <span class="no">Вид дохода перепутан</span><span class="why">연금보험 → <span class="ok">이자소득</span> (보험차익). 연금저축 → <span class="ok">연금소득</span>.</span></span></div></li>
-      <li><span class="n">19</span><div class="body"><span class="q">Когда декларация</span><span class="a"><b>①</b> <span class="num">5월 1일 ~ 31일</span></span></div></li>
-      <li><span class="n">20</span><div class="body"><span class="q">Виды дохода — верно</span><span class="a"><b>②</b> <span class="ok">모집수당 = 사업소득</span><span class="why">보험차익 → <span class="ok">이자소득</span>. Доход от фонда → <span class="ok">배당소득</span>.</span></span></div></li>
-    </ul>
-    <h3>생명보험 · 21–30</h3>
-    <ul class="list">
-      <li><span class="n">21</span><div class="body"><span class="q">Особенности 생명보험 — неверно</span><span class="a"><b>④</b> <span class="no">Ущерб имуществу — 실손</span><span class="why">Это 손해보험. Жизнь — <span class="ok">정액</span>.</span></span></div></li>
-      <li><span class="n">22</span><div class="body"><span class="q">Функции продукта — неверно</span><span class="a"><b>③</b> <span class="no">Компания подаёт заявку, клиент принимает</span><span class="why">Наоборот: <span class="ok">клиент — 청약, компания — 승낙</span>.</span></span></div></li>
-      <li><span class="n">23</span><div class="body"><span class="q">특약 — неверно</span><span class="a"><b>④</b> <span class="no">Можно только 특약 без основного</span></span></div></li>
-      <li><span class="n">24</span><div class="body"><span class="q">종신 vs 정기 — разница</span><span class="a"><b>②</b> <span class="ok">보험기간</span></span></div></li>
-      <li><span class="n">25</span><div class="body"><span class="q">종신 — неверно</span><span class="a"><b>②</b> <span class="no">Выплата при смерти ≤ взносов</span><span class="why">При смерти платят большую сумму. «≤ взносов» — это про выплаты <span class="ok">при жизни</span>.</span></span></div></li>
-      <li><span class="n">26</span><div class="body"><span class="q">장애인전용 — неверно</span><span class="a"><b>④</b> <span class="no">Страховку от рака оформить нельзя</span></span></div></li>
-      <li><span class="n">27</span><div class="body"><span class="q">연금 — неверно</span><span class="a"><b>③</b> <span class="no">확정연금형 платит только проценты</span><span class="why">Только проценты — это <span class="ok">상속연금형</span>. 확정 — фиксированный срок.</span></span></div></li>
-      <li><span class="n">28</span><div class="body"><span class="q">퇴직연금 — неверно</span><span class="a"><b>③</b> <span class="no">IRP открыть нельзя</span></span></div></li>
-      <li><span class="n">29</span><div class="body"><span class="q">변액 — верно</span><span class="a"><b>①</b> <span class="ok">При смерти — больше из (выплата, 기납입보험료)</span><span class="why">Цель — <span class="no">не стабильность</span>, а доходность. Отчёт — раз в <span class="ok">квартал</span>. У 적립형 и 보장형 расчёт <span class="ok">разный</span>.</span></span></div></li>
-      <li><span class="n">30</span><div class="body"><span class="q">Продукты — неверно</span><span class="a"><b>②</b> <span class="no">연금저축 — по 조세특례제한법</span><span class="why">Правильно: <span class="ok">소득세법</span>.</span></span></div></li>
-    </ul>
-  </section>
-
-  <section id="oct">
-    <h2>Пробник 10월</h2>
-    <ul class="list nonum">
-      <li><div class="body"><span class="q">종신형 연금 보험차익 비과세 한도</span><span class="a"><span class="ok">한도 없음</span></span></div></li>
-      <li><div class="body"><span class="q">보험나이 ( ) 합</span><span class="a"><span class="num">6</span> + <span class="num">6</span> + <span class="num">1</span> = <span class="num">13</span></span></div></li>
-      <li><div class="body"><span class="q">위험의 ( ): 인수 여부 / 요율 분류</span><span class="a"><span class="ok">선택</span> · <span class="ok">분류</span></span></div></li>
-      <li><div class="body"><span class="q">상품 신고 → куда</span><span class="a"><span class="ok">금융위원회</span> (<span class="no">생명보험협회</span>)</span></div></li>
-      <li><div class="body"><span class="q">연금전환특약</span><span class="a"><span class="ok">Без доплаты</span>, 제도성특약</span></div></li>
-      <li><div class="body"><span class="q">장애인전용보험 단체보험</span><span class="a"><span class="ok">Нет</span>. Бывает 보장성 и 저축성</span></div></li>
-      <li><div class="body"><span class="q">생존시 지급 없음</span><span class="a"><span class="ok">순수보장성</span></span></div></li>
-      <li><div class="body"><span class="q">Не добавляет покрытие</span><span class="a"><span class="ok">우량체할인특약</span></span></div></li>
-      <li><div class="body"><span class="q">퇴직연금사업자 — нет</span><span class="a"><span class="ok">우체국</span></span></div></li>
-      <li><div class="body"><span class="q">클레임</span><span class="a">정액 <span class="ok">и</span> 실손. <span class="no">정액만</span></span></div></li>
-      <li><div class="body"><span class="q">보험사기</span><span class="a"><span class="num">10년</span> 징역 или <span class="num">5천만원</span> · 광고 → <span class="num">3천만원</span></span></div></li>
-      <li><div class="body"><span class="q">주관적 요건 (не объективный)</span><span class="a"><span class="ok">고의 · 불법영득의사</span></span></div></li>
-      <li><div class="body"><span class="q">위촉 / 해촉</span><span class="a">Оба — с <span class="ok">보험회사</span> (<span class="no">보험협회</span>)</span></div></li>
-      <li><div class="body"><span class="q">교차모집 회사 — можно</span><span class="a"><span class="ok">자사 상품 교육</span></span></div></li>
-      <li><div class="body"><span class="q">상속순위</span><span class="a"><span class="ok">자녀·손자 → 부모·조부모 → 형제자매 → 4촌</span>. 배우자 вместе с 1-м или 2-м</span></div></li>
-      <li><div class="body"><span class="q">설계사 소득</span><span class="a"><span class="ok">사업소득</span> (<span class="no">근로소득</span>)</span></div></li>
-      <li><div class="body"><span class="q">작성자 불이익 원칙</span><span class="a">Спор → <span class="ok">против 보험회사</span></span></div></li>
-      <li><div class="body"><span class="q">피보험이익</span><span class="a"><span class="ok">Только вещи</span> (손해보험). <span class="no">사람</span></span></div></li>
-      <li><div class="body"><span class="q">상해보험 재해사망</span><span class="a"><span class="ok">Покрывает</span></span></div></li>
-      <li><div class="body"><span class="q">특화 질병보험 보험료</span><span class="a"><span class="ok">낮다</span> (<span class="no">높다</span>)</span></div></li>
-      <li><div class="body"><span class="q">암 입원 — срок закончился</span><span class="a">Лечение <span class="ok">продолжают оплачивать</span>. Осложнения — нет</span></div></li>
-      <li><div class="body"><span class="q">4세대 실손</span><span class="a"><span class="num">2021.7.1</span> (<span class="no">2018</span>) · <span class="ok">주계약 = 급여, 특약 = 비급여</span> · 도수치료 — в 특약</span></div></li>
-    </ul>
-  </section>
-
-  <section id="notes">
-    <h2>Из твоей тетради</h2>
-    <ul class="list nonum">
-      <li><div class="body"><span class="q">제도성 특약</span><span class="a">Запоминалка <span class="ok">전·연·우</span> = 전환, 연금전환, 우량체할인. <span class="no">휴일재해보장특약</span> — это покрытие</span></div></li>
-      <li><div class="body"><span class="q">종신보험 + 질병·간병</span><span class="a">Это <span class="ok">제3보험</span></span></div></li>
-      <li><div class="body"><span class="q">변액유니버설</span><span class="a">Ловушка была в слове <span class="no">않더라도</span></span></div></li>
-      <li><div class="body"><span class="q">IRP</span><span class="a">Открыть <span class="ok">можно</span> (<span class="no">불가</span>)</span></div></li>
-      <li><div class="body"><span class="q">퇴직연금사업자</span><span class="a"><span class="ok">금융투자회사 · 근로복지공단</span> — да. <span class="no">우체국</span></span></div></li>
-      <li><div class="body"><span class="q">언더라이팅 4 вида риска</span><span class="a"><span class="ok">신체적</span> возраст, болезни · <span class="ok">환경적</span> работа, алкоголь, курение · <span class="ok">도덕적</span> · <span class="ok">재정적</span> доход</span></div></li>
-      <li><div class="body"><span class="q">장애인 비과세 лимит в год</span><span class="a"><span class="num">4천만원</span> (<span class="no">3천만원</span> в тетради — ошибка). Подтверждает 17형 №27</span></div></li>
-      <li><div class="body"><span class="q">Какой закон</span><span class="a">Договор — <span class="ok">상법</span>, работа компаний и агентов — <span class="ok">보험업법</span><span class="check">сверь</span></span></div></li>
-    </ul>
-  </section>
-
-  <section id="nums">
-    <h2>Цифры</h2>
-    <p class="hint">Верхние — из пробников. С пометкой «сверь» — по памяти, проверь в учебнике.</p>
-    <div class="tbl"><table>
-      <tr><td>지급기일</td><td><span class="num">3 / 10 / 30</span> 영업일</td></tr>
-      <tr><td>알릴 의무 해지 불가</td><td><span class="num">2년</span> без случая</td></tr>
-      <tr><td>승낙 간주</td><td><span class="num">30일</span></td></tr>
-      <tr><td>가지급</td><td>до <span class="num">50%</span></td></tr>
-      <tr><td>특별이익</td><td><span class="num">10%</span> или <span class="num">3만원</span> — меньшее</td></tr>
-      <tr><td>공시</td><td>결산 <span class="num">3개월</span> · 분기 <span class="num">2개월</span></td></tr>
-      <tr><td>월적립식 비과세</td><td><span class="num">5년</span> · 선납 <span class="num">6개월</span> · <span class="num">150만원</span>/월</td></tr>
-      <tr><td>일시납 비과세</td><td><span class="num">1억</span></td></tr>
-      <tr><td>연금저축</td><td><span class="num">5년</span> · <span class="num">1,800만</span> · 공제 <span class="num">900만</span></td></tr>
-      <tr><td>세율</td><td>5,000만~8,800만 → <span class="num">24%</span></td></tr>
-      <tr><td>모집수당 원천징수</td><td><span class="num">3%</span></td></tr>
-      <tr><td>4세대 실손</td><td><span class="num">2021.7.1</span></td></tr>
-      <tr><td>장애인 수익자 증여세 비과세</td><td><span class="num">4천만원</span>/год</td></tr>
-      <tr><td>보장성 세액공제</td><td><span class="num">100만</span> · <span class="num">12%</span> · инвалиды <span class="num">15%</span></td></tr>
-      <tr><td>한시장해</td><td><span class="num">5년</span> → <span class="num">20%</span></td></tr>
-      <tr><td>금융재산 상속공제</td><td>до 2천 — всё · 2천~1억 — <span class="num">2천만</span></td></tr>
-      <tr><td>원천징수 신고</td><td>следующий месяц, до <span class="num">10일</span></td></tr>
-      <tr><td>설명의무 위반 취소</td><td><span class="num">3개월</span></td></tr>
-      <tr><td>부당 계약전환</td><td><span class="num">1개월</span> до / после</td></tr>
-      <tr><td>등록취소 후</td><td>1 раз <span class="num">2년</span> · 2+ раза <span class="num">3년</span></td></tr>
-      <tr><td>분쟁조정안</td><td><span class="num">60일</span></td></tr>
-      <tr><td>우수인증</td><td>13회차 <span class="num">90%</span> · 25회차 <span class="num">80%</span> · стаж <span class="num">3년</span></td></tr>
-      <tr><td>기업형 IRP</td><td><span class="num">10인 미만</span></td></tr>
-      <tr><td>보험사기</td><td><span class="num">10년</span> / <span class="num">5천만원</span></td></tr>
-      <tr><td>청약철회</td><td><span class="num">15일</span> / <span class="num">30일</span><span class="check">сверь</span></td></tr>
-      <tr><td>품질보증해지</td><td><span class="num">3개월</span><span class="check">сверь</span></td></tr>
-      <tr><td>납입최고</td><td><span class="num">14일</span> · до 1 года <span class="num">7일</span></td></tr>
-      <tr><td>부활</td><td><span class="num">3년</span><span class="check">сверь</span></td></tr>
-      <tr><td>자살 면책</td><td><span class="num">2년</span><span class="check">сверь</span></td></tr>
-      <tr><td>소멸시효</td><td><span class="num">3년</span><span class="check">сверь</span></td></tr>
-    </table></div>
-  </section>
-
-  <section id="dict">
+  <section id="dict" class="nomine">
     <h2>Словарь</h2>
+    <p class="hint">Слова, которые встречаются в каждом пробнике.</p>
     <div class="tbl"><table>
-      <tr><td>틀린 / 맞는 / 아닌</td><td>неверное / верное / не является</td></tr>
-      <tr><td>해당하지 않는</td><td>не относится</td></tr>
-      <tr><td>거리가 먼</td><td>далёкое от сути</td></tr>
-      <tr><td>있어야 / 없어야</td><td>должно быть / не должно быть</td></tr>
-      <tr><td>불가 / 가능</td><td>нельзя / можно</td></tr>
-      <tr><td>이내 / 이상 / 미만 / 초과</td><td>в пределах / от и больше / меньше / свыше</td></tr>
-      <tr><td>정액 / 실손</td><td>фиксированная сумма / фактический ущерб</td></tr>
-      <tr><td>주계약 / 특약</td><td>основной договор / доп. условие</td></tr>
-      <tr><td>계약자 / 피보험자 / 수익자</td><td>страхователь / застрахованный / получатель</td></tr>
-      <tr><td>청약 / 승낙 / 거절 / 철회</td><td>заявка / принятие / отказ / отзыв</td></tr>
-      <tr><td>해지 / 부활 / 갱신</td><td>расторжение / восстановление / продление</td></tr>
-      <tr><td>고지의무</td><td>обязанность сообщить правду</td></tr>
-      <tr><td>원천징수</td><td>налог удержан сразу</td></tr>
+      <tr><td>보험계약자 (계약자)</td><td>страхователь — кто заключает договор и платит</td></tr>
+      <tr><td>피보험자</td><td>застрахованный — чью жизнь страхуют</td></tr>
+      <tr><td>보험수익자 (수익자)</td><td>получатель выплаты</td></tr>
+      <tr><td>보험회사</td><td>страховая компания</td></tr>
+      <tr><td>보험설계사 (설계사)</td><td>страховой агент</td></tr>
+      <tr><td>청약 / 승낙 / 거절</td><td>заявка клиента / компания принимает / отказывает</td></tr>
+      <tr><td>보험료 / 보험금</td><td>взнос (платит клиент) / выплата (платит компания)</td></tr>
+      <tr><td>주계약 / 특약</td><td>основной договор / дополнительное условие</td></tr>
+      <tr><td>약관</td><td>правила договора</td></tr>
+      <tr><td>보험증권</td><td>страховой полис</td></tr>
+      <tr><td>해지 / 부활 / 무효</td><td>расторжение / восстановление / недействителен</td></tr>
+      <tr><td>보험나이</td><td>страховой возраст</td></tr>
+      <tr><td>계약 전 알릴 의무 (고지의무)</td><td>обязанность сказать правду о здоровье до договора</td></tr>
+      <tr><td>언더라이팅</td><td>андеррайтинг — проверка клиента: брать или нет</td></tr>
+      <tr><td>클레임</td><td>работа с выплатами</td></tr>
+      <tr><td>보험사기</td><td>страховое мошенничество</td></tr>
+      <tr><td>종신보험</td><td>пожизненное страхование (на случай смерти)</td></tr>
+      <tr><td>정기보험</td><td>срочное страхование (на определённый срок)</td></tr>
+      <tr><td>보장성 / 저축성</td><td>защитная / накопительная страховка</td></tr>
+      <tr><td>정액 / 실손</td><td>фиксированная сумма / по факту ущерба</td></tr>
+      <tr><td>연금보험 / 연금저축</td><td>пенсионная страховка / пенсионные накопления</td></tr>
+      <tr><td>퇴직연금</td><td>пенсия от работодателя</td></tr>
+      <tr><td>IRP</td><td>личный пенсионный счёт</td></tr>
+      <tr><td>변액보험</td><td>переменная страховка — выплата зависит от фонда</td></tr>
+      <tr><td>유니버설</td><td>универсальная — можно доплачивать и снимать</td></tr>
+      <tr><td>특별계정</td><td>отдельный инвестиционный счёт</td></tr>
+      <tr><td>장애인</td><td>человек с инвалидностью</td></tr>
       <tr><td>세액공제 / 소득공제</td><td>вычет из налога / вычет из дохода</td></tr>
-      <tr><td>비과세 / 과세</td><td>без налога / облагается</td></tr>
-      <tr><td>기납입보험료</td><td>уже уплаченные взносы</td></tr>
-      <tr><td>해약환급금</td><td>возврат при расторжении</td></tr>
-      <tr><td>책임준비금</td><td>резерв на выплаты</td></tr>
-      <tr><td>기초서류</td><td>основные документы продукта</td></tr>
+      <tr><td>비과세</td><td>без налога</td></tr>
+      <tr><td>원천징수</td><td>налог удерживают сразу при выплате</td></tr>
+      <tr><td>사업소득 / 근로소득</td><td>доход от бизнеса / зарплата</td></tr>
+      <tr><td>모집수당</td><td>комиссия агента за продажи</td></tr>
+      <tr><td>금융위원회</td><td>Комиссия по финансовым услугам (правительство)</td></tr>
+      <tr><td>금융감독원 (금감원)</td><td>Служба финансового надзора</td></tr>
+      <tr><td>생명보험협회 (협회)</td><td>Ассоциация страховщиков жизни</td></tr>
+      <tr><td>상법 / 보험업법</td><td>торговый кодекс / закон о страховом бизнесе</td></tr>
+      <tr><td>만원 / 억</td><td>10 000 вон / 100 000 000 вон</td></tr>
+      <tr><td>개월 / 년 / 일 / 영업일</td><td>месяц / год / день / рабочий день</td></tr>
+      <tr><td>이내 / 이상 / 미만 / 초과</td><td>в пределах / от и больше / меньше / больше</td></tr>
     </table></div>
   </section>
+
+  <section id="nums" class="nomine">
+    <h2>Цифры</h2>
+    <p class="hint">Их чаще всего подменяют.</p>
+    <div class="tbl"><table>
+      <tr><td>보험금 지급기일</td><td>Срок выплаты: обычно — 3 рабочих дня; если нужна проверка — 10; если дольше — 30</td><td class="num">3 · 10 · 30</td></tr>
+      <tr><td>승낙 간주</td><td>Компания молчит после заявки — договор считается принятым</td><td class="num">30 дней</td></tr>
+      <tr><td>계약 전 알릴 의무</td><td>Клиент соврал, но покрытие длилось без случаев — расторгнуть уже нельзя</td><td class="num">2 года</td></tr>
+      <tr><td>보험나이</td><td>Меньше 6 месяцев отбрасывают, 6 и больше — округляют до года</td><td class="num">6 мес.</td></tr>
+      <tr><td>만 15세 미만</td><td>Страховка на смерть ребёнка до 15 лет (реальный возраст) недействительна</td><td class="num">15 лет</td></tr>
+      <tr><td>납입최고</td><td>Срок напоминания о неуплате (договор до года — 7 дней)</td><td class="num">14 дней</td></tr>
+      <tr><td>가지급</td><td>Выплата авансом</td><td class="num">до 50%</td></tr>
+      <tr><td>약관 설명의무 위반</td><td>Не объяснили правила — клиент может отменить договор</td><td class="num">3 месяца</td></tr>
+      <tr><td>부당 계약전환</td><td>Замена старого договора на новый в этих пределах — нарушение</td><td class="num">1 месяц</td></tr>
+      <tr><td>특별이익</td><td>Подарок клиенту: меньшее из 10% взносов за 1-й год или 30 000 вон</td><td class="num">10% / 3만원</td></tr>
+      <tr><td>우수인증</td><td>Лучший агент: договоры живы на 13-й месяц — 90%, на 25-й — 80%; стаж 3 года</td><td class="num">90% · 80%</td></tr>
+      <tr><td>등록취소</td><td>Отмена регистрации: 1 раз — нельзя 2 года; 2 раза и больше — 3 года</td><td class="num">2 · 3 года</td></tr>
+      <tr><td>정기공시</td><td>Годовой отчёт — за 3 месяца, квартальный — за 2</td><td class="num">3 · 2 мес.</td></tr>
+      <tr><td>분쟁조정</td><td>Комиссия по спорам готовит решение</td><td class="num">60 дней</td></tr>
+      <tr><td>모집수당 원천징수</td><td>Налог с комиссии агента; сдают до 10-го числа следующего месяца</td><td class="num">3%</td></tr>
+      <tr><td>종합소득세 신고</td><td>Декларация о доходах</td><td class="num">май</td></tr>
+      <tr><td>세율 5,000만~8,800만원</td><td>Налог с дохода 50–88 млн вон</td><td class="num">24%</td></tr>
+      <tr><td>보장성 세액공제</td><td>Вычет за защитную страховку, лимит 1 млн вон; для инвалидов — 15%</td><td class="num">12% · 15%</td></tr>
+      <tr><td>장애인 수익자</td><td>Выплата получателю-инвалиду без налога на дарение, в год</td><td class="num">40 млн вон</td></tr>
+      <tr><td>월적립식 비과세</td><td>Ежемесячная накопительная без налога: платить от 5 лет, предоплата до 6 месяцев</td><td class="num">5 лет · 6 мес.</td></tr>
+      <tr><td>연금저축</td><td>Пенсионные накопления: платить от 5 лет, лимит 18 млн вон в год, вычет до 9 млн</td><td class="num">5 лет</td></tr>
+      <tr><td>기업형 IRP</td><td>Пенсионный счёт для маленьких фирм — меньше 10 работников</td><td class="num">10 чел.</td></tr>
+      <tr><td>한시장해</td><td>Временная инвалидность от 5 лет — платят 20% от ставки</td><td class="num">5 лет · 20%</td></tr>
+      <tr><td>4세대 실손</td><td>Медстраховка 4-го поколения введена</td><td class="num">1.7.2021</td></tr>
+      <tr><td>보험사기</td><td>Наказание за мошенничество: до 10 лет или до 50 млн вон</td><td class="num">10 лет</td></tr>
+    </table></div>
+  </section>
+
+  <div id="tests"></div>
 </div>
 
 <script>
-(function(){
-  var body=document.body, btn=document.getElementById('quizBtn'), all=document.getElementById('showAll');
-  function set(on){
-    body.classList.toggle('quiz',on);
-    btn.textContent=on?'Показать ответы':'Скрыть ответы';
-    all.hidden=!on;
-    if(!on) document.querySelectorAll('.a.shown').forEach(function(e){e.classList.remove('shown')});
-    try{localStorage.setItem('quiz',on?'1':'0')}catch(e){}
-  }
-  btn.addEventListener('click',function(){set(!body.classList.contains('quiz'))});
-  all.addEventListener('click',function(){document.querySelectorAll('.a').forEach(function(e){e.classList.add('shown')})});
-  document.addEventListener('click',function(e){
-    var a=e.target.closest('.a'); if(a&&body.classList.contains('quiz')) a.classList.toggle('shown');
+/* t: wrong = найди неверное, right = найди верное, not = не относится, fill = вставь/выбери.
+   k = корейский текст вопроса, r = перевод, a = ответ по-корейски, ar = перевод ответа, w = почему.
+   m = моя ошибка, u = я (Claude) не уверен в ответе. */
+var TESTS=[
+{id:"t21",title:"Пробник 2-1",hint:"Ответы из официального разбора — им можно верить. Жёлтые карточки — где ты ошибся.",parts:[
+["공통 1–10 · теория и этика",[
+{n:1,t:"fill",k:"생명보험자산의 운용원칙 — 보험금 지급에 지장이 없도록",r:"Деньги страховой надо вкладывать так, чтобы всегда хватило на выплаты. Какой это принцип?",a:"안정성",ar:"надёжность",w:"수익성 — доходность, 유동성 — чтобы быстро получить наличные. Здесь речь о надёжности."},
+{n:2,t:"wrong",m:1,k:"보험계약 관계자에 대한 설명으로 틀린 것은?",r:"Участники договора. Найди неверное.",a:"피보험자는 1인으로 제한된다",ar:"«застрахованный может быть только один»",w:"Застрахованных может быть несколько. Правда: страховка на смерть другого человека — обязательно (반드시) его письменное согласие."},
+{n:3,t:"right",k:"보험계약의 청약과 거절에 대한 맞는 설명은?",r:"Заявка и отказ. Найди верное.",a:"승낙한 때에는 보험증권을 교부한다",ar:"компания приняла договор — выдаёт полис",w:"Ловушка в другом варианте: если компания 30 дней молчит, договор считается принятым (승낙), а не отклонённым (거절)."},
+{n:4,t:"wrong",k:"보험금 지급기일 (가)(나)(다) — 틀린 것은?",r:"Сроки выплаты. Какая цифра неверная?",a:"(가) 2영업일",ar:"«2 рабочих дня»",w:"Правильно: 3 рабочих дня. С проверкой — 10. Дольше — 30."},
+{n:5,t:"fill",k:"보험금의 50% 이내를 미리 지급하고 확정시 정산하는 제도",r:"Платят до 50% заранее, потом пересчитывают. Как называется?",a:"보험금 가지급제도",ar:"авансовая выплата",w:"가지급 = выплата заранее."},
+{n:6,t:"wrong",m:1,k:"계약 전 알릴 의무에 대한 설명으로 틀린 것은?",r:"Обязанность сказать правду до договора. Найди неверное.",a:"보장개시일부터 1년이 지난 무진단 계약은 해지할 수 없다",ar:"«через 1 год расторгнуть нельзя»",w:"Правильно: 2 года (2년)."},
+{n:7,t:"wrong",m:1,k:"보험나이의 계산에 대한 설명으로 틀린 것은?",r:"Страховой возраст. Найди неверное.",a:"피보험자의 생일을 기준으로 매년 재계산된다",ar:"«пересчитывают каждый год в день рождения»",w:"Пересчитывают в годовщину договора (계약해당일), не в день рождения (생일)."},
+{n:8,t:"fill",k:"체감성 위험에 적용하는 인수 방법은?",r:"Риск, который со временем уменьшается. Как берут такого клиента?",a:"보험금 삭감",ar:"уменьшают выплату",w:"Подсказка: 체감 и 삭감 — оба на «감» (уменьшение)."},
+{n:9,t:"fill",k:"보험설계사가 준수해야 할 '3대 기본지키기'는?",r:"3 главных правила агента. Что из них?",a:"보험약관 교부 및 중요한 내용 설명",ar:"выдать правила договора и объяснить главное",w:"Все три: выдать 약관 и объяснить; отдать копию заявки (청약서 부본); клиент подписывает сам (자필서명)."},
+{n:10,t:"wrong",m:1,k:"보험사기의 객관적 구성요건 — 틀린 것은?",r:"Мошенничество: внешние признаки. Найди неверное.",a:"기망과 착오 및 처분행위 사이에 인과관계가 없어야 한다",ar:"«связи между обманом и действием быть НЕ должно»",w:"Связь ДОЛЖНА быть (있어야). 기망 — обман, 착오 — заблуждение, 처분행위 — жертва отдала деньги."}]],
+["공통 11–20 · законы",[
+{n:11,t:"not",m:1,k:"교차모집설계사의 금지사항에 해당하지 않는 것은?",r:"Агент продаёт продукты другой компании. Что ему НЕ запрещено?",a:"자신이 교차모집설계사임을 알리는 행위",ar:"сказать клиенту, кто он такой",w:"Это его обязанность. Запрещено: передавать данные одной компании другой; требовать доплату сверх комиссии."},
+{n:12,t:"not",k:"금융기관보험대리점으로 등록할 수 있는 기관이 아닌 것은?",r:"Кто НЕ может продавать страховку как банк-агент?",a:"겸영여신업자",ar:"компания, у которой кредиты — побочный бизнес",w:"Могут: банки (은행), 농협은행."},
+{n:13,t:"not",k:"특별이익 제공 금지행위에 해당하지 않는 것은?",r:"Подарки клиенту. Что НЕ нарушение?",a:"월 보험료 10만원 계약자에게 3만원 상당의 선물",ar:"подарок 30 000 вон клиенту со взносом 100 000 вон в месяц",w:"Можно: меньшее из 10% взносов за год и 3만원. 120만 × 10% = 12만; меньшее — 3만. Значит, можно."},
+{n:14,t:"right",k:"우수인증설계사 제도에 대한 맞는 설명은?",r:"Сертификат «лучший агент». Найди верное.",a:"유지율 13회차 89%, 25회차 89%는 기준을 충족하지 않는다",ar:"89% — не проходит",w:"Нужно 90% на 13-й месяц. Агент юр. агентства не подходит. Заявка — через свою компанию."},
+{n:15,t:"wrong",m:1,k:"생명보험 광고심의제도 — 틀린 것은?",r:"Проверка рекламы. Найди неверное.",a:"브랜드광고는 사전심의를 원칙으로 한다",ar:"«рекламу бренда проверяют заранее»",w:"Рекламу бренда НЕ проверяют."},
+{n:16,t:"right",m:1,k:"정기공시에 대한 맞는 설명은?",r:"Регулярные отчёты компании. Найди верное.",a:"결산공시와 분기별 임시결산공시가 있다",ar:"есть годовой и квартальный отчёт",w:"Ловушки: годовой — 3 месяца (не 6), квартальный — 2 месяца (не 3)."},
+{n:17,t:"wrong",m:1,k:"생명보험 민원에 대해 맞지 않는 것은?",r:"Жалобы. Найди неверное.",a:"금감원은 보험업 관련 금융민원 현황만 발표",ar:"«публикует жалобы только по страхованию»",w:"금감원 публикует жалобы по всем финансам: банки, инвестиции, страхование."},
+{n:18,t:"wrong",m:1,k:"월적립식 저축성보험의 비과세 요건 — 틀린 것은?",r:"Ежемесячная накопительная без налога. Какое условие неверное?",a:"(다) 3개월",ar:"«предоплата до 3 месяцев»",w:"Правильно: 6 месяцев. Платить 5 лет и больше, взнос одинаковый."},
+{n:19,t:"fill",k:"5,000만원 초과 8,800만원 이하 기본세율",r:"Налог на доход 50–88 млн вон?",a:"24%",ar:""},
+{n:20,t:"wrong",m:1,k:"보험설계사 '김생명' 세무처리 — 틀린 것은?",r:"Налоги агента. Найди неверное.",a:"공제받은 후의 모집수당은 기납부세액으로 공제된다",ar:"«в зачёт идёт сама комиссия»",w:"В зачёт идёт уже удержанный налог (원천징수된 세액). Правда: с комиссии удерживают 3%; в мае (5월) декларация; доход агента и зарплату складывают."}]],
+["생명보험 21–30",[
+{n:21,t:"fill",k:"보험상품이란 ( )을 목적으로…",r:"Страховой продукт — договор с целью ( )",a:"위험보장",ar:"защита от риска"},
+{n:22,t:"wrong",m:1,k:"생명보험계약의 법적 특성 — 틀린 것은?",r:"Юридические свойства договора. Найди неверное.",a:"보험회사에게 고지의무가 부과된다",ar:"«говорить правду обязана компания»",w:"Обязан клиент (계약자)."},
+{n:23,t:"wrong",k:"상품개발 원칙 — 틀린 것은?",r:"Разработка продукта. Найди неверное.",a:"보험약관, 산출방법서는 기초서류에 해당하지 않는다",ar:"«правила и расчёты — не основные документы»",w:"Основные документы — все три: план (사업방법서), правила (약관), расчёт взноса и возврата (산출방법서)."},
+{n:24,t:"right",m:1,k:"생명보험 상품에 대한 맞는 설명은?",r:"Виды страховки. Найди верное.",a:"보험금 액수가 계약시 확정 → 정액보험",ar:"сумма известна при заключении — фиксированная страховка",w:"Ловушки: выплаты при жизни больше взносов — накопительная (저축성); срок + смерть — срочная (정기); только если дожил — 생존보험."},
+{n:25,t:"wrong",k:"종신보험 — 틀린 것은?",r:"Пожизненная страховка. Найди неверное.",a:"보험료가 상대적으로 저렴하다",ar:"«она дешёвая»",w:"На всю жизнь, поэтому дорогая (비싸다)."},
+{n:26,t:"right",m:1,k:"장애인의 보험가입기준 및 절차 — 맞는 것은?",r:"Страховка для людей с инвалидностью. Найди верное.",a:"정당한 이유 없이 거절 → 장애인차별금지법에 따라 처벌",ar:"отказ без причины — наказание по закону",w:"Ловушки: могут и в обычную страховку; правила одинаковые (동일); центр жалоб — в Ассоциации (협회), не в 금융위원회."},
+{n:27,t:"right",m:1,k:"세제적격 연금저축 — 맞는 것은?",r:"Пенсионные накопления с налоговым вычетом. Найди верное.",a:"가입나이 제한이 없다",ar:"возраст не ограничен",w:"Ловушки: платить от 5 лет (не 7); лимит 18 млн вон (не 12); вычет из налога (세액공제)."},
+{n:28,t:"wrong",k:"퇴직연금제도 — 틀린 것은?",r:"Пенсия от работодателя. Найди неверное.",a:"확정급여형(DB)은 퇴직급여가 사전에 결정되지 않는다",ar:"«в DB сумма заранее не известна»",w:"DB — сумма известна заранее. DC — зависит от доходности."},
+{n:29,t:"fill",k:"추가납입·중도인출 + 펀드 실적에 따라 변동",r:"Можно доплачивать и снимать, выплата зависит от фонда.",a:"변액유니버설보험",ar:"переменная универсальная страховка"},
+{n:30,t:"wrong",k:"생명보험 상품 — 틀린 것은?",r:"Найди неверное.",a:"연금저축보험의 소득공제 한도는 900만원",ar:"«вычет из дохода»",w:"Правильно: вычет из налога (세액공제)."}]]
+]},
+
+{id:"t9",title:"Пробник 9형",hint:"Разбора нет — ответы нашёл я. Метка «не уверен» — сверь с учебником.",parts:[
+["공통 1–10",[
+{n:1,t:"right",k:"톤틴연금에 대한 설명으로 맞는 것은?",r:"Тонтина. Найди верное.",a:"국고에 자금을 융자 → 원리금 대신 종신연금",ar:"дал деньги государству — вместо возврата пожизненная пенсия",w:"Придумал итальянец Тонти, не Паскаль."},
+{n:2,t:"not",k:"생애주기의 미래 리스크에 해당하지 않는 것은?",r:"Что НЕ риск в жизни человека?",a:"물가하락",ar:"падение цен",w:"Риск — рост цен. Болезнь (질병) и долгая жизнь без денег (장수) — риски."},
+{n:3,t:"right",k:"보험료 산출에 대한 설명으로 맞는 것은?",r:"Расчёт взноса. Найди верное.",a:"현금흐름방식은 3이원방식보다 복잡하고 비용이 더 든다",ar:"новый способ сложнее и дороже старого",w:"Старый способ (3이원) в 2010 не отменили полностью."},
+{n:4,t:"fill",k:"보장개시일을 모두 포함하는 날짜는?",r:"Когда покрытие уже началось у обоих договоров?",a:"11월 9일",ar:"9 ноября",w:"Покрытие начинается в день первого взноса, даже если медосмотр позже."},
+{n:5,t:"fill",k:"한시적 장해 ( )년 이상 → 장해지급률의 ( )%",r:"Временная инвалидность от ( ) лет — платят ( )%",a:"5, 20",ar:"5 лет, 20%"},
+{n:6,t:"right",k:"납입최고(독촉)기간 — 맞는 것은?",r:"Срок напоминания о неуплате. Какие верные?",a:"가, 다, 라",ar:"",w:"Неверно только 나: договор расторгают на следующий день после конца срока."},
+{n:7,t:"right",k:"계약내용 변경 — 옳은 것은?",r:"Изменение договора. Найди верное.",a:"보험수익자 변경 — 보험회사의 승낙이 필요하지 않다",ar:"сменить получателя — согласие компании не нужно",w:"Сменить страхователя — нужно согласие компании."},
+{n:8,t:"wrong",k:"30년 11개월 '김생명' 보험나이 — 틀린 것은?",r:"Человеку 30 лет 11 месяцев. Найди неверное.",a:"사망 계약은 무효이다",ar:"«договор на смерть недействителен»",w:"Страховой возраст — 31. Недействителен только до 15 лет."},
+{n:9,t:"wrong",k:"클레임에 대한 설명으로 틀린 것은?",r:"Выплаты. Найди неверное.",a:"생활환경·소득 수준 확인 → 계약 인수",ar:"«проверяют доход и решают, брать ли клиента»",w:"Это андеррайтинг, а не выплаты."},
+{n:10,t:"wrong",k:"보험사기의 사회적 피해 — 틀린 것은?",r:"Вред от мошенничества. Найди неверное.",a:"공보험의 재정악화를 초래하지 않는다",ar:"«государственная страховка не страдает»",w:"Страдает."}]],
+["공통 11–20",[
+{n:11,t:"right",k:"생명보험설계사의 등록요건 — 맞는 것은?",r:"Регистрация агента. Найди верное.",a:"생명보험협회가 금융위원회로부터 위탁받아 수행",ar:"регистрирует Ассоциация по поручению Комиссии",w:"Экзамен проводит Ассоциация, не 금융위원회."},
+{n:12,t:"wrong",k:"등록 및 말소 — 틀린 것은?",r:"Регистрация и снятие. Найди неверное.",a:"시험 합격 및 등록 후 등록교육 이수",ar:"«сначала регистрация, потом обучение»",w:"Сначала экзамен и обучение, потом регистрация."},
+{n:13,t:"not",k:"금융기관보험대리점의 금지행위에 해당하지 않는 것은?",r:"Банк продаёт страховку. Что НЕ запрещено?",a:"미리 개인의 동의를 받고 개인정보 이용",ar:"использовать данные с согласия клиента"},
+{n:14,t:"fill",u:1,k:"승환계약 제재대상에서 제외되는 총 계약건수는?",r:"Сколько договоров не наказывают за «перезаключение»?",a:"10건",ar:"10 договоров",w:"Свои (4) + супруга (3) + родители (3). Братья и сёстры не входят."},
+{n:15,t:"wrong",u:1,k:"우수인증설계사 인증기준 — 틀린 것은?",r:"Сертификат «лучший агент». Найди неверное.",a:"② 유지율 산정 … 일시납 제외",ar:"вариант про подсчёт удержания",w:"Точно верно: 90% и 80%, стаж 3 года."},
+{n:16,t:"wrong",k:"광고심의제도 — 틀린 것은?",r:"Проверка рекламы. Найди неверное.",a:"광고심의위원회는 금융감독원 산하에 있다",ar:"«комиссия при 금감원»",w:"Комиссия — в Ассоциации (협회)."},
+{n:17,t:"wrong",k:"보험회사의 상품공시 — 틀린 것은?",r:"Публикация о продуктах. Найди неверное.",a:"보험안내자료 기재사항은 상법에서 정한다",ar:"«что писать в буклете — в торговом кодексе»",w:"Это в законе о страховом бизнесе (보험업법)."},
+{n:18,t:"wrong",k:"보장성보험 세액공제 (가)(나)(다) — 틀린 것은?",r:"Вычет за защитную страховку. Что неверно?",a:"(다) 14.5%",ar:"",w:"Правильно: 12% обычная, 15% для инвалидов."},
+{n:19,t:"fill",k:"순금융재산 3천만원 → 금융재산 상속공제",r:"Наследство: 30 млн вон в финансах. Сколько вычитают?",a:"2,000만원",ar:"20 млн вон",w:"До 20 млн — вычитают всё. От 20 до 100 млн — 20 млн."},
+{n:20,t:"right",k:"보험설계사의 세제 — 맞는 것을 모두 고른 것은?",r:"Налоги агента. Выбери все верные.",a:"(나), (다)",ar:"",w:"(가) неверно: доход агента — от бизнеса (사업소득), декларация в мае."}]],
+["생명보험 21–30",[
+{n:21,t:"wrong",k:"생명보험계약의 특성 — 틀린 것은?",r:"Свойства страховки жизни. Найди неверное.",a:"보험기간의 단기",ar:"«срок короткий»",w:"Страхование жизни — долгосрочное."},
+{n:22,t:"right",k:"생명보험계약의 특성 — 맞는 것은?",r:"Найди верное.",a:"사행계약성이 인정된다",ar:"похоже на лотерею",w:"Ловушки: 편무 — должно быть 쌍무 (обязанности у обеих сторон); 요식 — должно быть 불요식 (без особой формы)."},
+{n:23,t:"fill",k:"추가 보험료 납입의 부담이 있는 특약은?",r:"За какое доп. условие надо доплачивать?",a:"휴일재해보장특약",ar:"несчастные случаи в выходные",w:"Остальные — бесплатные служебные условия."},
+{n:24,t:"fill",k:"생존시 보험금 합계가 납입보험료를 초과하지 않는 상품은?",r:"Выплаты при жизни не больше взносов (защитная). Какая?",a:"상해보험",ar:"страхование от несчастных случаев"},
+{n:25,t:"right",k:"종신보험 — 맞는 것은?",r:"Пожизненная. Найди верное.",a:"다양한 특약 → 종합보장형 설계 가능",ar:"можно добавить много доп. условий"},
+{n:26,t:"wrong",k:"장애인전용보험 — 틀린 것은?",r:"Страховка для инвалидов. Найди неверное.",a:"일반보장성 공제를 받으면 장애인전용 공제는 받을 수 없다",ar:"«получил обычный вычет — второй нельзя»",w:"Можно оба."},
+{n:27,t:"wrong",k:"일반적인 연금보험 — 틀린 것은?",r:"Пенсионная страховка. Найди неверное.",a:"위험보장기간과 연금지급기간은 중복된다",ar:"«период защиты и период выплат совпадают»",w:"Они разделены: сначала защита, потом выплаты."},
+{n:28,t:"wrong",k:"세제적격 연금저축 — 틀린 것은?",r:"Пенсионные накопления. Найди неверное.",a:"가입나이는 만 20세 이상",ar:"«с 20 лет»",w:"Возраст без ограничений."},
+{n:29,t:"wrong",k:"변액유니버설보험 — 틀린 것은?",r:"Найди неверное.",a:"의무납입기간 이후 매월 납입해야 유지된다",ar:"«после обязательного срока надо платить каждый месяц»",w:"Взнос берут из накоплений, платить не обязательно."},
+{n:30,t:"wrong",k:"생명보험 상품 — 틀린 것은?",r:"Найди неверное.",a:"기업형 IRP는 상시근로자 5인 미만",ar:"«для фирм до 5 человек»",w:"Правильно: меньше 10 человек."}]]
+]},
+
+{id:"t17",title:"Пробник 17형",hint:"Разбора нет — ответы нашёл я.",parts:[
+["공통 1–10",[
+{n:1,t:"not",k:"생명보험을 필요로 하는 사회적 배경에 해당하지 않는 것은?",r:"Что НЕ причина, почему нужна страховка жизни?",a:"충분한 공적 사회보장체계",ar:"достаточная гос. соцзащита",w:"Страховка нужна, потому что соцзащиты НЕ хватает."},
+{n:2,t:"fill",k:"중년기에는 (가)이 (나)보다 많아 (다)이 발생",r:"В среднем возрасте ( ) больше ( ), поэтому есть ( )",a:"소득, 소비지출, 잉여소득",ar:"доход больше расходов — лишние деньги"},
+{n:3,t:"wrong",u:1,k:"보험계약의 단체취급 — 틀린 것은?",r:"Групповое оформление. Найди неверное.",a:"계약자 또는 피보험자 3인 이상",ar:"«от 3 человек»",w:"Насколько я знаю, нужно от 5 человек."},
+{n:4,t:"wrong",k:"보험약관의 설명의무 — 틀린 것은?",r:"Обязанность объяснить правила. Найди неверное.",a:"1년 이내에 계약을 취소할 수 있다",ar:"«отменить в течение 1 года»",w:"Правильно: 3 месяца."},
+{n:5,t:"wrong",k:"계약 전 알릴 의무 — 틀린 것은?",r:"Сказать правду до договора. Найди неверное.",a:"알릴 의무자는 보험계약자와 보험수익자",ar:"«обязаны страхователь и получатель»",w:"Обязаны страхователь и застрахованный (피보험자)."},
+{n:6,t:"fill",k:"부당한 계약전환 ( )개월 + ( )개월의 합",r:"Недобросовестная замена договора: сумма месяцев",a:"2",ar:"1 + 1"},
+{n:7,t:"wrong",k:"2006년 1월 1일생 — 잘못된 것은?",r:"Родился 1.1.2006. Найди неверное.",a:"2020년 7월 1일부터 사망 담보 피보험자가 가능하다",ar:"«с 1.7.2020 можно страховать на смерть»",w:"15 лет считают по реальному возрасту: исполнится только 1.1.2021."},
+{n:8,t:"wrong",k:"언더라이팅 — 틀린 것은?",r:"Андеррайтинг. Найди неверное.",a:"직장 건강검진 결과로 대신할 수 없다",ar:"«медосмотр с работы не подходит»",w:"Подходит."},
+{n:9,t:"not",k:"내부신고제도 신고대상 행위가 아닌 것은?",r:"Что НЕ нарушение для внутренней жалобы?",a:"② 위법성 검토 지시를 받았다",ar:"начальник попросил проверить законность"},
+{n:10,t:"wrong",u:1,k:"생·손보협회의 보험사기 방지활동 — 바르지 못한 것은?",r:"Борьба с мошенничеством. Найди неверное.",a:"①",ar:"про совет по расследованию"}]],
+["공통 11–20",[
+{n:11,t:"right",k:"생명보험설계사의 등록요건 — 맞는 것은?",r:"Регистрация. Найди верное.",a:"생명보험 업무 1년 이상(3년 이내) + 교육 이수",ar:"опыт 1 год (за последние 3 года) + обучение"},
+{n:12,t:"fill",k:"보험설계사 등록절차 순서",r:"Порядок регистрации",a:"시험합격·교육 → 협회 등록신청 → 등록·위촉계약",ar:"экзамен и обучение → заявка → регистрация и договор с компанией"},
+{n:13,t:"wrong",k:"금융기관보험대리점의 모집방법 — 틀린 것은?",r:"Как банк продаёт страховку. Найди неверное.",a:"모든 대리점이 전화·우편·방문판매 가능",ar:"«все банки — по телефону и на дому»",w:"Банки — в отделении и через сайт. По телефону — только карточные компании."},
+{n:14,t:"wrong",k:"공정경쟁질서 유지에 관한 협정 — 틀린 것은?",r:"Соглашение о честной конкуренции. Найди неверное.",a:"과태료를 부과한다",ar:"«назначают государственный штраф»",w:"Ассоциация берёт 제재금 (санкция по соглашению)."},
+{n:15,t:"fill",k:"우수인증설계사 인증기준에 해당하는 자는?",r:"Кто подходит под «лучшего агента»?",a:"연간소득 4,000만원 이상",ar:"доход от 40 млн вон в год",w:"Плохих продаж не должно быть ни одной."},
+{n:16,t:"wrong",k:"생명보험 광고심의절차 — 틀린 것은?",r:"Проверка рекламы. Найди неверное.",a:"금융위원회가 심의 후 결과를 통보",ar:"«проверяет Комиссия»",w:"Проверяет Ассоциация."},
+{n:17,t:"wrong",u:1,k:"보험회사의 상품공시 — 틀린 것은?",r:"Публикация продуктов компанией. Найди неверное.",a:"② 가격공시실",ar:"сравнение цен",w:"Сравнение цен ведёт Ассоциация, а не сама компания."},
+{n:18,t:"fill",k:"세액공제 ( )% + ( )%의 합",r:"Сумма двух ставок вычета",a:"27",ar:"12 + 15"},
+{n:19,t:"fill",k:"피상속인이 계약자인 사망보험금은 ( )으로 본다",r:"Умерший сам платил взносы. Выплата считается…",a:"상속재산",ar:"наследством"},
+{n:20,t:"fill",k:"모집수당 (가)% 원천징수, 다음달 (나)일까지 납부",r:"Налог с комиссии: ( )%, сдать до ( )-го числа",a:"3, 10",ar:"3%, до 10-го"}]],
+["생명보험 21–30",[
+{n:21,t:"fill",k:"생명보험 (가)은 상법보다 계약자의 권리를 (나)",r:"Стандартные правила по сравнению с кодексом…",a:"표준약관, 확대",ar:"дают клиенту больше прав"},
+{n:22,t:"fill",k:"작성자 불이익의 원칙이 적용되는 특성은?",r:"Какое свойство договора даёт правило «против составителя»?",a:"부합계약성",ar:"договор присоединения",w:"Текст пишет компания, клиент только подписывает."},
+{n:23,t:"fill",k:"보험료 부담 없이 편의성을 위한 ( )",r:"Доп. условие без доплаты, для удобства",a:"제도성특약",ar:"служебное доп. условие"},
+{n:24,t:"not",k:"특별계정에서 운영되는 상품이 아닌 것은?",r:"Что НЕ ведут на отдельном инвестиционном счёте?",a:"장기간병보험",ar:"страхование долгосрочного ухода"},
+{n:25,t:"fill",k:"종신보험은 (가)을 보장하는 (나) 상품",r:"Пожизненная страховка защищает от ( ), это ( )",a:"사망, 보장성보험",ar:"смерти, защитная"},
+{n:26,t:"not",k:"장애인 차별 위반행위에 해당하지 않는 것은?",r:"Что НЕ дискриминация инвалида?",a:"최근 2년 이내 암 경력으로 거절",ar:"отказ из-за рака за последние 2 года",w:"Это отказ из-за здоровья — законно."},
+{n:27,t:"fill",k:"제( )보험기간 + 연간 ( )천만원 + ( )년의 합",r:"Сумма трёх чисел",a:"11",ar:"2 + 4 + 5",w:"Выплата пенсии — 2-й период. Инвалид-получатель — 40 млн вон без налога. 연금저축 сократили с 10 до 5 лет."},
+{n:28,t:"wrong",u:1,k:"퇴직연금 — 틀린 것은?",r:"Пенсия от работодателя. Найди неверное.",a:"공무원, 군인은 가입할 수 없다",ar:"«госслужащие и военные не могут»",w:"С 2017 года они могут открыть IRP."},
+{n:29,t:"right",k:"변액보험 — 맞는 것은?",r:"Найди верное.",a:"계약자는 펀드를 직접 선택하여 운용",ar:"клиент сам выбирает фонд"},
+{n:30,t:"fill",k:"투자실적에 따라 변동되는 항목",r:"Что меняется от доходности фонда?",a:"해약환급금, 보험금",ar:"возврат при расторжении и выплата"}]]
+]},
+
+{id:"t18",title:"Пробник 18형",hint:"Разбора нет — ответы нашёл я.",parts:[
+["공통 1–10",[
+{n:1,t:"right",u:1,k:"우리나라 생명보험의 역사 — 맞는 것은?",r:"История страхования в Корее. Найди верное.",a:"1998년 4개 생명보험회사의 허가 취소",ar:"в 1998 у 4 компаний отобрали лицензию"},
+{n:2,t:"not",k:"의미가 다른 것은?",r:"Какое слово значит другое?",a:"납입기간",ar:"период оплаты",w:"위험기간 и 보험기간 — одно и то же."},
+{n:3,t:"not",k:"위험정도에 따라 붙일 수 있는 조건이 아닌 것은?",r:"Что НЕ условие для рискованного клиента?",a:"사업비 증액",ar:"рост расходов компании",w:"Условия: меньше выплата, выше взнос, исключить часть."},
+{n:4,t:"not",k:"보험계약이 무효가 되는 경우가 아닌 것은?",r:"Когда договор НЕ недействителен?",a:"① 승낙 전 보험사고",ar:"случай до принятия договора"},
+{n:5,t:"right",u:1,k:"보험금 청구와 지급 — 맞는 것은?",r:"Заявка на выплату. Найди верное.",a:"② 약관에 회사의 조사권, 계약자 협조",ar:"в правилах есть право проверки, клиент помогает"},
+{n:6,t:"wrong",k:"통지의무(계약 후 알릴 의무) — 틀린 것은?",r:"Сообщать об изменениях после договора. Найди неверное.",a:"통지의무 위반 → 보험금 지급책임 면제",ar:"«не сообщил адрес — компания не платит»",w:"Письмо на последний известный адрес считается доставленным. Это не освобождает от выплаты."},
+{n:7,t:"right",k:"계약내용 변경 — 옳은 것은?",r:"Изменение договора. Найди верное.",a:"수익자 변경: 승낙 불필요, 피보험자 서면 동의 필요",ar:"сменить получателя: без согласия компании, но с письменным согласием застрахованного"},
+{n:8,t:"wrong",k:"약관의 해석 — 틀린 것은?",r:"Толкование правил. Найди неверное.",a:"계약자에 따라 다르게 해석한다",ar:"«толкуют по-разному для разных клиентов»"},
+{n:9,t:"wrong",k:"클레임 업무 — 틀린 것은?",r:"Работа с выплатами. Найди неверное.",a:"잘못 처리되어도 경영에 미치는 영향은 미미하다",ar:"«ошибки почти не влияют на компанию»"},
+{n:10,t:"right",u:1,k:"한국생명존중희망재단 — 옳은 것은?",r:"Фонд защиты жизни. Найди верное.",a:"③ 자살징후 발견·대응 교육프로그램",ar:"учит замечать признаки суицида"}]],
+["공통 11–20",[
+{n:11,t:"fill",k:"등록취소 2회 이상 → 최종 처분 후 ( )년",r:"Регистрацию отменяли 2 раза и больше. Сколько лет нельзя?",a:"3년",ar:"3 года",w:"Один раз — 2 года."},
+{n:12,t:"not",k:"금융기관보험대리점으로 등록할 수 없는 기관은?",r:"Кто НЕ может продавать страховку как банк-агент?",a:"우체국",ar:"почта"},
+{n:13,t:"right",u:1,k:"공정경쟁질서 협정 — 맞는 것은?",r:"Соглашение о конкуренции. Найди верное.",a:"금융위원회의 인가를 받아 시행",ar:"действует с разрешения Комиссии"},
+{n:14,t:"right",k:"우수인증설계사 인증 — 맞는 것은?",r:"«Лучший агент». Найди верное.",a:"유지율 13회차 90%, 25회차 80% 이상",ar:"90% и 80%",w:"Сертификат даёт Ассоциация, не 금융위원회."},
+{n:15,t:"wrong",k:"금융분쟁조정위원회 — 틀린 것은?",r:"Комиссия по спорам. Найди неверное.",a:"조정안은 법원의 재판결과에 우선한다",ar:"«решение комиссии сильнее суда»",w:"Оно равно мировому соглашению в суде, но не выше суда."},
+{n:16,t:"wrong",u:1,k:"수시공시 — 틀린 것은?",r:"Срочные отчёты. Найди неверное.",a:"① 홈페이지 보험안내자료 제공",ar:"«раздача буклетов на сайте»",w:"Срочные отчёты — о крупных изменениях в деньгах компании."},
+{n:17,t:"wrong",u:1,k:"보험민원 — 틀린 것은?",r:"Жалобы. Найди неверное.",a:"③ 생명보험협회에 민원 접수",ar:"«жалобы принимает Ассоциация»",w:"Жалобы — в 금감원."},
+{n:18,t:"wrong",k:"연금보험 vs 연금저축 비교 — 틀린 것은?",r:"Сравнение. Найди неверное.",a:"③ 소득구분",ar:"вид дохода перепутан",w:"연금보험 — процентный доход (이자소득). 연금저축 — пенсионный (연금소득)."},
+{n:19,t:"fill",k:"종합소득세 신고·납부기간",r:"Когда подают декларацию?",a:"다음연도 5월 1일 ~ 31일",ar:"1–31 мая следующего года"},
+{n:20,t:"right",k:"소득별 과세소득 분류 — 맞는 것은?",r:"Виды дохода. Найди верное.",a:"보험설계사의 모집수당 – 사업소득",ar:"комиссия агента — доход от бизнеса",w:"Доход от страховки — процентный. От фонда — дивидендный."}]],
+["생명보험 21–30",[
+{n:21,t:"wrong",k:"생명보험계약의 특징 — 틀린 것은?",r:"Найди неверное.",a:"재산상의 손해는 실손보상한다",ar:"«ущерб имуществу — по факту»",w:"Это про страхование имущества (손해보험), не жизни."},
+{n:22,t:"wrong",k:"생명보험 상품의 기능적 특성 — 틀린 것은?",r:"Найди неверное.",a:"보험회사가 청약하고 계약자가 승낙",ar:"«компания подаёт заявку, клиент принимает»",w:"Наоборот: заявку подаёт клиент."},
+{n:23,t:"wrong",k:"특약 — 틀린 것은?",r:"Доп. условия. Найди неверное.",a:"주계약 없이 특약만 가입 가능",ar:"«можно купить только доп. условие»"},
+{n:24,t:"fill",k:"종신보험과 정기보험의 차이점",r:"Чем отличаются пожизненная и срочная?",a:"보험기간",ar:"сроком страховки"},
+{n:25,t:"wrong",k:"종신보험 — 틀린 것은?",r:"Пожизненная. Найди неверное.",a:"사망보험금은 납입보험료를 초과하지 않는다",ar:"«выплата при смерти не больше взносов»"},
+{n:26,t:"wrong",k:"장애인전용보험 — 틀린 것은?",r:"Страховка для инвалидов. Найди неверное.",a:"암보험 가입은 불가능하다",ar:"«страховку от рака нельзя»"},
+{n:27,t:"wrong",k:"연금보험 — 틀린 것은?",r:"Пенсионная. Найди неверное.",a:"확정연금형은 적립금의 이자만 지급",ar:"«фиксированная пенсия платит только проценты»",w:"Только проценты — это 상속연금형 (наследуемая)."},
+{n:28,t:"wrong",k:"퇴직연금 — 틀린 것은?",r:"Найди неверное.",a:"퇴직연금 가입자는 IRP 가입이 불가하다",ar:"«IRP открыть нельзя»"},
+{n:29,t:"right",k:"변액보험 — 맞는 것은?",r:"Найди верное.",a:"저축성 변액: 사망보험금과 기납입보험료 중 큰 금액 지급",ar:"при смерти платят большее: выплату или внесённые взносы"},
+{n:30,t:"wrong",k:"생명보험 상품 — 틀린 것은?",r:"Найди неверное.",a:"세제적격 연금저축의 근거법령은 조세특례제한법",ar:"«закон — о налоговых льготах»",w:"Правильно: закон о подоходном налоге (소득세법)."}]]
+]},
+
+{id:"oct",title:"Пробник 10월",hint:"Ответы отметили в группе — им можно верить.",parts:[
+["Вопросы",[
+{n:1,t:"fill",k:"종신형 연금보험의 보험차익 비과세 한도",r:"Пожизненная пенсионная страховка: лимит без налога?",a:"한도없음",ar:"лимита нет"},
+{n:2,t:"fill",k:"보험나이 ( )개월 미만 버림, ( )개월 이상 ( )년 — 합",r:"Сумма чисел в правиле страхового возраста",a:"13",ar:"6 + 6 + 1"},
+{n:3,t:"fill",k:"위험의 ( ): 심사·분석 → 인수 여부 / 위험의 ( ): 요율 위해 분류",r:"Риск: ( ) — брать или нет; ( ) — для тарифа",a:"선택, 분류",ar:"выбор, классификация"},
+{n:4,t:"wrong",k:"상품 개발원칙 — 잘못된 것은?",r:"Разработка продукта. Найди неверное.",a:"신고사항 → 생명보험협회에 신고",ar:"«сообщают в Ассоциацию»",w:"Сообщают в 금융위원회."},
+{n:5,t:"wrong",k:"보험계약의 특약 — 틀린 것은?",r:"Доп. условия. Найди неверное.",a:"연금전환특약은 추가로 보험료를 납입해야 한다",ar:"«за перевод в пенсию надо доплатить»",w:"Это бесплатное служебное условие."},
+{n:6,t:"wrong",k:"장애인전용보험 — 틀린 것은?",r:"Найди неверное.",a:"3인 이상 단체보험이 있다",ar:"«есть групповая от 3 человек»",w:"Групповой нет."},
+{n:7,t:"fill",k:"「보험업법」 제2조: 보험상품이란 ( )을 목적으로",r:"Страховой продукт — с целью ( )",a:"위험보장",ar:"защита от риска"},
+{n:8,t:"fill",k:"기납입보험료 1,000만원, 생존시 지급 보험금 없음",r:"Внесено 10 млн вон, при жизни ничего не платят. Что это?",a:"순수보장성보험",ar:"чисто защитная страховка"},
+{n:9,t:"not",k:"보장을 추가·확대하는 특약이 아닌 것은?",r:"Что НЕ добавляет покрытие?",a:"우량체할인특약",ar:"скидка для здоровых"},
+{n:10,t:"not",k:"퇴직연금사업자가 아닌 것은?",r:"Кто НЕ ведёт пенсии работодателей?",a:"우체국",ar:"почта"},
+{n:11,t:"wrong",k:"언더라이팅 — 틀린 것은?",r:"Андеррайтинг. Найди неверное.",a:"③ 계약적부 확인 …",ar:"вариант про проверку договора на месте"},
+{n:12,t:"wrong",k:"클레임 — 틀린 것은?",r:"Выплаты. Найди неверное.",a:"정액 클레임업무만 수행",ar:"«только фиксированные выплаты»",w:"Есть и выплаты по факту ущерба (실손)."},
+{n:13,t:"right",k:"보험사기와 처벌 — 바르게 짝지어진 것은?",r:"Мошенничество и наказание. Найди верную пару.",a:"10년 이하 징역 또는 5천만원 이하 벌금",ar:"до 10 лет или до 50 млн вон"},
+{n:14,t:"right",k:"보험사기 처벌기준 — 맞는 것은?",r:"Найди верное.",a:"보험사기 광고 – 벌금 3천만원",ar:"реклама мошенничества — 30 млн вон"},
+{n:15,t:"not",k:"보험사기의 객관적 구성요건이 아닌 것은?",r:"Что НЕ внешний признак мошенничества?",a:"불법영득의사",ar:"умысел присвоить",w:"Это то, что в голове (субъективное)."},
+{n:16,t:"right",k:"등록 말소 — 맞는 것은?",r:"Найди верное.",a:"위촉: 보험회사와 위탁계약 체결",ar:"위촉 — заключить договор с компанией",w:"Расторжение (해촉) — тоже с компанией."},
+{n:17,t:"not",k:"교차모집 위탁 보험회사의 금지사항이 아닌 것은?",r:"Что НЕ запрещено компании?",a:"자사 보험상품 교육",ar:"обучать своим продуктам"},
+{n:18,t:"not",k:"우수인증설계사 도입 취지와 거리가 먼 것은?",r:"Что далеко от цели сертификата?",a:"실적 경쟁 부추기기",ar:"разжигать гонку за продажами"},
+{n:19,t:"right",k:"민법상 상속순위 — 맞는 것은?",r:"Порядок наследования. Найди верное.",a:"손자 → 조부모 → 형제자매 → 4촌 이내 방계혈족",ar:"внуки → бабушки и дедушки → братья и сёстры → двоюродные"},
+{n:20,t:"wrong",k:"보험설계사의 세제 — 틀린 것은?",r:"Налоги агента. Найди неверное.",a:"소득은 근로소득이다",ar:"«доход агента — зарплата»",w:"Это доход от бизнеса (사업소득)."},
+{n:21,t:"fill",k:"다툼 → 보험회사의 불이익으로 해석",r:"Спор толкуют против компании. Какой принцип?",a:"작성자 불이익의 원칙",ar:"принцип «против составителя»"},
+{n:22,t:"wrong",k:"피보험이익 — 틀린 것은?",r:"Страховой интерес. Найди неверное.",a:"보험목적물과 사람 모두 적용",ar:"«и к вещам, и к людям»",w:"Только к вещам."},
+{n:23,t:"wrong",k:"상해보험 — 틀린 것은?",r:"От несчастных случаев. Найди неверное.",a:"재해사망은 보장하지 않는다",ar:"«смерть от несчастного случая не покрывает»"},
+{n:24,t:"wrong",k:"질병보험 — 틀린 것은?",r:"От болезней. Найди неверное.",a:"특화된 질병 상품은 보험료가 높다",ar:"«узкая страховка дорогая»",w:"Она дешевле."},
+{n:25,t:"wrong",k:"암직접치료 입원보험금 — 틀린 것은?",r:"Лечение рака в больнице. Найди неверное.",a:"보험기간 만료 후 입원기간은 보장되지 않는다",ar:"«после конца срока не оплачивают»",w:"Лёг до конца срока — оплатят и дальше."},
+{n:26,t:"wrong",k:"4세대 실손의료보험 — 틀린 것은?",r:"Медстраховка 4-го поколения. Найди неверное.",a:"2018년 4월 1일부터 도입",ar:"«с 1.4.2018»",w:"Правильно: 1.7.2021."},
+{n:27,t:"wrong",k:"4세대 실손의료보험 — 틀린 것은?",r:"Найди неверное.",a:"주계약으로 비급여를 보장한다",ar:"«основной договор покрывает то, что не покрывает гос. страховка»",w:"Это (비급여) — в доп. условии."}]]
+]}
+];
+
+var LABEL={wrong:"Найди НЕВЕРНОЕ",right:"Найди ВЕРНОЕ",not:"НЕ относится",fill:"Вставь / выбери"};
+var ALBL={wrong:"Выбрать — это неверное утверждение",right:"Выбрать — это верное утверждение",not:"Выбрать — это лишнее",fill:"Ответ"};
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+var out="";
+TESTS.forEach(function(T){
+  var hasMine=T.parts.some(function(P){return P[1].some(function(q){return q.m})});
+  out+='<section id="'+T.id+'"'+(hasMine?'':' class="nomine"')+'><h2>'+T.title+'</h2><p class="hint nomine">'+T.hint+'</p>';
+  T.parts.forEach(function(P){
+    out+='<h3>'+P[0]+'</h3><div class="cards">';
+    P[1].forEach(function(q){
+      out+='<article class="card'+(q.m?' mine':'')+'" data-t="'+q.t+'"><div class="top"><span class="no-n">'+q.n+'</span>'+
+        '<span class="tag t-'+q.t+'">'+LABEL[q.t]+'</span>'+(q.m?'<span class="tag t-mine">моя ошибка</span>':'')+(q.u?'<span class="tag t-unsure">не уверен</span>':'')+'</div>'+
+        '<div class="kr">'+esc(q.k)+'</div><div class="ru">'+esc(q.r)+'</div>'+
+        '<div class="ans"><div class="lbl">'+ALBL[q.t]+'</div><div class="akr">'+esc(q.a)+'</div>'+(q.ar?'<div class="aru">'+esc(q.ar)+'</div>':'')+(q.w?'<div class="why">'+esc(q.w)+'</div>':'')+'</div></article>';
+    });
+    out+='</div>';
   });
-  try{ if(localStorage.getItem('quiz')==='1') set(true) }catch(e){}
+  out+='</section>';
+});
+document.getElementById('tests').innerHTML=out;
+
+(function(){
+  var b=document.body,q=document.getElementById('quizBtn'),m=document.getElementById('mineBtn');
+  function setQ(on){b.classList.toggle('quiz',on);q.textContent=on?'Показать ответы':'Скрыть ответы';
+    if(!on)document.querySelectorAll('.ans.shown').forEach(function(e){e.classList.remove('shown')});
+    try{localStorage.setItem('quiz',on?'1':'0')}catch(e){}}
+  q.addEventListener('click',function(){setQ(!b.classList.contains('quiz'))});
+  m.addEventListener('click',function(){var on=!b.classList.contains('onlymine');b.classList.toggle('onlymine',on);m.classList.toggle('on',on);m.textContent=on?'Показать все вопросы':'Только мои ошибки'});
+  document.addEventListener('click',function(e){var a=e.target.closest('.ans');if(a&&b.classList.contains('quiz'))a.classList.toggle('shown')});
+  try{if(localStorage.getItem('quiz')==='1')setQ(true)}catch(e){}
 })();
 </script>
 </body>
