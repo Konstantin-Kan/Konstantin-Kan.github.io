@@ -24,20 +24,82 @@ const HW = {
   redo: ['На доработку', 'bad'],
   passed: ['Сдал ✓', 'ok']
 };
+// Фото к домашке: уменьшаем в браузере, чтобы грузилось быстро и не забивало место
+const MAX_SHOTS = 10;
+async function shrink(file, max = 1600) {
+  let img;
+  try { img = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch {
+    img = await new Promise((ok, no) => {
+      const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = URL.createObjectURL(file);
+    }).catch(() => null);
+  }
+  if (!img) throw new Error(`Не получилось открыть «${file.name}». Пришли JPG, PNG или скриншот`);
+  const k = Math.min(1, max / Math.max(img.width, img.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.82));
+}
+const shots = (files, urls) => (files || []).length ? `<div class="shots">${files.map(f => urls[f.path]
+  ? `<a href="${esc(urls[f.path])}" target="_blank" rel="noopener" title="${esc(f.name || '')}"><img src="${esc(urls[f.path])}" alt="" loading="lazy"></a>`
+  : '<span class="shot-miss">фото</span>').join('')}</div>` : '';
 const hwPill = s => s && HW[s] ? `<span class="pill ${HW[s][1]}">${HW[s][0]}</span>` : '';
+
+// ---------- Материалы: скачивание одной кнопкой ----------
+const fileExt = m => m.ext || ((m.name || m.url || '').split('?')[0].match(/\.([a-z0-9]{2,5})$/i)?.[1] || '').toLowerCase();
+const EXT = { pdf: ['PDF', '#e0261b'], doc: ['DOC', '#2b5797'], docx: ['DOC', '#2b5797'], xls: ['XLS', '#1d7044'], xlsx: ['XLS', '#1d7044'],
+  ppt: ['PPT', '#c4441c'], pptx: ['PPT', '#c4441c'], zip: ['ZIP', '#6e6e73'], jpg: ['JPG', '#8e44ad'], png: ['PNG', '#8e44ad'] };
+const fmtSize = b => !b ? '' : b < 1048576 ? Math.max(1, Math.round(b / 1024)) + ' КБ' : (b / 1048576).toFixed(1).replace('.', ',') + ' МБ';
+// Ссылку Google Диска / Документов превращаем в прямое скачивание, без захода на Диск
+function dlUrl(u) {
+  u = String(u || '').trim();
+  let m = u.match(/docs\.google\.com\/(document|spreadsheets|presentation)\/d\/([\w-]+)/);
+  if (m) return `https://docs.google.com/${m[1]}/d/${m[2]}/export?format=${{ document: 'docx', spreadsheets: 'xlsx', presentation: 'pptx' }[m[1]]}`;
+  m = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:[^#]*&)?id=)([\w-]+)/);
+  if (m) return `https://drive.google.com/uc?export=download&id=${m[1]}`;
+  return u;
+}
+function saveAs(href, name) {
+  const a = document.createElement('a');
+  a.href = href; if (name) a.download = name; a.rel = 'noopener';
+  document.body.append(a); a.click(); a.remove();
+}
 
 // ============================================================
 // Данные: демо (в браузере) или Supabase
 // ============================================================
 
 function demoApi() {
-  const KEY = 'school_demo_v2';
+  const KEY = 'school_demo_v4';
+  const MATS = {
+    1: ['Памятка ученика — Казахстан:pdf', 'Памятка ученика — Корея:pdf', 'Книга техник продаж:pdf', 'Таблица учёта клиентов:xlsx',
+        'Таблица — пример заполнения:xlsx', 'Анкета точки А:docx', 'Гайд до старта:pdf', 'Рабочая тетрадь:docx'],
+    2: ['Рабочая тетрадь:docx'], 3: ['Рабочая тетрадь:docx'], 4: ['Рабочая тетрадь:docx'], 5: ['Гайд до старта:pdf']
+  };
   const L = (id, position, title, needs_homework, blocks, homework, body = '') => ({
     id, course_id: 1, position, module: 'Модуль 1 · Работаем с головой', title, needs_homework,
     published: true, body, homework,
     blocks: blocks.map(t => ({ title: t, video: '' })),
-    materials: id === 1 ? [{ title: 'Рабочая тетрадь', url: 'https://drive.google.com/' }] : []
+    materials: (MATS[id] || []).map(t => { const [title, ext] = t.split(':'); return { title, ext }; })
   });
+  // Файлы материалов в демо лежат в этом браузере (IndexedDB), наружу не уходят
+  const idb = (() => {
+    let p;
+    const open = () => p ||= new Promise((ok, no) => {
+      const r = indexedDB.open('school_demo_files', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('f');
+      r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error);
+    });
+    const tx = async (mode, fn) => {
+      const d = await open();
+      return new Promise((ok, no) => {
+        const t = d.transaction('f', mode), r = fn(t.objectStore('f'));
+        t.oncomplete = () => ok(r.result); t.onerror = () => no(t.error);
+      });
+    };
+    return { put: (k, v) => tx('readwrite', s => s.put(v, k)), get: k => tx('readonly', s => s.get(k)) };
+  })();
   const seed = () => ({
     seq: 100, session: null,
     users: [
@@ -66,10 +128,11 @@ function demoApi() {
         'Сожми адресное предложение в шапку из трёх строк. Поправь имя профиля под поиск, скрой категорию, убери адрес и список услуг.')
     ],
     enrollments: [{ user_id: 'u-student', course_id: 1, access_until: null }],
-    progress: [], homework: [], comments: []
+    progress: [], homework: [], comments: [], files: {}
   });
   let db;
   try { db = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch { db = seed(); }
+  db.files = db.files || {};
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {} };
   const id = () => ++db.seq;
   const now = () => new Date().toISOString();
@@ -90,7 +153,7 @@ function demoApi() {
 
   return {
     demo: true,
-    reset() { localStorage.removeItem(KEY); location.hash = '#/'; location.reload(); },
+    reset() { localStorage.removeItem(KEY); try { indexedDB.deleteDatabase('school_demo_files'); } catch {} location.hash = '#/'; location.reload(); },
     async session() {
       const p = me(); return p ? { user: { id: p.id, email: p.email }, profile: { ...p } } : null;
     },
@@ -144,10 +207,34 @@ function demoApi() {
     async myHomework(lid) {
       return ok(db.homework.filter(h => h.lesson_id === lid && h.user_id === db.session).sort((a, b) => b.id - a.id));
     },
-    async submitHomework(lid, text) {
+    async uploadShots(lid, blobs) {
+      const out = [];
+      for (const [i, b] of blobs.entries()) {
+        const path = `${db.session}/${lid}/${Date.now()}-${i}.jpg`;
+        db.files[path] = await new Promise(ok => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(b); });
+        out.push({ path, name: b.name || 'фото' });
+      }
+      return out;
+    },
+    async shotUrls(paths) { return Object.fromEntries(paths.map(p => [p, db.files[p]]).filter(x => x[1])); },
+    async uploadMaterial(lid, file) {
+      if (!isAdmin()) return fail('Только для админа');
+      const path = `lesson-${lid}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      await idb.put(path, file);
+      return { path, name: file.name, size: file.size };
+    },
+    async downloadMaterial(m) {
+      if (!canSee(+String(m.path).match(/^lesson-(\d+)/)?.[1])) return fail('Урок закрыт');
+      const blob = await idb.get(m.path);
+      if (!blob) return fail('В демо файл есть только в том браузере, где его загрузили');
+      const href = URL.createObjectURL(blob);
+      saveAs(href, m.name); setTimeout(() => URL.revokeObjectURL(href), 5000);
+    },
+    async submitHomework(lid, text, files = []) {
       if (!lessonOpen(lid, db.session)) return fail('Урок закрыт');
-      db.homework.push({ id: id(), lesson_id: lid, user_id: db.session, text, status: 'new', admin_reply: null, created_at: now() });
-      save();
+      db.homework.push({ id: id(), lesson_id: lid, user_id: db.session, text, files, status: 'new', admin_reply: null, created_at: now() });
+      try { localStorage.setItem(KEY, JSON.stringify(db)); }
+      catch { db.homework.pop(); files.forEach(f => delete db.files[f.path]); return fail('В демо закончилось место: нажми «Сбросить демо»'); }
     },
     admin: {
       async homework(status) {
@@ -230,7 +317,32 @@ function supabaseApi() {
     addComment: (lid, text) => q(sb.from('comments').insert({ lesson_id: lid, user_id: uid, text })),
     deleteComment: id => q(sb.from('comments').delete().eq('id', id)),
     myHomework: lid => q(sb.from('homework').select('*').eq('lesson_id', lid).eq('user_id', uid).order('created_at', { ascending: false })),
-    submitHomework: (lid, text) => q(sb.from('homework').insert({ lesson_id: lid, user_id: uid, text })),
+    async uploadShots(lid, blobs) {
+      const out = [];
+      for (const [i, b] of blobs.entries()) {
+        const path = `${uid}/${lid}/${Date.now()}-${i}.jpg`;
+        await q(sb.storage.from('homework').upload(path, b, { contentType: 'image/jpeg' }));
+        out.push({ path, name: b.name || 'фото' });
+      }
+      return out;
+    },
+    async shotUrls(paths) {
+      if (!paths.length) return {};
+      const d = await q(sb.storage.from('homework').createSignedUrls(paths, 3600));
+      return Object.fromEntries(d.filter(x => x.signedUrl).map(x => [x.path, x.signedUrl]));
+    },
+    submitHomework: (lid, text, files = []) => q(sb.from('homework').insert({ lesson_id: lid, user_id: uid, text, files })),
+    async uploadMaterial(lid, file) {
+      const ext = (file.name.match(/\.([a-z0-9]{1,5})$/i)?.[1] || 'bin').toLowerCase();
+      const path = `lesson-${lid}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+      await q(sb.storage.from('materials').upload(path, file, { contentType: file.type || undefined }));
+      return { path, name: file.name, size: file.size };
+    },
+    async downloadMaterial(m) {
+      // Ссылка живёт 1 минуту и сразу отдаёт файл на скачивание под его настоящим именем
+      const d = await q(sb.storage.from('materials').createSignedUrl(m.path, 60, { download: m.name || true }));
+      saveAs(d.signedUrl);
+    },
     admin: {
       homework(status) {
         let r = sb.from('homework').select('*, profiles(name, phone, telegram, email), lessons(title, course_id)')
@@ -476,6 +588,7 @@ async function renderLesson(lid) {
   const next = toc[idx + 1];
   const passed = toc[idx]?.passed || !l.needs_homework;
   const last = hw[0];
+  const urls = await api.shotUrls(hw.flatMap(h => (h.files || []).map(f => f.path)));
   const blocks = (l.blocks || []).length ? l.blocks : [{ title: '', video: '' }];
   let cur = 0;
 
@@ -491,19 +604,33 @@ async function renderLesson(lid) {
       <button class="btn" id="go-hw" style="width:100%;justify-content:center;padding:14px">📝 Сдать ДЗ</button></div>` : ''}
     ${l.body ? `<div class="card text" style="margin-top:16px">${linkify(l.body)}</div>` : '<div style="height:16px"></div>'}
     ${(l.materials || []).length ? `<div class="card files"><h3>Материалы</h3>
-      ${l.materials.map(m => `<a href="${esc(m.url)}" target="_blank" rel="noopener">📎 <span class="grow">${esc(m.title)}</span><span class="muted small">открыть</span></a>`).join('')}</div>` : ''}
+      ${l.materials.map((m, i) => {
+        const [lab, col] = EXT[fileExt(m)] || ['ФАЙЛ', '#6e6e73'];
+        const ready = m.path || m.url;
+        return `<button type="button" class="file" data-mat="${i}" ${ready ? '' : 'disabled'}>
+          <span class="ext" style="background:${col}">${lab}</span>
+          <span class="grow"><b>${esc(m.title || m.name)}</b>${m.size ? `<span class="muted small">${fmtSize(m.size)}</span>` : ''}</span>
+          <span class="dl">${ready ? '⬇<i> Скачать</i>' : '<i>скоро</i>'}</span></button>`;
+      }).join('')}</div>` : ''}
     ${l.needs_homework ? `<div class="card" id="hw">
       <div class="row" style="justify-content:space-between"><h2 style="margin:0">Домашнее задание</h2>${toc[idx]?.passed ? hwPill('passed') : hwPill(last?.status)}</div>
       ${l.homework ? `<div class="task text" style="margin:14px 0">${linkify(l.homework)}</div>` : ''}
       ${isAdmin() ? '<p class="muted small">Ответы учеников — в админке, вкладка «Домашки».</p>' : `
         ${hw.map(h => `<div class="hw-item">
           <div class="row" style="justify-content:space-between"><span class="muted small">${fmt(h.created_at)}</span>${hwPill(h.status)}</div>
-          <div class="text" style="margin-top:6px">${linkify(h.text)}</div>
+          ${h.text ? `<div class="text" style="margin-top:6px">${linkify(h.text)}</div>` : ''}
+          ${shots(h.files, urls)}
           ${h.admin_reply ? `<div class="reply"><b>Константин:</b> <span class="text">${linkify(h.admin_reply)}</span></div>` : ''}
         </div>`).join('')}
         ${toc[idx]?.passed ? '' : `<form id="hw-form" class="stack" style="margin-top:14px">
           <label>${last?.status === 'redo' ? 'Исправленный ответ' : last?.status === 'new' ? 'Дополнить ответ' : 'Твой ответ'}</label>
-          <textarea name="text" required placeholder="Напиши ответ. Файл или фото — загрузи на Google Диск и вставь сюда ссылку"></textarea>
+          <textarea name="text" placeholder="Напиши ответ. Аудио или видео — вставь сюда ссылку"></textarea>
+          <div class="shots" id="hw-prev"></div>
+          <div class="row">
+            <label class="btn ghost sm" for="hw-file" style="margin:0;color:var(--text)">📷 Прикрепить фото или скриншот</label>
+            <input id="hw-file" type="file" accept="image/*" multiple hidden>
+            <span class="muted small">до ${MAX_SHOTS} шт.: тетрадь, переписка, профиль</span>
+          </div>
           <button class="btn">📝 Сдать ДЗ</button>
         </form>`}`}
     </div>` : `<div class="card muted">В этом уроке задания нет. Переходи к следующему уроку.</div>`}
@@ -525,6 +652,13 @@ async function renderLesson(lid) {
     </div>`;
 
   moveWatermark();
+  $$('[data-mat]').forEach(b => b.onclick = async () => {
+    const m = l.materials[+b.dataset.mat];
+    b.disabled = true;
+    try { if (m.path) await api.downloadMaterial(m); else saveAs(dlUrl(m.url)); }
+    catch (err) { toast(err.message); }
+    setTimeout(() => { b.disabled = false; }, 1200);
+  });
   const goHw = $('#go-hw');
   if (goHw) goHw.onclick = () => {
     $('#hw').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -536,11 +670,42 @@ async function renderLesson(lid) {
     $('#pl').innerHTML = player(blocks[cur]); moveWatermark();
   });
   const hf = $('#hw-form');
-  if (hf) hf.onsubmit = async e => {
-    e.preventDefault();
-    try { await api.submitHomework(lid, hf.text.value.trim()); toast('Отправлено. Я проверю и открою следующий урок'); renderLesson(lid); }
-    catch (err) { toast(err.message); }
-  };
+  if (hf) {
+    const picked = [];
+    const drawPrev = () => {
+      $('#hw-prev').innerHTML = picked.map((f, i) => `<span class="shot-new"><img src="${f.url}" alt="">
+        <button type="button" data-rm-shot="${i}" title="Убрать">✕</button></span>`).join('');
+      $$('[data-rm-shot]', hf).forEach(b => b.onclick = () => {
+        URL.revokeObjectURL(picked[+b.dataset.rmShot].url); picked.splice(+b.dataset.rmShot, 1); drawPrev();
+      });
+    };
+    const add = list => {
+      const imgs = [...list].filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name));
+      if (list.length && !imgs.length) return toast('Можно прикрепить только фото и скриншоты');
+      const room = MAX_SHOTS - picked.length;
+      if (imgs.length > room) toast(`Не больше ${MAX_SHOTS} фото в одной сдаче`);
+      imgs.slice(0, Math.max(0, room)).forEach(file => picked.push({ file, url: URL.createObjectURL(file) }));
+      drawPrev();
+    };
+    $('#hw-file').onchange = e => { add(e.target.files); e.target.value = ''; };
+    hf.text.addEventListener('paste', e => {
+      const imgs = [...(e.clipboardData?.files || [])];
+      if (imgs.length) { e.preventDefault(); add(imgs); }
+    });
+    hf.onsubmit = async e => {
+      e.preventDefault();
+      const text = hf.text.value.trim();
+      if (!text && !picked.length) return toast('Напиши ответ или прикрепи фото');
+      const btn = hf.querySelector('button.btn:not([type])'); btn.disabled = true;
+      try {
+        if (picked.length) btn.textContent = 'Загружаю фото…';
+        const blobs = await Promise.all(picked.map(async p => Object.assign(await shrink(p.file), { name: p.file.name })));
+        const files = await api.uploadShots(lid, blobs);
+        await api.submitHomework(lid, text, files);
+        toast('Отправлено. Я проверю и открою следующий урок'); renderLesson(lid);
+      } catch (err) { toast(err.message); btn.disabled = false; btn.textContent = '📝 Сдать ДЗ'; }
+    };
+  }
   $('#c-form').onsubmit = async e => {
     e.preventDefault();
     try { await api.addComment(lid, e.target.text.value.trim()); renderLesson(lid); }
@@ -574,6 +739,7 @@ async function renderAdmin(tab = 'hw', a, b) {
 
 async function adminHomework(box, filter) {
   const list = await api.admin.homework(filter === 'all' ? null : filter);
+  const urls = await api.shotUrls(list.flatMap(h => (h.files || []).map(f => f.path)));
   const F = { new: 'Новые', redo: 'На доработке', passed: 'Принятые', all: 'Все' };
   box.innerHTML = `
     <div class="chips">${Object.entries(F).map(([k, v]) =>
@@ -585,7 +751,8 @@ async function adminHomework(box, filter) {
         ${hwPill(h.status)}
       </div>
       <div class="muted small" style="margin:4px 0 10px">${esc(h.lessons?.title || '')} · ${fmt(h.created_at)}</div>
-      <div class="text">${linkify(h.text)}</div>
+      ${h.text ? `<div class="text">${linkify(h.text)}</div>` : ''}
+      ${shots(h.files, urls)}
       ${h.admin_reply ? `<div class="reply"><b>Мой ответ:</b> <span class="text">${linkify(h.admin_reply)}</span></div>` : ''}
       ${h.status === 'new' ? `<div class="stack" style="margin-top:12px">
         <textarea class="rep" placeholder="Комментарий ученику (можно пусто)" style="min-height:70px"></textarea>
@@ -739,9 +906,16 @@ function lessonForm(box, l) {
     <input placeholder="Название блока" data-k="title" value="${esc(b.title)}">
     <input placeholder="Ссылка на YouTube (видео «доступ по ссылке»)" data-k="video" value="${esc(b.video)}">
     <button type="button" class="btn danger sm" data-rm>✕</button></div>`;
-  const rowM = (m = {}) => `<div class="repeat" data-row="m">
-    <input placeholder="Название файла" data-k="title" value="${esc(m.title)}">
-    <input placeholder="Ссылка (Google Диск и т.п.)" data-k="url" value="${esc(m.url)}">
+  const rowM = (m = {}) => `<div class="repeat mat" data-row="m">
+    <input placeholder="Название для ученика" data-k="title" value="${esc(m.title)}">
+    <div class="mat-file">
+      <input type="hidden" data-k="path" value="${esc(m.path)}"><input type="hidden" data-k="name" value="${esc(m.name)}">
+      <input type="hidden" data-k="size" value="${esc(m.size)}">
+      <span class="mat-name small">${m.path ? `📎 ${esc(m.name)} · ${fmtSize(m.size)}` : ''}</span>
+      <input placeholder="или ссылка (Google Диск)" data-k="url" value="${esc(m.url)}" ${m.path ? 'hidden' : ''}>
+      <label class="btn ghost sm" style="margin:0;color:var(--text);white-space:nowrap">${m.path ? 'Заменить' : '⬆ Загрузить файл'}
+        <input type="file" hidden data-up></label>
+    </div>
     <button type="button" class="btn danger sm" data-rm>✕</button></div>`;
   box.innerHTML = `
     <a class="back" href="#/admin/lessons/${l.course_id}">← Все уроки</a>
@@ -765,7 +939,25 @@ function lessonForm(box, l) {
         ${l.id ? `<a class="btn ghost" href="#/lesson/${l.id}">Посмотреть</a><button type="button" class="btn danger" id="del-l">Удалить урок</button>` : ''}
       </div>
     </form>`;
-  const bindRm = () => $$('[data-rm]', box).forEach(x => x.onclick = () => x.closest('.repeat').remove());
+  const bindRm = () => {
+    $$('[data-rm]', box).forEach(x => x.onclick = () => x.closest('.repeat').remove());
+    $$('[data-up]', box).forEach(x => x.onchange = async () => {
+      const file = x.files[0], row = x.closest('.repeat'); x.value = '';
+      if (!file) return;
+      if (!l.id) return toast('Сначала сохрани урок, потом загружай файлы');
+      const set = (k, v) => { $(`[data-k="${k}"]`, row).value = v; };
+      const nameEl = $('.mat-name', row);
+      nameEl.textContent = 'Загружаю…';
+      try {
+        const up = await api.uploadMaterial(l.id, file);
+        set('path', up.path); set('name', up.name); set('size', up.size); set('url', '');
+        $('[data-k="url"]', row).hidden = true;
+        if (!$('[data-k="title"]', row).value.trim()) set('title', file.name.replace(/\.[^.]+$/, '').replace(/^\d+[а-яa-z]?\.\s*/i, ''));
+        nameEl.textContent = `📎 ${up.name} · ${fmtSize(up.size)}`;
+        toast('Файл загружен. Не забудь «Сохранить»');
+      } catch (err) { nameEl.textContent = ''; toast(err.message); }
+    });
+  };
   $('#add-b').onclick = () => { $('#blocks').insertAdjacentHTML('beforeend', rowB()); bindRm(); };
   $('#add-m').onclick = () => { $('#mats').insertAdjacentHTML('beforeend', rowM()); bindRm(); };
   bindRm();
@@ -779,7 +971,15 @@ function lessonForm(box, l) {
     const row = {
       ...(l.id ? { id: l.id } : {}), course_id: l.course_id,
       position: +f.position.value || 0, module: f.module.value.trim(), title: f.title.value.trim(),
-      blocks, body: f.body.value, materials: rows('[data-row="m"]').filter(m => m.url),
+      blocks, body: f.body.value,
+      materials: rows('[data-row="m"]').filter(m => m.title || m.url || m.path).map(m => {
+        const o = { title: m.title || m.name };
+        const old = (l.materials || []).find(x => x.title === o.title && x.ext);
+        if (old && !m.path) o.ext = old.ext;
+        if (m.path) Object.assign(o, { path: m.path, name: m.name, size: +m.size || 0 });
+        else if (m.url) o.url = m.url;
+        return o;
+      }),
       needs_homework: f.needs_homework.checked, homework: f.homework.value, published: f.published.checked
     };
     try { await api.admin.saveLesson(row); toast('Урок сохранён'); location.hash = `#/admin/lessons/${l.course_id}`; }
@@ -822,5 +1022,14 @@ async function boot() {
 
 window.addEventListener('hashchange', route);
 document.addEventListener('contextmenu', e => { if (e.target.closest('.player')) e.preventDefault(); });
+// Фото домашки — крупно поверх страницы
+document.addEventListener('click', e => {
+  const a = e.target.closest('.shots a'); if (!a) return;
+  e.preventDefault();
+  const d = document.createElement('dialog'); d.className = 'shot-view';
+  d.innerHTML = `<img src="${esc(a.href)}" alt=""><button class="btn ghost sm">Закрыть</button>`;
+  d.onclick = () => d.close(); d.addEventListener('close', () => d.remove());
+  document.body.append(d); d.showModal();
+});
 boot();
 })();
