@@ -74,7 +74,7 @@ function demoApi() {
   const KEY = 'school_demo_v4';
   const MATS = {
     // Каждый документ — в тот урок, где он нужен. Раздатки — к блоку «Путь клиента»: добавятся вместе с этими уроками
-    1: ['Памятка ученика — Казахстан:pdf', 'Памятка ученика — Корея:pdf', 'Рабочая тетрадь:docx'],
+    1: ['Рабочая тетрадь:docx'],
     2: ['Рабочая тетрадь:docx'], 3: ['Рабочая тетрадь:docx'], 4: ['Рабочая тетрадь:docx'], 5: ['Гайд до старта:pdf'],
     6: ['Анкета точки А:docx', 'Таблица учёта клиентов:xlsx', 'Таблица — пример заполнения:xlsx', 'Книга техник продаж:pdf', 'Рабочая тетрадь:docx']
   };
@@ -571,12 +571,35 @@ function moveWatermark() {
   };
   move(); wmTimer = setInterval(move, 7000);
   const fs = $('#fs');
-  if (fs) fs.onclick = () => {
-    const p = $('#player');
-    if (document.fullscreenElement) document.exitFullscreen();
-    else (p.requestFullscreen || p.webkitRequestFullscreen)?.call(p);
-  };
+  if (fs) fs.onclick = toggleFullscreen;
 }
+
+// На весь экран вместе с водяным знаком. iPhone не умеет так с обычным блоком —
+// там плеер растягивается на весь экран средствами страницы
+function pseudoFullscreen(on) {
+  const p = $('#player');
+  if (!p) return;
+  p.classList.toggle('pseudo-fs', on);
+  document.documentElement.classList.toggle('no-scroll', on);
+  const fs = $('#fs', p);
+  if (fs) fs.textContent = on ? '✕' : '⛶';
+}
+function toggleFullscreen() {
+  const p = $('#player');
+  if (!p) return;
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    return (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  }
+  if (p.classList.contains('pseudo-fs')) return pseudoFullscreen(false);
+  const req = p.requestFullscreen || p.webkitRequestFullscreen;
+  if (!req || document.fullscreenEnabled === false) return pseudoFullscreen(true);
+  try {
+    Promise.resolve(req.call(p))
+      .then(() => screen.orientation?.lock?.('landscape').catch(() => {}))
+      .catch(() => pseudoFullscreen(true));
+  } catch { pseudoFullscreen(true); }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') pseudoFullscreen(false); });
 
 async function renderLesson(lid) {
   app.className = '';
@@ -1020,6 +1043,7 @@ function lessonForm(box, l) {
 
 async function route() {
   clearInterval(wmTimer);
+  document.documentElement.classList.remove('no-scroll');
   const [, page, a, b, c] = (location.hash || '#/').split('/');
   if (page === 'new-password') return renderNewPassword();
   if (!ME) return renderAuth();

@@ -139,6 +139,24 @@ input[type=checkbox] { width: auto; }
   background: rgba(0,0,0,.55); color: #fff; padding: 6px 10px; font-size: 13px; cursor: pointer;
 }
 .player:fullscreen { border-radius: 0; aspect-ratio: auto; }
+.player:fullscreen .fs, .player.pseudo-fs .fs { font-size: 18px; padding: 8px 14px; }
+/* «На весь экран» на iPhone: плеер на весь экран страницы, водяной знак остаётся */
+.player.pseudo-fs {
+  position: fixed; inset: 0; z-index: 100; width: 100vw; height: 100vh; height: 100dvh;
+  aspect-ratio: auto; border-radius: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.player.pseudo-fs .fs { top: calc(10px + env(safe-area-inset-top)); right: calc(10px + env(safe-area-inset-right)); }
+.player.pseudo-fs::after {
+  content: "Поверните телефон горизонтально"; position: absolute; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom));
+  transform: translateX(-50%); z-index: 3; pointer-events: none; color: #fff; font-size: 14px;
+  background: rgba(0,0,0,.6); padding: 8px 14px; border-radius: 999px; white-space: nowrap;
+  animation: fs-hint 4s forwards;
+}
+@keyframes fs-hint { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
+@media (orientation: landscape) { .player.pseudo-fs::after { display: none; } }
+html.no-scroll, html.no-scroll body { overflow: hidden; }
+@media (max-width: 640px) { .player .fs { padding: 8px 12px; font-size: 16px; } }
 .text { white-space: pre-wrap; word-wrap: break-word; }
 .files a {
   display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px;
