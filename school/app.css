@@ -248,3 +248,6 @@ dialog.shot-view img { display: block; max-width: 96vw; max-height: 86vh; border
 
 .link.who { text-decoration: none; color: var(--text); }
 .link.who:hover { color: var(--accent); }
+.mat-pk { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-top: -2px; }
+.mat-pk .check { font-size: 14px; }
+.repeat.mat { padding-bottom: 10px; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); }

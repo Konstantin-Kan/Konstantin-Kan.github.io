@@ -404,6 +404,9 @@ function ruError(m) {
 const api = DEMO ? demoApi() : supabaseApi();
 let ME = null; // { user, profile }
 const isAdmin = () => ME?.profile?.role === 'admin';
+const PACKAGES = ['базовый', 'стандарт', 'премиум'];
+// Файл без отмеченных пакетов — для всех
+const forPackage = (m, pkg) => !m.packages?.length || m.packages.includes(pkg);
 const app = $('#app');
 
 // ============================================================
@@ -620,6 +623,8 @@ async function renderLesson(lid) {
   const last = hw[0];
   const urls = await api.shotUrls(hw.flatMap(h => (h.files || []).map(f => f.path)));
   const blocks = (l.blocks || []).length ? l.blocks : [{ title: '', video: '' }];
+  // Ученик видит только файлы своего пакета; скачать чужой не даст и сама база
+  const mats = (l.materials || []).filter(m => isAdmin() || forPackage(m, ME.profile.package));
   let cur = 0;
 
   app.innerHTML = `
@@ -633,13 +638,13 @@ async function renderLesson(lid) {
     ${l.needs_homework && !isAdmin() && !toc[idx]?.passed ? `<div style="margin-top:14px">
       <button class="btn" id="go-hw" style="width:100%;justify-content:center;padding:14px">📝 Сдать ДЗ</button></div>` : ''}
     ${l.body ? `<div class="card text" style="margin-top:16px">${linkify(l.body)}</div>` : '<div style="height:16px"></div>'}
-    ${(l.materials || []).length ? `<div class="card files"><h3>Материалы</h3>
-      ${l.materials.map((m, i) => {
+    ${mats.length ? `<div class="card files"><h3>Материалы</h3>
+      ${mats.map((m, i) => {
         const [lab, col] = EXT[fileExt(m)] || ['ФАЙЛ', '#6e6e73'];
         const ready = m.path || m.url;
         return `<button type="button" class="file" data-mat="${i}" ${ready ? '' : 'disabled'}>
           <span class="ext" style="background:${col}">${lab}</span>
-          <span class="grow"><b>${esc(m.title || m.name)}</b>${m.size ? `<span class="muted small">${fmtSize(m.size)}</span>` : ''}</span>
+          <span class="grow"><b>${esc(m.title || m.name)}</b>${m.size ? `<span class="muted small">${fmtSize(m.size)}</span>` : ''}${isAdmin() && m.packages?.length ? ` <span class="pill">${esc(m.packages.join(', '))}</span>` : ''}</span>
           <span class="dl">${ready ? '⬇<i> Скачать</i>' : '<i>скоро</i>'}</span></button>`;
       }).join('')}</div>` : ''}
     ${l.needs_homework ? `<div class="card" id="hw">
@@ -683,7 +688,7 @@ async function renderLesson(lid) {
 
   moveWatermark();
   $$('[data-mat]').forEach(b => b.onclick = async () => {
-    const m = l.materials[+b.dataset.mat];
+    const m = mats[+b.dataset.mat];
     b.disabled = true;
     try { if (m.path) await api.downloadMaterial(m); else saveAs(dlUrl(m.url)); }
     catch (err) { toast(err.message); }
@@ -833,7 +838,8 @@ async function adminStudents(box) {
       const waiting = data.homework.filter(h => h.user_id === p.id && h.status === 'new').length;
       return `<div class="card student" data-s="${p.id}">
         <div class="row" style="justify-content:space-between">
-          <div><b>${esc(p.name || 'Без имени')}</b> ${p.package ? `<span class="pill">${esc(p.package)}</span>` : ''}</div>
+          <div><b>${esc(p.name || 'Без имени')}</b> ${p.package ? `<span class="pill">${esc(p.package)}</span>`
+            : en.length ? '<span class="pill bad">пакет не выбран</span>' : ''}</div>
           ${waiting ? `<span class="pill warn">ждёт проверки: ${waiting}</span>` : en.length ? '' : '<span class="pill bad">нет доступа</span>'}
         </div>
         <div class="muted small">${esc([p.phone, p.telegram, p.email].filter(Boolean).join(' · '))}</div>
@@ -867,7 +873,7 @@ function studentDialog(p, data, courses, lessonsBy) {
       <div><label>Телефон</label><input name="phone" value="${esc(p.phone)}"></div>
       <div><label>Telegram</label><input name="telegram" value="${esc(p.telegram)}"></div>
       <div><label>Пакет</label><select name="package">
-        ${['', 'базовый', 'стандарт', 'премиум'].map(v => `<option ${p.package === v ? 'selected' : ''} value="${v}">${v || '—'}</option>`).join('')}
+        ${['', ...PACKAGES].map(v => `<option ${p.package === v ? 'selected' : ''} value="${v}">${v || '—'}</option>`).join('')}
       </select></div>
     </div>
     <div><label>Оплата</label><input name="paid" value="${esc(p.paid)}" placeholder="Например: 300 000 ₸, 20.10, Kaspi"></div>
@@ -961,7 +967,10 @@ function lessonForm(box, l) {
       <label class="btn ghost sm" style="margin:0;color:var(--text);white-space:nowrap">${m.path ? 'Заменить' : '⬆ Загрузить файл'}
         <input type="file" hidden data-up></label>
     </div>
-    <button type="button" class="btn danger sm" data-rm>✕</button></div>`;
+    <button type="button" class="btn danger sm" data-rm>✕</button>
+    <div class="mat-pk small"><span class="muted">Кому:</span>
+      ${PACKAGES.map(v => `<label class="check"><input type="checkbox" data-pk value="${v}" ${m.packages?.includes(v) ? 'checked' : ''}> ${v}</label>`).join('')}
+      <span class="muted">ничего не отмечено — всем</span></div></div>`;
   box.innerHTML = `
     <a class="back" href="#/admin/lessons/${l.course_id}">← Все уроки</a>
     <form id="lf" class="card stack">
@@ -1017,12 +1026,15 @@ function lessonForm(box, l) {
       ...(l.id ? { id: l.id } : {}), course_id: l.course_id,
       position: +f.position.value || 0, module: f.module.value.trim(), title: f.title.value.trim(),
       blocks, body: f.body.value,
-      materials: rows('[data-row="m"]').filter(m => m.title || m.url || m.path).map(m => {
+      materials: rows('[data-row="m"]').map((m, i) => ({ ...m, el: $$('[data-row="m"]', box)[i] }))
+        .filter(m => m.title || m.url || m.path).map(m => {
         const o = { title: m.title || m.name };
         const old = (l.materials || []).find(x => x.title === o.title && x.ext);
         if (old && !m.path) o.ext = old.ext;
         if (m.path) Object.assign(o, { path: m.path, name: m.name, size: +m.size || 0 });
         else if (m.url) o.url = m.url;
+        const pk = $$('[data-pk]:checked', m.el).map(x => x.value);
+        if (pk.length) o.packages = pk;
         return o;
       }),
       needs_homework: f.needs_homework.checked, homework: f.homework.value, published: f.published.checked
