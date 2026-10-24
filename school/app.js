@@ -81,7 +81,7 @@ function demoApi() {
   // Видео уроков: YouTube «доступ по ссылке»
   const VIDEOS = { 1: ['https://youtu.be/JiVX4C0WWj0'] };
   const L = (id, position, title, needs_homework, blocks, homework, body = '') => ({
-    id, course_id: 1, position, module: 'Модуль 1 · Работаем с головой', title, needs_homework,
+    id, course_id: 1, position, module: 'Блок 1 · Голова продавца', title, needs_homework,
     published: true, body, homework,
     blocks: blocks.map((t, i) => ({ title: t, video: (VIDEOS[id] || [])[i] || '' })),
     materials: (MATS[id] || []).map(t => { const [title, ext] = t.split(':'); return { title, ext }; })
@@ -113,7 +113,8 @@ function demoApi() {
       { id: 'u-admin', email: 'admin@demo', name: 'Константин', role: 'admin', phone: '', telegram: '', created_at: new Date().toISOString() },
       { id: 'u-student', email: 'student@demo', name: 'Демо-ученик', role: 'student', phone: '+7 700 000 00 00', telegram: '@demo', package: 'стандарт', paid: '', note: '', created_at: new Date().toISOString() }
     ],
-    courses: [{ id: 1, title: 'Sky — обучение продажам', description: 'Обучение продажам: 2 месяца. Уроки открываются по очереди, после проверки домашки.', position: 1, published: true }],
+    courses: [{ id: 1, title: 'Sky — обучение продажам', description: 'Обучение продажам: 2 месяца. Уроки открываются по очереди, после проверки домашки.', position: 1, published: true,
+      outline: [{"name": "Блок 2 · Ты и твой продукт", "lessons": ["2.1 Кто твой клиент", "2.2 Сколько стоит твой продукт на самом деле", "2.3 Говори о себе фактами", "2.4 Продукт глазами клиента", "2.5 Тренировка презентации"]}, {"name": "Блок 3 · Путь клиента", "lessons": ["3.1 Первое сообщение и цена в первом вопросе", "3.2 Вопросы", "3.3 Презентация под человека", "3.4 Возражения", "3.5 Закрытие", "3.6 Переписка, голосовое или созвон"]}, {"name": "Блок 4 · Практика и система", "lessons": ["4.1 Дожим без давления", "4.2 Поток клиентов", "4.3 День продажника: норма, учёт, время", "4.4 Продажа на созвоне", "4.5 Допродажи, повторные покупки, рекомендации"]}, {"name": "Блок 5 · Закрепление", "lessons": ["5.1 Тренажёр сложных клиентов", "5.2 Мой скрипт", "5.3 Экзамен"]}, {"name": "Блок 6 · Итоги", "lessons": ["6.1 Точка Б и план на 3 месяца", "6.2 Напутствие"]}] }],
     lessons: [
       L(1, 0, 'Вступление к курсу', false, ['Вступление'], null,
         'Держи рядом рабочую тетрадь. Когда я говорю «поставь на паузу» — ставь на паузу и пиши. Не потом, а сразу.\nИ ещё одно правило: 15 минут на продажи каждый день.'),
@@ -531,7 +532,13 @@ async function renderCourse(cid, courses) {
   const toc = await api.toc(cid);
   const need = toc.filter(l => l.needs_homework);
   const done = need.filter(l => l.passed).length;
-  let mod = null;
+  // Уроки группируются по блокам (поле «Блок» у урока). Текущий блок раскрыт, остальные свёрнуты
+  const groups = [];
+  toc.forEach(l => {
+    const g = groups.at(-1);
+    if (g && g.name === (l.module || '')) g.items.push(l); else groups.push({ name: l.module || '', items: [l] });
+  });
+  const current = groups.findIndex(g => g.items.some(l => l.is_open && !l.passed && (l.needs_homework || l === toc[0])));
   app.innerHTML = `
     ${courses.length > 1 ? '<a class="back" href="#/">← Все курсы</a>' : ''}
     <h1>${esc(c.title)}</h1>
@@ -539,15 +546,40 @@ async function renderCourse(cid, courses) {
     ${need.length ? `<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px">
       <b>Пройдено</b><span class="muted">${done} из ${need.length}</span></div>
       <div class="bar"><i style="width:${need.length ? done / need.length * 100 : 0}%"></i></div></div>` : ''}
-    ${toc.map(l => {
-      let head = '';
-      if (l.module !== mod) { mod = l.module; head = `${l !== toc[0] ? '</ul>' : ''}<div class="module">${esc(mod || '')}</div><ul class="toc">`; }
-      const status = l.passed ? '<span class="pill ok">Сдал ✓</span>' : hwPill(l.hw_status);
-      const ico = l.passed ? '<span class="ico ok">✓</span>' : l.is_open ? '<span class="ico go">▶</span>' : '<span class="ico">🔒</span>';
-      return head + (l.is_open
-        ? `<li><a href="#/lesson/${l.id}">${ico}<span class="grow">${esc(l.title)}</span>${status}</a></li>`
-        : `<li><div class="locked">${ico}<span class="grow">${esc(l.title)}<br><span class="small">Откроется после проверки домашки</span></span></div></li>`);
-    }).join('')}</ul>
+    ${groups.map((g, gi) => {
+      const [lab, ...rest] = g.name.split(' · ');
+      const name = rest.join(' · ');
+      const hw = g.items.filter(l => l.needs_homework);
+      const ok = hw.filter(l => l.passed).length;
+      const all = hw.length && ok === hw.length;
+      const locked = !g.items.some(l => l.is_open);
+      const open = isAdmin() || gi === current || (current < 0 && gi === 0);
+      return `<details class="block${all ? ' done' : ''}${locked ? ' locked-block' : ''}" ${open ? 'open' : ''}>
+        <summary>
+          <span class="grow"><span class="block-lab">${esc(name ? lab : '')}</span><b>${esc(name || lab || 'Уроки')}</b></span>
+          ${hw.length ? `<span class="block-count">${all ? '✓ ' : locked ? '🔒 ' : ''}${ok} из ${hw.length}</span>` : ''}
+          <span class="chev">›</span>
+        </summary>
+        ${hw.length ? `<div class="bar mini"><i style="width:${ok / hw.length * 100}%"></i></div>` : ''}
+        <ul class="toc">${g.items.map(l => {
+          const status = l.passed ? '<span class="pill ok">Сдал ✓</span>' : hwPill(l.hw_status);
+          const ico = l.passed ? '<span class="ico ok">✓</span>' : l.is_open ? '<span class="ico go">▶</span>' : '<span class="ico">🔒</span>';
+          return l.is_open
+            ? `<li><a href="#/lesson/${l.id}">${ico}<span class="grow">${esc(l.title)}</span>${status}</a></li>`
+            : `<li><div class="locked">${ico}<span class="grow">${esc(l.title)}<br><span class="small">Откроется после проверки домашки</span></span></div></li>`;
+        }).join('')}</ul>
+      </details>`;
+    }).join('')}
+    ${(c.outline || []).filter(o => !groups.some(g => g.name === o.name)).map(o => {
+      const [lab, ...rest] = o.name.split(' · ');
+      return `<details class="block locked-block soon">
+        <summary>
+          <span class="grow"><span class="block-lab">${esc(rest.length ? lab : '')}</span><b>${esc(rest.join(' · ') || lab)}</b></span>
+          <span class="block-count">🔒 скоро</span><span class="chev">›</span>
+        </summary>
+        <ul class="toc">${(o.lessons || []).map(t => `<li><div class="locked"><span class="ico">🔒</span><span class="grow">${esc(t)}</span></div></li>`).join('')}</ul>
+      </details>`;
+    }).join('')}
     ${!toc.length ? '<div class="card muted">Уроков пока нет.</div>' : ''}`;
 }
 
@@ -925,7 +957,7 @@ async function adminLessons(box, cid, editId) {
       title: '', blocks: [{ title: '', video: '' }], body: '', homework: '', materials: [], needs_homework: true, published: true
     };
     if (!l) { box.innerHTML = '<div class="card">Урок не найден</div>'; return; }
-    return lessonForm(box, l);
+    return lessonForm(box, l, lessons);
   }
   box.innerHTML = `
     <div class="row" style="margin-bottom:14px">
@@ -952,7 +984,7 @@ async function adminLessons(box, cid, editId) {
   };
 }
 
-function lessonForm(box, l) {
+function lessonForm(box, l, others) {
   const rowB = (b = {}) => `<div class="repeat" data-row="b">
     <input placeholder="Название блока" data-k="title" value="${esc(b.title)}">
     <input placeholder="Ссылка на YouTube (видео «доступ по ссылке»)" data-k="video" value="${esc(b.video)}">
@@ -977,7 +1009,8 @@ function lessonForm(box, l) {
       <h2>${l.id ? 'Редактировать урок' : 'Новый урок'}</h2>
       <div class="grid3">
         <div><label>Порядок</label><input name="position" type="number" value="${l.position}"></div>
-        <div style="grid-column:span 2"><label>Модуль</label><input name="module" value="${esc(l.module)}"></div>
+        <div style="grid-column:span 2"><label>Блок (например: Блок 2 · Ты и твой продукт)</label><input name="module" list="mod-list" value="${esc(l.module)}">
+          <datalist id="mod-list">${[...new Set((others || []).map(x => x.module).filter(Boolean))].map(m => `<option value="${esc(m)}">`).join('')}</datalist></div>
       </div>
       <div><label>Название урока</label><input name="title" required value="${esc(l.title)}"></div>
       <div><label>Видео-блоки</label><div id="blocks">${(l.blocks || []).map(rowB).join('')}</div>
