@@ -739,21 +739,32 @@ async function renderAdmin(tab = 'hw', a, b) {
     </div>
     <div id="tab"></div>`;
   const box = $('#tab');
-  if (tab === 'hw') return adminHomework(box, a || 'new');
+  if (tab === 'hw') return adminHomework(box, a || 'new', b);
   if (tab === 'students') return adminStudents(box);
   if (tab === 'lessons') return adminLessons(box, a ? +a : null, b ? +b : null);
 }
 
-async function adminHomework(box, filter) {
-  const list = await api.admin.homework(filter === 'all' ? null : filter);
+async function adminHomework(box, filter, uid) {
+  const [all, data] = await Promise.all([api.admin.homework(filter === 'all' ? null : filter), api.admin.students()]);
+  const students = data.profiles.filter(p => p.role !== 'admin').sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ru'));
+  const list = uid ? all.filter(h => h.user_id === uid) : all;
+  const who = uid && students.find(p => p.id === uid);
   const urls = await api.shotUrls(list.flatMap(h => (h.files || []).map(f => f.path)));
   const F = { new: 'Новые', redo: 'На доработке', passed: 'Принятые', all: 'Все' };
+  const go = (f, u) => { location.hash = `#/admin/hw/${f}${u ? '/' + u : ''}`; };
   box.innerHTML = `
+    <div class="row" style="margin-bottom:12px">
+      <select id="hw-who" class="grow">
+        <option value="">Все ученики</option>
+        ${students.map(p => `<option value="${p.id}" ${p.id === uid ? 'selected' : ''}>${esc(p.name || p.email || 'Без имени')}</option>`).join('')}
+      </select>
+    </div>
     <div class="chips">${Object.entries(F).map(([k, v]) =>
       `<button data-f="${k}" class="${k === filter ? 'on' : ''}">${v}</button>`).join('')}</div>
+    ${who ? `<p class="muted small" style="margin:0 0 12px">Домашки: <b>${esc(who.name || who.email)}</b> · ${list.length} шт.</p>` : ''}
     ${list.length ? list.map(h => `<div class="card" data-h="${h.id}">
       <div class="row" style="justify-content:space-between">
-        <div><b>${esc(h.profiles?.name || 'Без имени')}</b>
+        <div><button type="button" class="link who" data-who="${h.user_id}" title="Все домашки этого ученика"><b>${esc(h.profiles?.name || 'Без имени')}</b></button>
           <span class="muted small">${esc([h.profiles?.phone, h.profiles?.telegram].filter(Boolean).join(' · '))}</span></div>
         ${hwPill(h.status)}
       </div>
@@ -769,10 +780,12 @@ async function adminHomework(box, filter) {
           <a class="btn ghost sm" href="#/lesson/${h.lesson_id}">Открыть урок</a>
         </div></div>` : ''}
     </div>`).join('') : `<div class="card muted">${filter === 'new' ? 'Новых домашек нет 👌' : 'Пусто'}</div>`}`;
-  $$('[data-f]').forEach(x => x.onclick = () => adminHomework(box, x.dataset.f));
+  $$('[data-f]').forEach(x => x.onclick = () => go(x.dataset.f, uid));
+  $('#hw-who').onchange = e => go(e.target.value && filter === 'new' ? 'all' : filter, e.target.value);
+  $$('[data-who]').forEach(x => x.onclick = () => go('all', x.dataset.who));
   const act = async (fn, hid, msg) => {
     const rep = $(`[data-h="${hid}"] .rep`).value.trim();
-    try { await fn(hid, rep); toast(msg); renderAdmin('hw', filter); } catch (err) { toast(err.message); }
+    try { await fn(hid, rep); toast(msg); renderAdmin('hw', filter, uid); } catch (err) { toast(err.message); }
   };
   $$('[data-ok]').forEach(x => x.onclick = () => act(api.admin.approve, +x.dataset.ok, 'Принято. Следующий урок открыт'));
   $$('[data-redo]').forEach(x => x.onclick = () => act(api.admin.redo, +x.dataset.redo, 'Отправлено на доработку'));
@@ -825,6 +838,7 @@ function studentDialog(p, data, courses, lessonsBy) {
     <div class="row" style="justify-content:space-between"><h2 style="margin:0">${esc(p.name || 'Ученик')}</h2>
       <button class="btn ghost sm" value="cancel">Закрыть</button></div>
     <div class="muted small">${esc(p.email || '')} · с ${fmt(p.created_at)}</div>
+    <a class="btn ghost sm" href="#/admin/hw/all/${p.id}" id="st-hw" style="align-self:flex-start">📝 Домашки ученика (${data.homework.filter(h => h.user_id === p.id).length})</a>
     <div class="grid2">
       <div><label>Имя</label><input name="name" value="${esc(p.name)}"></div>
       <div><label>Телефон</label><input name="phone" value="${esc(p.phone)}"></div>
@@ -851,7 +865,8 @@ function studentDialog(p, data, courses, lessonsBy) {
     }).join('')}
   </form>`;
   document.body.append(d); d.showModal();
-  d.addEventListener('close', () => { d.remove(); if (d.dirty) renderAdmin('students'); });
+  d.addEventListener('close', () => { d.remove(); if (d.dirty && location.hash.startsWith('#/admin/students')) renderAdmin('students'); });
+  $('#st-hw', d).onclick = () => d.close();
   $('#save-st', d).onclick = async e => {
     e.preventDefault();
     const f = Object.fromEntries(new FormData($('#sf', d)));

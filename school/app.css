@@ -227,3 +227,6 @@ dialog.shot-view img { display: block; max-width: 96vw; max-height: 86vh; border
 .mat-file input[data-k="url"] { flex: 1; min-width: 0; }
 .mat-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 640px) { .repeat.mat { grid-template-columns: 1fr; } .mat-file { flex-wrap: wrap; } }
+
+.link.who { text-decoration: none; color: var(--text); }
+.link.who:hover { color: var(--accent); }
