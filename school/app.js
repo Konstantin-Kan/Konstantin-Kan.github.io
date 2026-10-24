@@ -81,7 +81,7 @@ function demoApi() {
   // Видео уроков: YouTube «доступ по ссылке»
   const VIDEOS = { 1: ['https://youtu.be/JiVX4C0WWj0'] };
   const L = (id, position, title, needs_homework, blocks, homework, body = '') => ({
-    id, course_id: 1, position, module: 'Блок 1 · Голова продавца', title, needs_homework,
+    id, course_id: 1, position, module: id === 1 ? '' : 'Блок 1 · Голова продавца', title, needs_homework,
     published: true, body, homework,
     blocks: blocks.map((t, i) => ({ title: t, video: (VIDEOS[id] || [])[i] || '' })),
     materials: (MATS[id] || []).map(t => { const [title, ext] = t.split(':'); return { title, ext }; })
@@ -538,7 +538,9 @@ async function renderCourse(cid, courses) {
     const g = groups.at(-1);
     if (g && g.name === (l.module || '')) g.items.push(l); else groups.push({ name: l.module || '', items: [l] });
   });
-  const current = groups.findIndex(g => g.items.some(l => l.is_open && !l.passed && (l.needs_homework || l === toc[0])));
+  // Уроки без блока (вступление) — отдельной карточкой сверху, не внутри блока
+  const current = groups.findIndex(g => g.name && g.items.some(l => l.is_open && !l.passed && l.needs_homework));
+  const firstBlock = groups.findIndex(g => g.name);
   app.innerHTML = `
     ${courses.length > 1 ? '<a class="back" href="#/">← Все курсы</a>' : ''}
     <h1>${esc(c.title)}</h1>
@@ -547,13 +549,19 @@ async function renderCourse(cid, courses) {
       <b>Пройдено</b><span class="muted">${done} из ${need.length}</span></div>
       <div class="bar"><i style="width:${need.length ? done / need.length * 100 : 0}%"></i></div></div>` : ''}
     ${groups.map((g, gi) => {
+      if (!g.name) return `<ul class="toc intro">${g.items.map(l => {
+        const ico = l.is_open ? '<span class="ico go">▶</span>' : '<span class="ico">🔒</span>';
+        return l.is_open
+          ? `<li><a href="#/lesson/${l.id}">${ico}<span class="grow"><b>${esc(l.title)}</b></span></a></li>`
+          : `<li><div class="locked">${ico}<span class="grow">${esc(l.title)}</span></div></li>`;
+      }).join('')}</ul>`;
       const [lab, ...rest] = g.name.split(' · ');
       const name = rest.join(' · ');
       const hw = g.items.filter(l => l.needs_homework);
       const ok = hw.filter(l => l.passed).length;
       const all = hw.length && ok === hw.length;
       const locked = !g.items.some(l => l.is_open);
-      const open = isAdmin() || gi === current || (current < 0 && gi === 0);
+      const open = isAdmin() || gi === current || (current < 0 && gi === firstBlock);
       return `<details class="block${all ? ' done' : ''}${locked ? ' locked-block' : ''}" ${open ? 'open' : ''}>
         <summary>
           <span class="grow"><span class="block-lab">${esc(name ? lab : '')}</span><b>${esc(name || lab || 'Уроки')}</b></span>

@@ -266,3 +266,5 @@ dialog.shot-view img { display: block; max-width: 96vw; max-height: 86vh; border
 .block .bar.mini { height: 4px; margin: -6px 18px 12px; }
 .block .toc { padding: 0 12px 6px; }
 .block .toc li a, .block .toc li .locked { border-color: var(--line); background: var(--bg); }
+.toc.intro { margin-bottom: 12px; }
+.toc.intro li a { padding: 16px 18px; border-radius: var(--radius); }
