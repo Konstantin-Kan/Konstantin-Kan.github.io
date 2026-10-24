@@ -31,7 +31,7 @@ const hwPill = s => s && HW[s] ? `<span class="pill ${HW[s][1]}">${HW[s][0]}</sp
 // ============================================================
 
 function demoApi() {
-  const KEY = 'school_demo_v1';
+  const KEY = 'school_demo_v2';
   const L = (id, position, title, needs_homework, blocks, homework, body = '') => ({
     id, course_id: 1, position, module: 'Модуль 1 · Работаем с головой', title, needs_homework,
     published: true, body, homework,
@@ -487,6 +487,8 @@ async function renderLesson(lid) {
     ${blocks.length > 1 ? `<div class="chips">${blocks.map((b, i) =>
       `<button data-b="${i}" class="${i ? '' : 'on'}">Блок ${i + 1}${b.title ? ' · ' + esc(b.title) : ''}</button>`).join('')}</div>` : ''}
     <div id="pl">${player(blocks[0])}</div>
+    ${l.needs_homework && !isAdmin() && !toc[idx]?.passed ? `<div style="margin-top:14px">
+      <button class="btn" id="go-hw" style="width:100%;justify-content:center;padding:14px">📝 Сдать ДЗ</button></div>` : ''}
     ${l.body ? `<div class="card text" style="margin-top:16px">${linkify(l.body)}</div>` : '<div style="height:16px"></div>'}
     ${(l.materials || []).length ? `<div class="card files"><h3>Материалы</h3>
       ${l.materials.map(m => `<a href="${esc(m.url)}" target="_blank" rel="noopener">📎 <span class="grow">${esc(m.title)}</span><span class="muted small">открыть</span></a>`).join('')}</div>` : ''}
@@ -502,9 +504,9 @@ async function renderLesson(lid) {
         ${toc[idx]?.passed ? '' : `<form id="hw-form" class="stack" style="margin-top:14px">
           <label>${last?.status === 'redo' ? 'Исправленный ответ' : last?.status === 'new' ? 'Дополнить ответ' : 'Твой ответ'}</label>
           <textarea name="text" required placeholder="Напиши ответ. Файл или фото — загрузи на Google Диск и вставь сюда ссылку"></textarea>
-          <button class="btn">Отправить на проверку</button>
+          <button class="btn">📝 Сдать ДЗ</button>
         </form>`}`}
-    </div>` : ''}
+    </div>` : `<div class="card muted">В этом уроке задания нет. Переходи к следующему уроку.</div>`}
     ${next ? `<div class="card row" style="justify-content:space-between">
       <div><div class="muted small">Следующий урок</div><b>${esc(next.title)}</b></div>
       ${next.is_open ? `<a class="btn" href="#/lesson/${next.id}">Перейти →</a>`
@@ -523,6 +525,11 @@ async function renderLesson(lid) {
     </div>`;
 
   moveWatermark();
+  const goHw = $('#go-hw');
+  if (goHw) goHw.onclick = () => {
+    $('#hw').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const ta = $('#hw-form textarea'); if (ta) setTimeout(() => ta.focus({ preventScroll: true }), 500);
+  };
   $$('.chips button').forEach(b => b.onclick = () => {
     cur = +b.dataset.b;
     $$('.chips button').forEach(x => x.classList.toggle('on', x === b));
