@@ -46,7 +46,7 @@ function demoApi() {
     ],
     profiles: [
       { id: 'u-admin', email: 'admin@demo', name: 'Константин', role: 'admin', phone: '', telegram: '', created_at: new Date().toISOString() },
-      { id: 'u-student', email: 'student@demo', name: 'Демо-ученица', role: 'student', phone: '+7 700 000 00 00', telegram: '@demo', package: 'стандарт', paid: '', note: '', created_at: new Date().toISOString() }
+      { id: 'u-student', email: 'student@demo', name: 'Демо-ученик', role: 'student', phone: '+7 700 000 00 00', telegram: '@demo', package: 'стандарт', paid: '', note: '', created_at: new Date().toISOString() }
     ],
     courses: [{ id: 1, title: 'Sky — обучение продажам', description: 'Обучение продажам: 2 месяца. Уроки открываются по очереди, после проверки домашки.', position: 1, published: true }],
     lessons: [
@@ -57,7 +57,7 @@ function demoApi() {
         'Первое. Тетрадь, пункт 1.1. Выпиши пять своих мыслей про продажи, которые тебе мешают.\nВторое. На каждую мысль посмотри с другой стороны — с позиции пользы для клиента. Что получит человек, если ты ему предложишь? Пропиши ответ на языке выгоды.'),
       L(3, 2, 'Урок 1.2 — Деньги и стыд', true,
         ['Деньги из детства', 'Стыд и два страха', 'Иди туда, где страшно', 'Отказ — не про тебя'],
-        'Тетрадь, пункт 1.2. Вспомни три ситуации, когда тебе было стыдно предложить или назвать цену. Чего ты боялась? И что было на самом деле?\nИ выпиши фразы про деньги, которые ты слышала в детстве.'),
+        'Тетрадь, пункт 1.2. Вспомни три ситуации, когда тебе было стыдно предложить или назвать цену. Чего было страшно? И что было на самом деле?\nИ выпиши фразы про деньги, которые звучали у тебя в детстве.'),
       L(4, 3, 'Урок 1.3 — Уверенность', true,
         ['Что клиент считывает', 'Знай и цени свой продукт', 'Круг забот и круг влияния', 'Не жди уверенности'],
         'Первое. Тетрадь, пункт 1.3. Пропиши три результата своих клиентов.\nВторое. Круг забот и круг влияния — два столбика.\nТретье. Перепиши три последних сообщения клиентам без «извините» и оправданий.'),
@@ -301,12 +301,20 @@ function renderTop() {
   $('#logout').onclick = async () => { await api.signOut(); ME = null; location.hash = '#/'; route(); };
 }
 
+// Демо-кнопки видит только владелец: один раз открыть /school/?owner, браузер запомнит
+function isOwner() {
+  try {
+    if (/[?&]owner\b/.test(location.search)) localStorage.setItem('school_owner', '1');
+    return localStorage.getItem('school_owner') === '1';
+  } catch { return /[?&]owner\b/.test(location.search); }
+}
+
 function demoNote() {
-  if (!api.demo) return '';
+  if (!api.demo || !isOwner()) return '';
   return `<div class="card demo-box small">
-    <b>Демо-режим.</b> Всё хранится только в этом браузере. Так можно потыкать платформу до подключения Supabase.
+    <b>Демо-режим.</b> Видишь только ты. Всё хранится только в этом браузере.
     <div class="row" style="margin-top:10px">
-      <button class="btn sm" data-demo="student@demo">Войти как ученица</button>
+      <button class="btn sm" data-demo="student@demo">Войти</button>
       <button class="btn ghost sm" data-demo="admin@demo">Войти как админ</button>
       <button class="link small" id="demo-reset">Сбросить демо</button>
     </div></div>`;
@@ -389,7 +397,7 @@ async function renderHome() {
         <h2>${esc(c.title)}</h2><div class="muted">${esc(c.description || '')}</div>
       </a>`).join('') : `
       <div class="card"><h2>Доступ скоро откроется</h2>
-        <p class="muted">Ты зарегистрирована. Как только я подтвержу оплату, здесь появится курс.</p>
+        <p class="muted">Регистрация прошла. Как только я подтвержу оплату, здесь появится курс.</p>
         <a class="btn" href="${esc(C.SUPPORT_TELEGRAM)}" target="_blank" rel="noopener">Написать в Telegram</a>
       </div>`}`;
 }
