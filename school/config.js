@@ -1,9 +1,9 @@
 // Настройки платформы.
-// Пока SUPABASE_URL пустой — сайт работает в демо-режиме (всё хранится в браузере).
-// После создания проекта в Supabase вставь сюда две строки из Settings → API.
+// Пустой SUPABASE_URL = демо-режим (всё хранится в браузере).
+// Ключ публичный (publishable): его можно показывать, данные защищают правила доступа в базе.
 window.SCHOOL_CONFIG = {
-  SUPABASE_URL: '',
-  SUPABASE_ANON_KEY: '',
+  SUPABASE_URL: 'https://dvnsphzmjffnyelztlhd.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_CU52WvSgn1MAIW79BnyfMA_oqGKnmzd',
   SCHOOL_NAME: 'Школа продаж Константина Кана',
   SUPPORT_TELEGRAM: 'https://t.me/Constantine_Kan'
 };
