@@ -78,10 +78,12 @@ function demoApi() {
     2: ['Рабочая тетрадь:docx'], 3: ['Рабочая тетрадь:docx'], 4: ['Рабочая тетрадь:docx'], 5: ['Гайд до старта:pdf'],
     6: ['Анкета точки А:docx', 'Таблица учёта клиентов:xlsx', 'Таблица — пример заполнения:xlsx', 'Книга техник продаж:pdf', 'Рабочая тетрадь:docx']
   };
+  // Видео уроков: YouTube «доступ по ссылке»
+  const VIDEOS = { 1: ['https://youtu.be/JiVX4C0WWj0'] };
   const L = (id, position, title, needs_homework, blocks, homework, body = '') => ({
     id, course_id: 1, position, module: 'Модуль 1 · Работаем с головой', title, needs_homework,
     published: true, body, homework,
-    blocks: blocks.map(t => ({ title: t, video: '' })),
+    blocks: blocks.map((t, i) => ({ title: t, video: (VIDEOS[id] || [])[i] || '' })),
     materials: (MATS[id] || []).map(t => { const [title, ext] = t.split(':'); return { title, ext }; })
   });
   // Файлы материалов в демо лежат в этом браузере (IndexedDB), наружу не уходят
