@@ -134,29 +134,124 @@ input[type=checkbox] { width: auto; }
   font: 600 13px/1.25 inherit; text-shadow: 0 1px 2px #000; max-width: 70%;
   transition: left 1.5s ease, top 1.5s ease;
 }
-.player .fs {
-  position: absolute; z-index: 3; right: 10px; top: 10px; border: 0; border-radius: 10px;
-  background: rgba(0,0,0,.55); color: #fff; padding: 6px 10px; font-size: 13px; cursor: pointer;
-}
 .player:fullscreen { border-radius: 0; aspect-ratio: auto; }
-.player:fullscreen .fs, .player.pseudo-fs .fs { font-size: 18px; padding: 8px 14px; }
+
+/* Свой плеер поверх YouTube */
+.player .cover {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: #000 center / cover no-repeat; transition: opacity .3s;
+}
+.player.playing .cover, .player.paused .cover { opacity: 0; }
+.player .shield { position: absolute; inset: 0; z-index: 2; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+/* Если телефон не дал запустить ролик кнопкой, следующее касание идёт прямо в ролик,
+   но края с названием и логотипом закрыты */
+.player.tap .shield { pointer-events: none; }
+.player.tap .shield::before, .player.tap .shield::after {
+  content: ""; position: absolute; left: 0; right: 0; pointer-events: auto; cursor: default;
+}
+.player.tap .shield::before { top: 0; height: 24%; }
+.player.tap .shield::after { bottom: 0; height: 24%; }
+.player .wm { z-index: 4; }
+.player button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+.player svg { width: 24px; height: 24px; display: block; }
+.player .mid {
+  position: absolute; z-index: 3; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 68px; height: 68px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(20,20,20,.62); color: #fff; display: grid; place-items: center;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  transition: opacity .25s, transform .2s;
+}
+.player .mid svg { width: 32px; height: 32px; }
+.player.tap .mid { pointer-events: none; }
+.player.idle .mid svg { margin-left: 4px; }
+.player.playing .mid { opacity: 0; pointer-events: none; }
+.player.playing.ui .mid { opacity: 1; pointer-events: auto; }
+@media (pointer: fine) { .player.playing.ui .mid { opacity: 0; pointer-events: none; } }
+.player.loading .mid { opacity: 0; }
+.player .ctrl {
+  position: absolute; z-index: 5; left: 10px; right: 10px; bottom: 10px;
+  padding: 4px 12px 6px; border-radius: 14px; color: #fff;
+  background: rgba(30,30,30,.55); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  transition: opacity .25s, transform .25s; opacity: 0; transform: translateY(6px); pointer-events: none;
+}
+.player.ui:not(.idle) .ctrl, .player.paused .ctrl, .player.ended .ctrl { opacity: 1; transform: none; pointer-events: auto; }
+.player .seek { position: relative; height: 22px; cursor: pointer; touch-action: none; display: flex; align-items: center; }
+.player .track { position: relative; flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,.28); overflow: hidden; }
+.player .track i { position: absolute; left: 0; top: 0; bottom: 0; }
+.player .track .buf { background: rgba(255,255,255,.35); }
+.player .track .done { background: var(--accent); }
+.player .seek b {
+  position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.4); transition: transform .15s;
+}
+.player.seeking .seek b { transform: scale(1.3); }
+.player .row { display: flex; align-items: center; gap: 4px; }
+.player .row button {
+  border: 0; background: none; cursor: pointer; padding: 6px; border-radius: 8px;
+  display: flex; align-items: center; gap: 4px;
+}
+.player .row button:hover { background: rgba(255,255,255,.12); }
+.player .time { font-size: 14px; font-variant-numeric: tabular-nums; margin-left: 4px; white-space: nowrap; }
+.player .grow { flex: 1; }
+.player .rate { font-size: 13px; font-weight: 600; }
+.player .rate:empty { display: none; }
+.player .vol { width: 80px; accent-color: #fff; cursor: pointer; }
+.player .menu {
+  position: absolute; z-index: 6; right: 10px; bottom: 76px; width: 230px; max-height: calc(100% - 90px); overflow-y: auto;
+  padding: 6px; border-radius: 14px; color: #fff;
+  background: rgba(36,36,36,.92); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+}
+.player .menu[hidden] { display: none; }
+.player .menu-h { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 8px 10px; border-bottom: 1px solid rgba(255,255,255,.12); margin-bottom: 4px; }
+.player .menu-h button { border: 0; background: none; cursor: pointer; font-size: 16px; padding: 2px 6px; }
+.player .sw-row {
+  display: flex; align-items: center; justify-content: space-between; width: 100%;
+  border: 0; background: none; cursor: pointer; padding: 9px 10px; border-radius: 9px; font-size: 15px;
+}
+.player .sw-row:hover { background: rgba(255,255,255,.1); }
+.player .sw { position: relative; width: 40px; height: 24px; border-radius: 12px; background: rgba(255,255,255,.25); transition: background .2s; flex: none; }
+.player .sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.player .sw-row.on .sw { background: #34c759; }
+.player .sw-row.on .sw::after { transform: translateX(16px); }
+.player .menu-sub { padding: 8px 10px 2px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: rgba(255,255,255,.55); }
+.player .menu [data-speed] {
+  display: block; width: 100%; text-align: left; border: 0; background: none; cursor: pointer;
+  padding: 9px 10px 9px 30px; border-radius: 9px; font-size: 15px; position: relative;
+}
+.player .menu [data-speed]:hover { background: rgba(255,255,255,.1); }
+.player .menu [data-speed].on::before { content: "✓"; position: absolute; left: 10px; color: var(--accent); font-weight: 700; }
+/* Если YouTube API не загрузился — обычный ролик без своих кнопок */
+.player.noapi .cover, .player.noapi .shield, .player.noapi .mid, .player.noapi .ctrl, .player.noapi .menu { display: none; }
+@media (max-width: 640px) {
+  .player .ctrl { left: 6px; right: 6px; bottom: 6px; padding: 2px 8px 4px; }
+  .player .time { font-size: 13px; }
+  .player .menu { right: 6px; bottom: 54px; width: 216px; padding: 4px; max-height: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .player .menu-h { display: none; }
+  .player .sw-row, .player .menu-sub { grid-column: 1 / -1; }
+  .player .sw-row { padding: 4px 8px; font-size: 14px; }
+  .player .menu-sub { padding: 2px 8px 0; font-size: 11px; }
+  .player .menu [data-speed] { padding: 5px 4px; text-align: center; font-size: 14px; }
+  .player .menu [data-speed].on { background: rgba(255,255,255,.16); }
+  .player .menu [data-speed].on::before { content: none; }
+  .player .mid { width: 58px; height: 58px; }
+}
 /* «На весь экран» на iPhone: плеер на весь экран страницы, водяной знак остаётся */
 .player.pseudo-fs {
   position: fixed; inset: 0; z-index: 100; width: 100vw; height: 100vh; height: 100dvh;
   aspect-ratio: auto; border-radius: 0;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
-.player.pseudo-fs .fs { top: calc(10px + env(safe-area-inset-top)); right: calc(10px + env(safe-area-inset-right)); }
+.player.pseudo-fs .ctrl { bottom: calc(10px + env(safe-area-inset-bottom)); left: calc(10px + env(safe-area-inset-left)); right: calc(10px + env(safe-area-inset-right)); }
+.player.pseudo-fs .menu { bottom: calc(76px + env(safe-area-inset-bottom)); right: calc(10px + env(safe-area-inset-right)); }
 .player.pseudo-fs::after {
-  content: "Поверните телефон горизонтально"; position: absolute; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom));
-  transform: translateX(-50%); z-index: 3; pointer-events: none; color: #fff; font-size: 14px;
+  content: "Поверните телефон горизонтально"; position: absolute; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom));
+  transform: translateX(-50%); z-index: 7; pointer-events: none; color: #fff; font-size: 14px;
   background: rgba(0,0,0,.6); padding: 8px 14px; border-radius: 999px; white-space: nowrap;
   animation: fs-hint 4s forwards;
 }
 @keyframes fs-hint { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
 @media (orientation: landscape) { .player.pseudo-fs::after { display: none; } }
 html.no-scroll, html.no-scroll body { overflow: hidden; }
-@media (max-width: 640px) { .player .fs { padding: 8px 12px; font-size: 16px; } }
 .text { white-space: pre-wrap; word-wrap: break-word; }
 .files a {
   display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px;

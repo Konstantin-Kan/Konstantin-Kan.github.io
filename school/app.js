@@ -591,31 +591,270 @@ async function renderCourse(cid, courses) {
     ${!toc.length ? '<div class="card muted">Уроков пока нет.</div>' : ''}`;
 }
 
-let wmTimer = null;
+// ---------- Плеер ----------
+// Видео лежит на YouTube, но все кнопки свои: поверх ролика «щит»,
+// поэтому до логотипа, названия и похожих роликов YouTube не дотянуться
+let wmTimer = null, yt = null, ytTick = null, ctrlTimer = null;
+const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+const TOUCH = matchMedia('(pointer: coarse)').matches;
+const svg = (d, fill = true) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}" ${fill ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'}/></svg>`;
+const ICO = {
+  play: svg('M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z'),
+  pause: svg('M7 5h3.5v14H7zM13.5 5H17v14h-3.5z'),
+  vol: svg('M4 9v6h4l5 4V5L8 9H4zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12', false),
+  mute: svg('M4 9v6h4l5 4V5L8 9H4zM17 9.5l5 5M22 9.5l-5 5', false),
+  gear: svg('M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2z'),
+  full: svg('M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5', false),
+  exit: svg('M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5', false),
+  replay: svg('M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4', false)
+};
+const hms = s => {
+  s = Math.max(0, Math.floor(s || 0));
+  const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, sec = String(s % 60).padStart(2, '0');
+  return h ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${m}:${sec}`;
+};
+let ytApi = null;
+const loadYT = () => ytApi ||= new Promise((ok, no) => {
+  if (window.YT?.Player) return ok(window.YT);
+  window.onYouTubeIframeAPIReady = () => ok(window.YT);
+  const s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  s.onerror = () => { ytApi = null; s.remove(); no(new Error('YouTube API')); };
+  document.head.append(s);
+});
+
 function player(block) {
   const vid = ytId(block?.video);
   const mark = esc([ME.profile.name, ME.profile.phone || ME.user.email].filter(Boolean).join(' · '));
-  return `<div class="player" id="player" oncontextmenu="return false">
-    ${vid ? `<iframe src="https://www.youtube-nocookie.com/embed/${vid}?rel=0&modestbranding=1&fs=0&iv_load_policy=3&playsinline=1"
-      allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"
-      title="${esc(block.title)}"></iframe>
-      <div class="wm">${mark}</div>
-      <button class="fs" id="fs" title="На весь экран">⛶</button>`
-    : '<div class="empty">Видео к этому блоку скоро появится</div>'}
+  if (!vid) return '<div class="player" id="player"><div class="empty">Видео к этому блоку скоро появится</div></div>';
+  const q = `enablejsapi=1&origin=${encodeURIComponent(location.origin)}&controls=0&disablekb=1&rel=0&fs=0&iv_load_policy=3&playsinline=1&modestbranding=1&cc_load_policy=0`;
+  return `<div class="player idle" id="player" oncontextmenu="return false">
+    <iframe id="yt" src="https://www.youtube-nocookie.com/embed/${vid}?${q}"
+      allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" title="${esc(block.title)}"></iframe>
+    <div class="cover" style="background-image:url(https://i.ytimg.com/vi/${vid}/hqdefault.jpg)"></div>
+    <div class="shield"></div>
+    <button class="mid" data-a="play" aria-label="Смотреть">${ICO.play}</button>
+    <div class="wm">${mark}</div>
+    <div class="ctrl">
+      <div class="seek"><div class="track"><i class="buf"></i><i class="done"></i></div><b></b></div>
+      <div class="row">
+        <button data-a="play" aria-label="Пуск">${ICO.play}</button>
+        <span class="time">0:00 / 0:00</span>
+        <span class="grow"></span>
+        <button data-a="mute" aria-label="Звук">${ICO.vol}</button>
+        ${TOUCH ? '' : '<input class="vol" type="range" min="0" max="100" value="100" aria-label="Громкость">'}
+        <button data-a="menu" aria-label="Настройки">${ICO.gear}<span class="rate"></span></button>
+        <button data-a="fs" aria-label="На весь экран">${ICO.full}</button>
+      </div>
+    </div>
+    <div class="menu" hidden>
+      <div class="menu-h"><b>Настройки</b><button data-a="close" aria-label="Закрыть">✕</button></div>
+      <button class="sw-row" data-a="cc">Субтитры<span class="sw"></span></button>
+      <div class="menu-sub">Скорость</div>
+      ${SPEEDS.map(s => `<button data-speed="${s}" class="${s === 1 ? 'on' : ''}">x${String(s).replace('.', ',')}</button>`).join('')}
+    </div>
   </div>`;
 }
+
+function stopPlayer() {
+  clearInterval(ytTick); clearTimeout(ctrlTimer);
+  try { yt?.destroy?.(); } catch {}
+  yt = null;
+}
+
+async function initPlayer() {
+  stopPlayer();
+  const p = $('#player'), frame = p && $('#yt', p);
+  if (!frame) return;
+  const st = cls => { p.classList.remove('idle', 'tap', 'playing', 'paused', 'ended'); p.classList.add(cls); };
+  const btn = a => $$(`[data-a="${a}"]`, p);
+  const menu = $('.menu', p), seek = $('.seek', p), vol = $('.vol', p);
+  let seeking = false, ccTrackSet = false, ccApplied = false;
+
+  // Кнопки прячутся, пока видео идёт, и появляются при движении мышью или касании
+  const showCtrl = () => {
+    p.classList.add('ui');
+    clearTimeout(ctrlTimer);
+    ctrlTimer = setTimeout(() => {
+      if (p.classList.contains('playing') && menu.hidden && !seeking) p.classList.remove('ui');
+    }, 2800);
+  };
+  const draw = () => {
+    if (!yt?.getDuration) return;
+    const d = yt.getDuration() || 0, t = seeking ? seeking * d : yt.getCurrentTime() || 0;
+    $('.done', p).style.width = (d ? t / d * 100 : 0) + '%';
+    $('b', seek).style.left = (d ? t / d * 100 : 0) + '%';
+    $('.buf', p).style.width = (yt.getVideoLoadedFraction?.() || 0) * 100 + '%';
+    $('.time', p).textContent = `${hms(t)} / ${hms(d)}`;
+  };
+  const setPlayIcon = on => btn('play').forEach(b => {
+    b.innerHTML = p.classList.contains('ended') ? ICO.replay : on ? ICO.pause : ICO.play;
+  });
+  const toggle = () => {
+    if (!yt?.getPlayerState) return;
+    const s = yt.getPlayerState();
+    if (s === 0) { yt.seekTo(0, true); yt.playVideo(); }
+    else if (s === 1 || s === 3) yt.pauseVideo();
+    else yt.playVideo();
+  };
+  const jump = sec => { if (yt?.seekTo) { yt.seekTo(Math.max(0, yt.getCurrentTime() + sec), true); showCtrl(); } };
+
+  let YT;
+  try { YT = await loadYT(); }
+  catch {
+    // YouTube API не загрузился — показываем ролик как есть, без своих кнопок
+    p.classList.add('noapi');
+    return;
+  }
+  if (!document.body.contains(frame)) return;
+  yt = new YT.Player(frame, {
+    events: {
+      onReady: () => { draw(); ytTick = setInterval(draw, 250); },
+      // Модуль субтитров подгружается сам — сразу приводим к выбору ученика
+      onApiChange: () => {
+        if (!ccOn()) return yt.unloadModule?.('captions');
+        const tracks = yt.getOption?.('captions', 'tracklist') || [];
+        const t = tracks.find(x => /^ru/.test(x.languageCode)) || tracks[0];
+        if (t && !ccTrackSet) { ccTrackSet = true; yt.setOption('captions', 'track', { languageCode: t.languageCode }); }
+      },
+      onStateChange: e => {
+        if (e.data === 1) { st('playing'); showCtrl(); if (!ccApplied) { ccApplied = true; setCC(ccOn()); } }
+        else if (e.data === 2) { st('paused'); p.classList.add('ui'); }
+        else if (e.data === 0) { st('ended'); p.classList.add('ui'); }
+        setPlayIcon(e.data === 1 || e.data === 3);
+        p.classList.toggle('loading', e.data === 3);
+      }
+    }
+  });
+
+  // Первый запуск. Если телефон не разрешил запустить ролик нашей кнопкой,
+  // следующее касание пропускаем прямо в ролик — так браузер точно разрешит
+  const start = () => {
+    yt?.playVideo?.();
+    setTimeout(() => { if (p.classList.contains('idle')) p.classList.add('tap'); }, 1200);
+  };
+  $('.mid', p).onclick = e => {
+    e.stopPropagation();
+    p.classList.contains('idle') ? start() : toggle();
+  };
+  $('.shield', p).onclick = () => {
+    if (p.classList.contains('idle')) return start();
+    if (!menu.hidden) { menu.hidden = true; return showCtrl(); }
+    if (TOUCH && !p.classList.contains('ui')) return showCtrl();
+    if (TOUCH && p.classList.contains('playing')) { p.classList.remove('ui'); return; }
+    toggle(); showCtrl();
+  };
+  $('.shield', p).ondblclick = () => { if (!TOUCH && !p.classList.contains('idle')) toggleFullscreen(); };
+  p.onpointermove = e => { if (e.pointerType === 'mouse') showCtrl(); };
+  p.onmouseleave = () => { if (p.classList.contains('playing') && menu.hidden) p.classList.remove('ui'); };
+
+  btn('play').forEach(b => { if (!b.classList.contains('mid')) b.onclick = e => { e.stopPropagation(); toggle(); showCtrl(); }; });
+  btn('mute')[0].onclick = () => {
+    if (!yt?.isMuted) return;
+    const m = !yt.isMuted();
+    m ? yt.mute() : yt.unMute();
+    btn('mute')[0].innerHTML = m ? ICO.mute : ICO.vol;
+    if (vol) vol.value = m ? 0 : yt.getVolume() || 100;
+    showCtrl();
+  };
+  if (vol) vol.oninput = () => {
+    const v = +vol.value;
+    yt?.setVolume?.(v); v ? yt?.unMute?.() : yt?.mute?.();
+    btn('mute')[0].innerHTML = v ? ICO.vol : ICO.mute;
+    showCtrl();
+  };
+  // Субтитры: выбор запоминаем, по умолчанию выключены
+  function ccOn() { try { return localStorage.getItem('school_cc') === '1'; } catch { return false; } }
+  function setCC(on) {
+    btn('cc')[0].classList.toggle('on', on);
+    if (!yt?.loadModule) return;
+    if (on) {
+      ccTrackSet = false;
+      yt.loadModule('captions');
+      const tracks = yt.getOption?.('captions', 'tracklist') || [];
+      const t = tracks.find(x => /^ru/.test(x.languageCode)) || tracks[0];
+      if (t) { ccTrackSet = true; yt.setOption('captions', 'track', { languageCode: t.languageCode }); }
+    } else yt.unloadModule('captions');
+  }
+  btn('cc')[0].classList.toggle('on', ccOn());
+  btn('cc')[0].onclick = () => {
+    const on = !ccOn();
+    try { localStorage.setItem('school_cc', on ? '1' : '0'); } catch {}
+    setCC(on); showCtrl();
+  };
+  btn('menu')[0].onclick = e => { e.stopPropagation(); menu.hidden = !menu.hidden; showCtrl(); };
+  btn('close')[0].onclick = () => { menu.hidden = true; showCtrl(); };
+  $$('[data-speed]', menu).forEach(b => b.onclick = () => {
+    const s = +b.dataset.speed;
+    yt?.setPlaybackRate?.(s);
+    $$('[data-speed]', menu).forEach(x => x.classList.toggle('on', x === b));
+    $('.rate', p).textContent = s === 1 ? '' : `x${String(s).replace('.', ',')}`;
+    menu.hidden = true; showCtrl();
+  });
+  btn('fs')[0].onclick = () => { toggleFullscreen(); showCtrl(); };
+
+  // Перемотка: тянем по полоске пальцем или мышью
+  const frac = e => {
+    const r = seek.getBoundingClientRect();
+    return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) || 0.0001;
+  };
+  seek.onpointerdown = e => {
+    if (!yt?.getDuration) return;
+    seek.setPointerCapture(e.pointerId);
+    seeking = frac(e); p.classList.add('seeking'); draw();
+  };
+  seek.onpointermove = e => { if (seeking) { seeking = frac(e); draw(); showCtrl(); } };
+  seek.onpointerup = seek.onpointercancel = e => {
+    if (!seeking) return;
+    yt.seekTo(frac(e) * yt.getDuration(), true);
+    seeking = false; p.classList.remove('seeking'); showCtrl();
+  };
+
+  p.player = { toggle, jump };
+}
+
+// Клавиши как на YouTube: пробел — пауза, стрелки — ±5 секунд, F — на весь экран, M — звук
+document.addEventListener('keydown', e => {
+  const p = $('#player');
+  if (!p?.player || p.classList.contains('idle') || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(document.activeElement?.tagName) && e.key !== 'Escape') return;
+  if (document.activeElement?.isContentEditable) return;
+  const k = e.key.toLowerCase();
+  if (k === ' ' || k === 'k' || k === 'л') { e.preventDefault(); p.player.toggle(); }
+  else if (k === 'arrowright') { e.preventDefault(); p.player.jump(5); }
+  else if (k === 'arrowleft') { e.preventDefault(); p.player.jump(-5); }
+  else if (k === 'f' || k === 'а') toggleFullscreen();
+  else if (k === 'm' || k === 'ь') $('[data-a="mute"]', p)?.click();
+});
+
 function moveWatermark() {
   clearInterval(wmTimer);
   const move = () => {
     const p = $('#player'), w = p && $('.wm', p);
     if (!w) return clearInterval(wmTimer);
     w.style.left = 4 + Math.random() * Math.max(0, 92 - w.offsetWidth / p.offsetWidth * 100) + '%';
-    w.style.top = 6 + Math.random() * Math.max(0, 88 - w.offsetHeight / p.offsetHeight * 100) + '%';
+    w.style.top = 6 + Math.random() * Math.max(0, 70 - w.offsetHeight / p.offsetHeight * 100) + '%';
   };
   move(); wmTimer = setInterval(move, 7000);
-  const fs = $('#fs');
-  if (fs) fs.onclick = toggleFullscreen;
+  initPlayer();
 }
+
+const syncFsIcon = () => {
+  const p = $('#player'), b = p && $('[data-a="fs"]', p);
+  if (!b) return;
+  const on = !!(document.fullscreenElement || document.webkitFullscreenElement) || p.classList.contains('pseudo-fs');
+  b.innerHTML = on ? ICO.exit : ICO.full;
+};
+// Настоящий полный экран включился позже запасного — запасной убираем
+const onFsChange = () => {
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    $('#player')?.classList.remove('pseudo-fs');
+    document.documentElement.classList.remove('no-scroll');
+  }
+  syncFsIcon();
+};
+document.addEventListener('fullscreenchange', onFsChange);
+document.addEventListener('webkitfullscreenchange', onFsChange);
 
 // На весь экран вместе с водяным знаком. iPhone не умеет так с обычным блоком —
 // там плеер растягивается на весь экран средствами страницы
@@ -624,8 +863,7 @@ function pseudoFullscreen(on) {
   if (!p) return;
   p.classList.toggle('pseudo-fs', on);
   document.documentElement.classList.toggle('no-scroll', on);
-  const fs = $('#fs', p);
-  if (fs) fs.textContent = on ? '✕' : '⛶';
+  syncFsIcon();
 }
 function toggleFullscreen() {
   const p = $('#player');
@@ -636,11 +874,15 @@ function toggleFullscreen() {
   if (p.classList.contains('pseudo-fs')) return pseudoFullscreen(false);
   const req = p.requestFullscreen || p.webkitRequestFullscreen;
   if (!req || document.fullscreenEnabled === false) return pseudoFullscreen(true);
+  // Некоторые браузеры молча не пускают в полный экран — тогда через полсекунды растягиваем сами
+  const fallback = setTimeout(() => {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) pseudoFullscreen(true);
+  }, 600);
   try {
     Promise.resolve(req.call(p))
       .then(() => screen.orientation?.lock?.('landscape').catch(() => {}))
-      .catch(() => pseudoFullscreen(true));
-  } catch { pseudoFullscreen(true); }
+      .catch(() => { clearTimeout(fallback); pseudoFullscreen(true); });
+  } catch { clearTimeout(fallback); pseudoFullscreen(true); }
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') pseudoFullscreen(false); });
 
@@ -1095,7 +1337,7 @@ function lessonForm(box, l, others) {
 // ============================================================
 
 async function route() {
-  clearInterval(wmTimer);
+  clearInterval(wmTimer); stopPlayer();
   document.documentElement.classList.remove('no-scroll');
   const [, page, a, b, c] = (location.hash || '#/').split('/');
   if (page === 'new-password') return renderNewPassword();
