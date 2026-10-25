@@ -26,7 +26,7 @@ const HW = {
 };
 // Фото к домашке: уменьшаем в браузере, чтобы грузилось быстро и не забивало место
 const MAX_SHOTS = 10;
-async function shrink(file, max = 1600) {
+async function shrink(file, max = 1600, quality = 0.82) {
   let img;
   try { img = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
   catch {
@@ -39,7 +39,7 @@ async function shrink(file, max = 1600) {
   const c = document.createElement('canvas');
   c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
   c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-  return new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.82));
+  return new Promise(ok => c.toBlob(ok, 'image/jpeg', quality));
 }
 const shots = (files, urls) => (files || []).length ? `<div class="shots">${files.map(f => urls[f.path]
   ? `<a href="${esc(urls[f.path])}" target="_blank" rel="noopener" title="${esc(f.name || '')}"><img src="${esc(urls[f.path])}" alt="" loading="lazy"></a>`
@@ -225,6 +225,10 @@ function demoApi() {
       return out;
     },
     async shotUrls(paths) { return Object.fromEntries(paths.map(p => [p, db.files[p]]).filter(x => x[1])); },
+    async uploadCover(lid, blob) {
+      if (!isAdmin()) return fail('Только для админа');
+      return new Promise(ok => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(blob); });
+    },
     async uploadMaterial(lid, file) {
       if (!isAdmin()) return fail('Только для админа');
       const path = `lesson-${lid}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -340,6 +344,12 @@ function supabaseApi() {
       return Object.fromEntries(d.filter(x => x.signedUrl).map(x => [x.path, x.signedUrl]));
     },
     submitHomework: (lid, text, files = []) => q(sb.from('homework').insert({ lesson_id: lid, user_id: uid, text, files })),
+    // Обложки лежат в открытом хранилище: это просто картинки, ссылка на них не страшна
+    async uploadCover(lid, blob) {
+      const path = `lesson-${lid}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.jpg`;
+      await q(sb.storage.from('covers').upload(path, blob, { contentType: 'image/jpeg' }));
+      return sb.storage.from('covers').getPublicUrl(path).data.publicUrl;
+    },
     async uploadMaterial(lid, file) {
       const ext = (file.name.match(/\.([a-z0-9]{1,5})$/i)?.[1] || 'bin').toLowerCase();
       const path = `lesson-${lid}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
@@ -631,7 +641,7 @@ function player(block) {
   return `<div class="player idle" id="player" oncontextmenu="return false">
     <iframe id="yt" src="https://www.youtube-nocookie.com/embed/${vid}?${q}"
       allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" title="${esc(block.title)}"></iframe>
-    <div class="cover" style="background-image:url(https://i.ytimg.com/vi/${vid}/hqdefault.jpg)"></div>
+    <div class="cover" ${block.cover ? '' : `data-yt="${vid}"`} style="background-image:url('${esc(block.cover || `https://i.ytimg.com/vi/${vid}/maxresdefault.jpg`)}')"></div>
     <div class="shield"></div>
     <button class="mid" data-a="play" aria-label="Смотреть">${ICO.play}</button>
     <div class="wm">${mark}</div>
@@ -669,6 +679,16 @@ async function initPlayer() {
   const st = cls => { p.classList.remove('idle', 'tap', 'playing', 'paused', 'ended'); p.classList.add(cls); };
   const btn = a => $$(`[data-a="${a}"]`, p);
   const menu = $('.menu', p), seek = $('.seek', p), vol = $('.vol', p);
+  // Своей обложки нет — берём с YouTube самую чёткую. Если у ролика нет большой (YouTube
+  // тогда отдаёт серую заглушку 120×90), ставим поменьше
+  const cov = $('.cover[data-yt]', p);
+  if (cov) {
+    const id = cov.dataset.yt, img = new Image();
+    const low = () => { cov.style.backgroundImage = `url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')`; };
+    img.onload = () => { if (img.naturalWidth <= 120) low(); };
+    img.onerror = low;
+    img.src = `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
+  }
   let seeking = false, ccTrackSet = false, ccApplied = false;
 
   // Кнопки прячутся, пока видео идёт, и появляются при движении мышью или касании
@@ -1238,7 +1258,15 @@ function lessonForm(box, l, others) {
   const rowB = (b = {}) => `<div class="repeat" data-row="b">
     <input placeholder="Название блока" data-k="title" value="${esc(b.title)}">
     <input placeholder="Ссылка на YouTube (видео «доступ по ссылке»)" data-k="video" value="${esc(b.video)}">
-    <button type="button" class="btn danger sm" data-rm>✕</button></div>`;
+    <button type="button" class="btn danger sm" data-rm>✕</button>
+    <div class="cover-pick">
+      <input type="hidden" data-k="cover" value="${esc(b.cover)}">
+      <span class="cover-thumb" ${b.cover ? `style="background-image:url('${esc(b.cover)}')"` : ''}>${b.cover ? '' : 'с YouTube'}</span>
+      <label class="btn ghost sm" style="margin:0;color:var(--text);white-space:nowrap">${b.cover ? 'Заменить обложку' : '⬆ Своя обложка'}
+        <input type="file" hidden accept="image/*" data-cover></label>
+      <button type="button" class="btn ghost sm" data-cover-rm ${b.cover ? '' : 'hidden'}>Убрать</button>
+      <span class="small muted">16:9, лучше 1920×1080</span>
+    </div></div>`;
   const rowM = (m = {}) => `<div class="repeat mat" data-row="m">
     <input placeholder="Название для ученика" data-k="title" value="${esc(m.title)}">
     <div class="mat-file">
@@ -1278,6 +1306,27 @@ function lessonForm(box, l, others) {
     </form>`;
   const bindRm = () => {
     $$('[data-rm]', box).forEach(x => x.onclick = () => x.closest('.repeat').remove());
+    const setCover = (row, url) => {
+      $('[data-k="cover"]', row).value = url;
+      const th = $('.cover-thumb', row);
+      th.style.backgroundImage = url ? `url('${url}')` : '';
+      th.textContent = url ? '' : 'с YouTube';
+      $('[data-cover]', row).parentElement.firstChild.textContent = url ? 'Заменить обложку' : '⬆ Своя обложка';
+      $('[data-cover-rm]', row).hidden = !url;
+    };
+    $$('[data-cover]', box).forEach(x => x.onchange = async () => {
+      const file = x.files[0], row = x.closest('.repeat'); x.value = '';
+      if (!file) return;
+      if (!l.id) return toast('Сначала сохрани урок, потом загружай обложку');
+      const th = $('.cover-thumb', row);
+      th.textContent = 'Загружаю…';
+      try {
+        const url = await api.uploadCover(l.id, await shrink(file, 1920, 0.9));
+        setCover(row, url);
+        toast('Обложка загружена. Не забудь «Сохранить»');
+      } catch (err) { th.textContent = ''; toast(err.message); }
+    });
+    $$('[data-cover-rm]', box).forEach(x => x.onclick = () => setCover(x.closest('.repeat'), ''));
     $$('[data-up]', box).forEach(x => x.onchange = async () => {
       const file = x.files[0], row = x.closest('.repeat'); x.value = '';
       if (!file) return;
@@ -1302,7 +1351,8 @@ function lessonForm(box, l, others) {
   $('#lf').onsubmit = async e => {
     e.preventDefault();
     const f = e.target;
-    const blocks = rows('[data-row="b"]').filter(b => b.title || b.video);
+    const blocks = rows('[data-row="b"]').filter(b => b.title || b.video)
+      .map(({ cover, ...b }) => cover ? { ...b, cover } : b);
     const bad = blocks.find(b => b.video && !ytId(b.video));
     if (bad) return toast(`Не понял ссылку в блоке «${bad.title || bad.video}»`);
     const row = {
