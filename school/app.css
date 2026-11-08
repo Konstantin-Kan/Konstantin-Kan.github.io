@@ -369,3 +369,17 @@ dialog.shot-view img { display: block; max-width: 96vw; max-height: 86vh; border
 .block .toc li a, .block .toc li .locked { border-color: var(--line); background: var(--bg); }
 .toc.intro { margin-bottom: 12px; }
 .toc.intro li a { padding: 16px 18px; border-radius: var(--radius); }
+
+/* Видео «Пару слов от меня» перед домашкой: картинка с кнопкой, пока ролик не включили */
+.poster {
+  position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; padding: 0; cursor: pointer;
+  border-radius: var(--radius); overflow: hidden; background: #000 center / cover no-repeat; color: #fff; font: inherit;
+}
+.poster::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 45%, rgba(0,0,0,.6)); }
+.poster .mid {
+  position: absolute; z-index: 1; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 64px; height: 64px; border-radius: 50%; background: rgba(20,20,20,.62); display: grid; place-items: center;
+}
+.poster .mid svg { width: 26px; height: 26px; }
+.poster .lab { position: absolute; z-index: 1; left: 16px; right: 16px; bottom: 12px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 15px; text-shadow: 0 1px 2px #000; }
+.card.pep { border-left: 4px solid var(--accent); }

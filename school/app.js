@@ -80,10 +80,13 @@ function demoApi() {
   };
   // Видео уроков: YouTube «доступ по ссылке»
   const VIDEOS = { 1: ['https://youtu.be/JiVX4C0WWj0'] };
+  // Видео «Пару слов от меня» перед домашкой (в демо — ролик вступления, только для проверки)
+  const PEP = { 2: 'https://youtu.be/JiVX4C0WWj0' };
   const L = (id, position, title, needs_homework, blocks, homework, body = '') => ({
     id, course_id: 1, position, module: id === 1 ? '' : 'Блок 1 · Голова продавца', title, needs_homework,
     published: true, body, homework,
-    blocks: blocks.map((t, i) => ({ title: t, video: (VIDEOS[id] || [])[i] || '' })),
+    blocks: blocks.map((t, i) => ({ title: t, video: (VIDEOS[id] || [])[i] || '' }))
+      .concat(PEP[id] ? [{ pep: true, title: 'Пару слов от меня', video: PEP[id] }] : []),
     materials: (MATS[id] || []).map(t => { const [title, ext] = t.split(':'); return { title, ext }; })
   });
   // Файлы материалов в демо лежат в этом браузере (IndexedDB), наружу не уходят
@@ -666,6 +669,14 @@ function player(block) {
   </div>`;
 }
 
+// Картинка вместо плеера: на странице может играть только один ролик
+function poster(block, label) {
+  const vid = ytId(block?.video);
+  const img = block?.cover || (vid ? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg` : '');
+  return `<button type="button" class="poster" data-p="${block?.pep ? 'pep' : 'main'}" ${img ? `style="background-image:url('${esc(img)}')"` : ''}>
+    <span class="mid">${ICO.play}</span><span class="lab">${esc(label)}</span></button>`;
+}
+
 function stopPlayer() {
   clearInterval(ytTick); clearTimeout(ctrlTimer);
   try { yt?.destroy?.(); } catch {}
@@ -924,7 +935,10 @@ async function renderLesson(lid) {
   const passed = toc[idx]?.passed || !l.needs_homework;
   const last = hw[0];
   const urls = await api.shotUrls(hw.flatMap(h => (h.files || []).map(f => f.path)));
-  const blocks = (l.blocks || []).length ? l.blocks : [{ title: '', video: '' }];
+  // Видео «Пару слов от меня» хранится среди блоков с пометкой pep и показывается перед домашкой
+  const pep = (l.blocks || []).find(b => b.pep && ytId(b.video));
+  const vids = (l.blocks || []).filter(b => !b.pep);
+  const blocks = vids.length ? vids : [{ title: '', video: '' }];
   // Ученик видит только файлы своего пакета; скачать чужой не даст и сама база
   const mats = (l.materials || []).filter(m => isAdmin() || forPackage(m, ME.profile.package));
   let cur = 0;
@@ -949,6 +963,9 @@ async function renderLesson(lid) {
           <span class="grow"><b>${esc(m.title || m.name)}</b>${m.size ? `<span class="muted small">${fmtSize(m.size)}</span>` : ''}${isAdmin() && m.packages?.length ? ` <span class="pill">${esc(m.packages.join(', '))}</span>` : ''}</span>
           <span class="dl">${ready ? '⬇<i> Скачать</i>' : '<i>скоро</i>'}</span></button>`;
       }).join('')}</div>` : ''}
+    ${pep ? `<div class="card pep"><h2 style="margin:0 0 4px">Пару слов от меня</h2>
+      <p class="muted small" style="margin:0 0 12px">${l.needs_homework ? 'Не бросай, двигайся дальше. Посмотри и садись за домашку' : 'Не бросай, двигайся дальше'}</p>
+      <div id="pep-pl">${poster(pep, 'Смотреть')}</div></div>` : ''}
     ${l.needs_homework ? `<div class="card" id="hw">
       <div class="row" style="justify-content:space-between"><h2 style="margin:0">Домашнее задание</h2>${toc[idx]?.passed ? hwPill('passed') : hwPill(last?.status)}</div>
       ${l.homework ? `<div class="task text" style="margin:14px 0">${linkify(l.homework)}</div>` : ''}
@@ -1001,10 +1018,23 @@ async function renderLesson(lid) {
     $('#hw').scrollIntoView({ behavior: 'smooth', block: 'start' });
     const ta = $('#hw-form textarea'); if (ta) setTimeout(() => ta.focus({ preventScroll: true }), 500);
   };
+  // На странице один живой плеер: включили «Пару слов» — видео урока становится картинкой, и наоборот
+  const bindPosters = () => $$('.poster').forEach(b => b.onclick = () => b.dataset.p === 'pep' ? showPep() : showMain());
+  const showMain = () => {
+    stopPlayer();
+    if ($('#pep-pl')) $('#pep-pl').innerHTML = poster(pep, 'Смотреть');
+    $('#pl').innerHTML = player(blocks[cur]); moveWatermark(); bindPosters();
+  };
+  const showPep = () => {
+    stopPlayer();
+    $('#pl').innerHTML = poster(blocks[cur], 'Вернуться к видео урока');
+    $('#pep-pl').innerHTML = player(pep); moveWatermark(); bindPosters();
+  };
+  bindPosters();
   $$('.chips button').forEach(b => b.onclick = () => {
     cur = +b.dataset.b;
     $$('.chips button').forEach(x => x.classList.toggle('on', x === b));
-    $('#pl').innerHTML = player(blocks[cur]); moveWatermark();
+    showMain();
   });
   const hf = $('#hw-form');
   if (hf) {
@@ -1238,7 +1268,8 @@ async function adminLessons(box, cid, editId) {
       ${lessons.map(l => `<div class="lesson-row">
         <span class="muted small" style="width:24px">${l.position}</span>
         <div class="grow"><b>${esc(l.title)}</b><div class="muted small">${esc(l.module || '')} ·
-          ${(l.blocks || []).filter(b => ytId(b.video)).length}/${(l.blocks || []).length} видео
+          ${(l.blocks || []).filter(b => !b.pep && ytId(b.video)).length}/${(l.blocks || []).filter(b => !b.pep).length} видео
+          ${(l.blocks || []).some(b => b.pep && ytId(b.video)) ? ' · пару слов ✓' : ''}
           ${l.needs_homework ? '' : ' · без домашки'}${l.published ? '' : ' · <b>скрыт</b>'}</div></div>
         <a class="btn ghost sm" href="#/admin/lessons/${cid}/${l.id}">Изменить</a>
       </div>`).join('') || '<p class="muted">Уроков нет</p>'}
@@ -1291,11 +1322,13 @@ function lessonForm(box, l, others) {
           <datalist id="mod-list">${[...new Set((others || []).map(x => x.module).filter(Boolean))].map(m => `<option value="${esc(m)}">`).join('')}</datalist></div>
       </div>
       <div><label>Название урока</label><input name="title" required value="${esc(l.title)}"></div>
-      <div><label>Видео-блоки</label><div id="blocks">${(l.blocks || []).map(rowB).join('')}</div>
+      <div><label>Видео-блоки</label><div id="blocks">${(l.blocks || []).filter(b => !b.pep).map(rowB).join('')}</div>
         <button type="button" class="btn ghost sm" id="add-b">+ Блок</button></div>
       <div><label>Текст под видео</label><textarea name="body">${esc(l.body)}</textarea></div>
       <div><label>Материалы для скачивания</label><div id="mats">${(l.materials || []).map(rowM).join('')}</div>
         <button type="button" class="btn ghost sm" id="add-m">+ Файл</button></div>
+      <div><label>Видео «Пару слов от меня» перед домашкой (YouTube «доступ по ссылке»)</label>
+        <input name="pep" placeholder="Ссылка на YouTube. Пусто — блока в уроке не будет" value="${esc((l.blocks || []).find(b => b.pep)?.video)}"></div>
       <label class="check"><input type="checkbox" name="needs_homework" ${l.needs_homework ? 'checked' : ''}> Есть домашка (следующий урок откроется только после «Сдал»)</label>
       <div><label>Задание</label><textarea name="homework">${esc(l.homework)}</textarea></div>
       <label class="check"><input type="checkbox" name="published" ${l.published ? 'checked' : ''}> Урок виден ученикам</label>
@@ -1355,6 +1388,9 @@ function lessonForm(box, l, others) {
       .map(({ cover, ...b }) => cover ? { ...b, cover } : b);
     const bad = blocks.find(b => b.video && !ytId(b.video));
     if (bad) return toast(`Не понял ссылку в блоке «${bad.title || bad.video}»`);
+    const pepUrl = f.pep.value.trim();
+    if (pepUrl && !ytId(pepUrl)) return toast('Не понял ссылку на видео «Пару слов от меня»');
+    if (pepUrl) blocks.push({ pep: true, title: 'Пару слов от меня', video: pepUrl });
     const row = {
       ...(l.id ? { id: l.id } : {}), course_id: l.course_id,
       position: +f.position.value || 0, module: f.module.value.trim(), title: f.title.value.trim(),
