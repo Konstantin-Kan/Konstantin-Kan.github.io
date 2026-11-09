@@ -161,7 +161,15 @@ header.solid{background:rgba(21,16,12,.82);backdrop-filter:blur(14px);-webkit-ba
 .reels img{border-radius:12px;aspect-ratio:524/816;object-fit:cover;width:100%;box-shadow:0 8px 24px rgba(27,20,15,.12)}
 .reels b{display:block;margin-top:10px;font-size:20px;font-weight:800;color:#a8692a}
 .reels span{display:block;font-size:13px;color:var(--muted-dark)}
+.ads-chain{margin-top:18px;color:var(--ink)}
+.ads-chain em{color:#a8692a}
+.ads-shots{margin-top:18px;display:grid;gap:8px}
+.ads-shots img{width:100%;border:1px solid rgba(27,20,15,.12);border-radius:8px}
+.ads-shots p{font-size:13px;color:var(--muted-dark)}
+.ads-covers span{display:block;margin-top:8px;font-size:13px;font-weight:600;color:var(--muted-dark)}
+.ads-covers img{aspect-ratio:9/16}
 @media (max-width:980px){.reels{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.ads-shots{overflow-x:auto}.ads-shots img{min-width:640px}}
 @media (max-width:640px){.deck{padding:18px}.deck-grid{grid-template-columns:1fr 1fr;gap:10px}.reels{grid-template-columns:1fr 1fr;gap:12px}}
 .soon{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:22px}
 .soon div{border:1.5px dashed rgba(27,20,15,.25);border-radius:var(--r);padding:26px}
@@ -323,7 +331,7 @@ footer a{text-decoration:underline}
       <div class="card rv d2">
         <div class="num">03</div>
         <h3>Упаковка экспертов</h3>
-        <p>Лендинги, презентации для консультаций, рилсы и карусели. Пишу тексты как продажник: каждый шаг ведёт клиента к заявке.</p>
+        <p>Лендинги, презентации для консультаций, рилсы и карусели, настройка и запуск рекламы. Пишу тексты как продажник: каждый шаг ведёт клиента к заявке.</p>
         <a class="btn btn-main" href="/upakovka/">Подробнее →</a>
       </div>
     </div>
@@ -388,6 +396,23 @@ footer a{text-decoration:underline}
         <img src="img/deck-2.jpg" alt="Слайд: немного о себе" loading="lazy" width="700" height="700">
         <img src="img/deck-3.jpg" alt="Слайд: давайте разберём Вашу ситуацию" loading="lazy" width="700" height="700">
         <img src="img/deck-4.jpg" alt="Слайд: путь клиента" loading="lazy" width="700" height="700">
+      </div>
+    </div>
+    <div class="deck rv">
+      <div class="deck-head"><small>Реклама</small><h4>Реклама для страховых агентов в Корее</h4><p>Свои запуски, октябрь – ноябрь 2026. Реклама → сайт → Telegram → оплаченный разбор.</p></div>
+      <div class="chain ads-chain"><em>$84,72</em> <i>→</i> <em>13</em> человек написали в Telegram <i>→</i> <em>3</em> оплатили разбор</div>
+      <div class="ads-shots">
+        <img src="img/ads-1.jpg" alt="Рекламный кабинет: расход и показы" loading="lazy" width="1568" height="154">
+        <img src="img/ads-2.jpg" alt="Рекламный кабинет: заявки с сайта" loading="lazy" width="1568" height="154">
+        <p>Скриншоты из рекламного кабинета Meta. «Лид с сайта» — человек нажал кнопку Telegram. Написали из них 13, оплатили разбор 3.</p>
+      </div>
+      <div class="reels ads-covers">
+        <div><img src="img/ad-32.jpg" alt="Креатив: нужен блог и реклама" loading="lazy" width="360" height="640"><span>Микс</span></div>
+        <div><img src="img/ad-34.jpg" alt="Креатив: пишешь людям, а в ответ тишина" loading="lazy" width="360" height="640"><span>Микс</span></div>
+        <div><img src="img/ad-35.jpg" alt="Креатив: звонок после встречи" loading="lazy" width="360" height="640"><span>Раскадровка</span></div>
+        <div><img src="img/ad-36.jpg" alt="Креатив: большие страховки" loading="lazy" width="360" height="640"><span>Apple</span></div>
+        <div><img src="img/ad-37.jpg" alt="Креатив: перестать навязываться" loading="lazy" width="360" height="640"><span>Неон</span></div>
+        <div><img src="img/ad-38.jpg" alt="Креатив: продавать знакомым" loading="lazy" width="360" height="640"><span>Мультик</span></div>
       </div>
     </div>
     <div class="deck rv">
