@@ -2,12 +2,464 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Константин Кан</title>
-<script>location.replace('/razbor/' + location.search + location.hash);</script>
-<meta http-equiv="refresh" content="0; url=/razbor/">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Константин Кан — продажи и упаковка экспертов</title>
+<meta name="description" content="Делюсь опытом продаж и упаковываю экспертов. В продажах с 2002 года: Marriott, Holiday Inn, Kraft Foods.">
+<meta property="og:title" content="Константин Кан — делюсь опытом продаж и упаковываю экспертов">
+<meta property="og:description" content="В продажах с 2002 года. Обучение продажам, разбор продаж, упаковка экспертов.">
+<meta property="og:image" content="https://constantinekan.com/img/hero.jpg">
+<meta name="theme-color" content="#15100c">
+<link rel="icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/hero.jpg">
+
+<!-- Meta Pixel (тот же, что на /insurance) -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('set','autoConfig',false,'1118977800855176');
+fbq('init','1118977800855176');
+fbq('track','PageView');
+</script>
+
+<style>
+:root{
+  --bg:#15100c;        /* тёмный шоколад */
+  --bg2:#1e1712;
+  --card:#271e17;
+  --line:rgba(241,230,214,.12);
+  --cream:#f3e9db;     /* светлые секции */
+  --cream2:#e9dbc6;
+  --ink:#1b140f;       /* текст на светлом */
+  --text:#f3e9db;      /* текст на тёмном */
+  --muted:#b8a690;
+  --muted-dark:#6d5a48;
+  --gold:#d9a05b;      /* карамель-золото */
+  --btn:#ffb34d;       /* яркая кнопка — видно издалека */
+  --btn-hover:#ffc472;
+  --r:22px;
+  --wrap:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:Montserrat,system-ui,-apple-system,sans-serif;font-size:17px;line-height:1.6;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+section{position:relative;padding:110px 0}
+.light{background:var(--cream);color:var(--ink)}
+.kicker{font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.light .kicker{color:#a8692a}
+h2{font-size:clamp(30px,4.4vw,52px);line-height:1.08;font-weight:800;text-transform:uppercase;letter-spacing:-.01em;margin:14px 0 26px}
+p+p{margin-top:14px}
+
+/* Кнопки */
+.btn{display:inline-flex;align-items:center;gap:10px;padding:18px 30px;border-radius:999px;font-weight:700;font-size:16px;transition:transform .2s,background .2s,box-shadow .2s;cursor:pointer;border:0}
+.btn-main{background:var(--btn);color:#1a110a;box-shadow:0 10px 30px rgba(255,179,77,.28)}
+.btn-main:hover{background:var(--btn-hover);transform:translateY(-2px)}
+.btn-ghost{border:1.5px solid rgba(243,233,219,.35);color:var(--text)}
+.btn-ghost:hover{border-color:var(--text);transform:translateY(-2px)}
+.btn svg{width:20px;height:20px;flex:none}
+
+/* Шапка */
+header{position:fixed;inset:0 0 auto 0;z-index:50;transition:background .3s,backdrop-filter .3s}
+header.solid{background:rgba(21,16,12,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+.logo{font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:15px}
+.logo span{color:var(--gold)}
+.menu{display:flex;gap:30px;font-size:14px;font-weight:500}
+.menu a{opacity:.8;transition:opacity .2s}
+.menu a:hover{opacity:1;color:var(--gold)}
+.nav .btn{padding:11px 20px;font-size:14px}
+.burger{display:none;width:44px;height:44px;border:0;background:none;color:var(--text);cursor:pointer}
+.burger span{display:block;width:22px;height:2px;background:currentColor;margin:5px auto;transition:.3s}
+
+/* Первый экран */
+.hero{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:120px 0 80px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hero-bg::before{content:"";position:absolute;width:900px;height:900px;right:-200px;top:-150px;background:radial-gradient(closest-side,rgba(217,160,91,.22),transparent);}
+.flow{position:absolute;inset:0;width:100%;height:100%}
+.flow path{fill:none;stroke:rgba(217,160,91,.22);stroke-width:1}
+.flow .glow{stroke:url(#g1);stroke-width:1.6;stroke-dasharray:140 1400;animation:run 9s linear infinite}
+.flow .glow.d2{animation-delay:-3s;animation-duration:11s}
+.flow .glow.d3{animation-delay:-6s;animation-duration:13s}
+@keyframes run{from{stroke-dashoffset:1540}to{stroke-dashoffset:0}}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center}
+.hero h1{font-size:clamp(40px,6.4vw,84px);line-height:1;font-weight:800;text-transform:uppercase;letter-spacing:-.02em;margin:20px 0 14px}
+.hero .sub-h{font-size:clamp(22px,2.6vw,34px);font-weight:500;color:var(--gold);margin-bottom:26px}
+.hero .lead{max-width:540px;color:var(--muted);font-size:18px}
+.hero .lead b{color:var(--text);font-weight:600}
+.hero-btns{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
+.photo-box{position:relative;justify-self:end;width:100%;max-width:440px}
+.photo-box img{border-radius:28px;aspect-ratio:4/5;object-fit:cover;object-position:50% 25%;width:100%;position:relative;z-index:2;box-shadow:0 40px 80px rgba(0,0,0,.5)}
+.shape{position:absolute;inset:-14%;z-index:1;animation:spin 60s linear infinite}
+.shape i{position:absolute;inset:0;border:1px solid rgba(217,160,91,.28);border-radius:38% 62% 55% 45%/45% 40% 60% 55%}
+.shape i:nth-child(2){inset:6%;transform:rotate(40deg);border-color:rgba(217,160,91,.18)}
+.shape i:nth-child(3){inset:12%;transform:rotate(80deg);border-color:rgba(243,233,219,.12)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.badge{position:absolute;z-index:3;left:-34px;bottom:46px;background:rgba(39,30,23,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:18px;padding:14px 18px;animation:float 6s ease-in-out infinite}
+.badge b{display:block;font-size:26px;font-weight:800;color:var(--gold);line-height:1.1}
+.badge span{font-size:13px;color:var(--muted)}
+.badge.b2{left:auto;right:-26px;top:40px;bottom:auto;animation-delay:-3s}
+@keyframes float{50%{transform:translateY(-10px)}}
+
+/* Обо мне */
+.about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:70px;align-items:center}
+.about-photo img{border-radius:var(--r);aspect-ratio:4/5;object-fit:cover;object-position:50% 20%;width:100%}
+.about-text{font-size:18px}
+.about-text .quote{margin-top:30px;padding:24px 28px;border-left:3px solid #a8692a;background:var(--cream2);border-radius:0 16px 16px 0;font-weight:600}
+.brands{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.brands span{border:1px solid rgba(27,20,15,.18);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600}
+
+/* Направления */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:20px}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:34px 30px;display:flex;flex-direction:column;overflow:hidden;transition:transform .3s,border-color .3s}
+.card:hover{transform:translateY(-6px);border-color:rgba(217,160,91,.5)}
+.card::after{content:"";position:absolute;width:260px;height:260px;right:-120px;top:-120px;background:radial-gradient(closest-side,rgba(217,160,91,.18),transparent)}
+.card .num{font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.1em}
+.card h3{font-size:24px;line-height:1.2;font-weight:800;margin:16px 0 14px;text-transform:uppercase}
+.card p{color:var(--muted);font-size:16px;flex:1}
+.card .tag{display:inline-block;margin-top:18px;font-size:14px;font-weight:600;color:var(--text)}
+.card .btn{margin-top:26px;align-self:flex-start;padding:14px 24px;font-size:15px}
+
+/* Почему */
+.why{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
+.why .big{font-size:clamp(22px,2.4vw,30px);font-weight:700;line-height:1.3}
+.why .txt{font-size:18px;color:#3b2e24}
+
+/* Цифры */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.stat{border:1px solid var(--line);border-radius:var(--r);padding:30px;background:linear-gradient(160deg,var(--card),var(--bg2))}
+.stat b{display:block;font-size:clamp(34px,4vw,48px);font-weight:800;color:var(--gold);line-height:1}
+.stat span{display:block;margin-top:14px;color:var(--muted);font-size:15px}
+.stat.wide{grid-column:span 3;display:flex;align-items:center;gap:30px;flex-wrap:wrap}
+.chain{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-weight:700;font-size:clamp(17px,1.8vw,22px)}
+.chain em{font-style:normal;color:var(--gold)}
+.chain i{font-style:normal;opacity:.5}
+
+/* Портфолио */
+.port{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.work{background:#fff;border-radius:var(--r);overflow:hidden;border:1px solid rgba(27,20,15,.1);transition:transform .3s,box-shadow .3s}
+.work:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(27,20,15,.15)}
+.work img{aspect-ratio:16/10;object-fit:cover;object-position:top;width:100%}
+.work .w-body{padding:22px 26px}
+.work small{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#a8692a}
+.work h4{font-size:20px;font-weight:700;margin-top:6px}
+.work p{font-size:15px;color:var(--muted-dark);margin-top:6px}
+.deck{margin-top:22px;background:#fff;border-radius:var(--r);border:1px solid rgba(27,20,15,.1);padding:26px}
+.deck-head small{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#a8692a}
+.deck-head h4{font-size:20px;font-weight:700;margin-top:6px}
+.deck-head p{font-size:15px;color:var(--muted-dark);margin-top:6px}
+.deck-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.deck-grid img{border-radius:12px;aspect-ratio:1;object-fit:cover;width:100%;box-shadow:0 8px 24px rgba(27,20,15,.12)}
+.reels{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:20px}
+.reels a{display:block;transition:transform .25s}
+.reels a:hover{transform:translateY(-4px)}
+.reels img{border-radius:12px;aspect-ratio:524/816;object-fit:cover;width:100%;box-shadow:0 8px 24px rgba(27,20,15,.12)}
+.reels b{display:block;margin-top:10px;font-size:20px;font-weight:800;color:#a8692a}
+.reels span{display:block;font-size:13px;color:var(--muted-dark)}
+@media (max-width:980px){.reels{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.deck{padding:18px}.deck-grid{grid-template-columns:1fr 1fr;gap:10px}.reels{grid-template-columns:1fr 1fr;gap:12px}}
+.soon{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:22px}
+.soon div{border:1.5px dashed rgba(27,20,15,.25);border-radius:var(--r);padding:26px}
+.soon h4{font-size:18px;font-weight:700}
+.soon p{font-size:15px;color:var(--muted-dark);margin-top:8px}
+.soon .st{display:inline-block;margin-top:14px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--ink);color:var(--cream);padding:6px 12px;border-radius:999px}
+.soon .st.ok{background:#a8692a}
+
+/* Финал */
+.final{text-align:center;overflow:hidden}
+.final h2{max-width:900px;margin:18px auto 20px}
+.final p{color:var(--muted);font-size:18px}
+.final .hero-btns{justify-content:center}
+.socials{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;margin-top:44px}
+.soc{width:60px;height:60px;border-radius:18px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);transition:transform .2s,background .2s,color .2s;color:var(--text)}
+.soc svg{width:26px;height:26px}
+.soc:hover{transform:translateY(-4px);background:var(--btn);color:#1a110a}
+.soc-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:30px 0;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+footer a{text-decoration:underline}
+
+/* Появление при прокрутке */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}
+
+/* Планшет */
+@media (max-width:980px){
+  section{padding:84px 0}
+  .menu{display:none}
+  .burger{display:block}
+  .menu.open{display:flex;position:absolute;top:72px;left:0;right:0;flex-direction:column;gap:0;background:rgba(21,16,12,.97);border-bottom:1px solid var(--line);padding:8px 24px 20px}
+  .menu.open a{padding:14px 0;border-bottom:1px solid var(--line);font-size:16px}
+  .hero-grid,.about-grid,.why{grid-template-columns:1fr;gap:44px}
+  .cards{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat.wide{grid-column:span 2}
+  .soon{grid-template-columns:1fr}
+}
+/* Телефон */
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 16px}
+  section{padding:64px 0}
+  .nav .btn{display:none}
+  /* Фото на весь первый экран, лицо видно, текст снизу */
+  .hero{padding:0;min-height:auto;display:block}
+  .hero-grid{display:flex;flex-direction:column;gap:0}
+  .photo-box{order:-1}
+  .photo-box{position:relative;max-width:none;width:auto;margin:0 -16px;padding-top:64px}
+  .photo-box img{border-radius:0;aspect-ratio:auto;height:66svh;min-height:420px;object-position:50% 10%;box-shadow:none}
+  .photo-box::after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(21,16,12,0) 45%,rgba(21,16,12,.85) 82%,var(--bg))}
+  .shape{display:none}
+  .badge{display:none}
+  .hero-text{position:relative;z-index:4;margin-top:-120px;padding-bottom:56px}
+  .hero h1{font-size:44px}
+  .hero-btns .btn{width:100%;justify-content:center}
+  .about-photo img{aspect-ratio:16/10;object-position:50% 15%}
+  .stats{grid-template-columns:1fr}
+  .stat.wide{grid-column:auto}
+  .port{grid-template-columns:1fr}
+  .soc{width:54px;height:54px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
 </head>
-<body style="background:#0c0c0a;color:#eee;font-family:-apple-system,sans-serif;text-align:center;padding:40px">
-<a href="/razbor/" style="color:#d4af37">Перейти на страницу разбора</a>
+<body>
+
+<header id="top">
+  <div class="wrap nav">
+    <a href="#" class="logo">Константин <span>Кан</span></a>
+    <nav class="menu" id="menu">
+      <a href="#about">Обо мне</a>
+      <a href="#help">Обучение</a>
+      <a href="#help">Разбор</a>
+      <a href="#help">Упаковка</a>
+      <a href="#portfolio">Портфолио</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a class="btn btn-main js-tg" href="https://t.me/Constantine_Kan?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%AF%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0" target="_blank" rel="noopener">Написать мне</a>
+    <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- 1. Первый экран -->
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true">
+    <svg class="flow" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#ffb34d" stop-opacity="0"/><stop offset=".5" stop-color="#ffd59a"/><stop offset="1" stop-color="#ffb34d" stop-opacity="0"/></linearGradient>
+      </defs>
+      <path d="M-50 760 C 300 700, 520 420, 900 430 S 1400 260, 1500 120"/>
+      <path d="M-50 820 C 340 760, 600 520, 960 520 S 1420 380, 1500 260"/>
+      <path d="M-50 880 C 380 820, 680 620, 1020 610 S 1440 500, 1500 400"/>
+      <path class="glow" d="M-50 760 C 300 700, 520 420, 900 430 S 1400 260, 1500 120"/>
+      <path class="glow d2" d="M-50 820 C 340 760, 600 520, 960 520 S 1420 380, 1500 260"/>
+      <path class="glow d3" d="M-50 880 C 380 820, 680 620, 1020 610 S 1440 500, 1500 400"/>
+    </svg>
+  </div>
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <div class="kicker rv">Константин Кан · продажи с 2002 года</div>
+      <h1 class="rv d1">Делюсь опытом продаж</h1>
+      <div class="sub-h rv d2">и упаковываю экспертов</div>
+      <p class="lead rv d2"><b>Marriott, Holiday Inn, Kraft Foods.</b> Делюсь знаниями и навыками с экспертами в Корее и Казахстане. А если Вам некогда разбираться самим, делаю упаковку, которая продаёт: сайты, презентации, рилсы.</p>
+      <div class="hero-btns rv d3">
+        <a class="btn btn-main js-tg" href="https://t.me/Constantine_Kan?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%AF%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0" target="_blank" rel="noopener">Написать мне</a>
+        <a class="btn btn-ghost" href="#help">Что я делаю ↓</a>
+      </div>
+    </div>
+    <div class="photo-box">
+      <div class="shape" aria-hidden="true"><i></i><i></i><i></i></div>
+      <img src="img/hero.jpg" alt="Константин Кан" width="1050" height="1400" fetchpriority="high">
+      <div class="badge"><b>с 2002</b><span>в продажах</span></div>
+      <div class="badge b2"><b>Best Associate</b><span>Marriott · 2011</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Обо мне -->
+<section class="light" id="about">
+  <div class="wrap about-grid">
+    <div class="about-photo rv"><img src="img/about.jpg" alt="Константин Кан за работой" loading="lazy" width="787" height="1400"></div>
+    <div class="about-text">
+      <div class="kicker rv">Обо мне</div>
+      <h2 class="rv d1">Продаю с 17 лет</h2>
+      <p class="rv d1">Я в продажах с 2002 года. Начинал в 17 лет промоутером на улице в Ростове: подходил к незнакомым людям. Скрипт от завода через неделю выкинул и переписал под себя.</p>
+      <p class="rv d2">Дальше были гостиницы, дистрибуция, B2B, корпоративные клиенты и мероприятия. С 2010 года занимаюсь ещё и маркетингом.</p>
+      <p class="rv d2">Сейчас живу в Южной Корее. Работаю с теми, кто продаёт сам: экспертами, консультантами и страховыми агентами.</p>
+      <div class="brands rv d3"><span>Renaissance · Marriott</span><span>Holiday Inn · IHG</span><span>Kraft Foods (сейчас Mondelēz)</span></div>
+      <div class="quote rv d3">Мой отец как-то сказал: «Твою жизнь за тебя никто не проживёт». С продажами так же.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Чем могу помочь -->
+<section id="help">
+  <div class="wrap">
+    <div class="kicker rv">Чем могу помочь</div>
+    <h2 class="rv d1">Три направления</h2>
+    <div class="cards">
+      <div class="card rv">
+        <div class="num">01</div>
+        <h3>Обучение продажам</h3>
+        <p>Два месяца. Учимся вести клиента от первого сообщения до оплаты: переписка, звонок, встреча, цена, возражения.</p>
+        <a class="btn btn-main" href="/sky/">Подробнее →</a>
+      </div>
+      <div class="card rv d1">
+        <div class="num">02</div>
+        <h3>Разбор продаж для страховых агентов</h3>
+        <p>Один созвон. Смотрим Ваши переписки, звонки и встречи и находим, где теряется клиент.</p>
+        <span class="tag">20 000 ₩</span>
+        <a class="btn btn-main" href="/insurance/">Подробнее →</a>
+      </div>
+      <div class="card rv d2">
+        <div class="num">03</div>
+        <h3>Упаковка экспертов</h3>
+        <p>Лендинги, презентации для консультаций, рилсы и карусели. Пишу тексты как продажник: каждый шаг ведёт клиента к заявке.</p>
+        <a class="btn btn-main" href="#portfolio">Смотреть работы →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Почему -->
+<section class="light">
+  <div class="wrap why">
+    <div>
+      <div class="kicker rv">Почему я этим занимаюсь</div>
+      <h2 class="rv d1">Клиент пишет, спрашивает цену и пропадает</h2>
+    </div>
+    <div class="txt">
+      <p class="big rv">Многие эксперты хорошо знают своё дело, но не умеют продавать.</p>
+      <p class="rv d1">Человек приходит на консультацию, ему всё нравится, а оплаты нет. Чаще всего дело не в цене и не в продукте, а в том, как вести человека к покупке.</p>
+      <p class="rv d2">Этому можно научиться. Я сам учился по книгам с 2002 года и проверял всё на живых клиентах.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Цифры -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">Цифры</div>
+    <h2 class="rv d1">Что было на деле</h2>
+    <div class="stats">
+      <div class="stat rv"><b>2002</b><span>Первая работа в продажах — промоутер на улице</span></div>
+      <div class="stat rv d1"><b>≈252%</b><span>к продажам предыдущего года. Kraft Foods (сейчас Mondelēz), ключевые клиенты</span></div>
+      <div class="stat rv d2"><b>300%</b><span>плана за 2 недели. Продажи продуктов в супермаркеты</span></div>
+      <div class="stat wide rv">
+        <span style="margin:0">2025, воронка для юристов, за месяц:</span>
+        <div class="chain"><em>5</em> рилсов <i>→</i> <em>40</em> заявок <i>→</i> <em>30</em> платных консультаций <i>→</i> <em>10</em> проектов на сопровождение</div>
+      </div>
+      <div class="stat wide rv">
+        <span style="margin:0">Реклама страницы для страховых агентов:</span>
+        <div class="chain"><em>$28</em> <i>→</i> <em>11</em> заявок <i>→</i> <em>7</em> человек написали в Telegram</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Портфолио -->
+<section class="light" id="portfolio">
+  <div class="wrap">
+    <div class="kicker rv">Портфолио</div>
+    <h2 class="rv d1">Мои работы</h2>
+    <div class="port">
+      <a class="work rv" href="/insurance/" target="_blank" rel="noopener">
+        <img src="img/site-insurance.jpg" alt="Сайт для страховых агентов" loading="lazy" width="900" height="562">
+        <div class="w-body"><small>Сайт</small><h4>Разбор продаж для страховых агентов</h4><p>Тексты, дизайн, анимация, пиксель Meta, метки рекламы.</p></div>
+      </a>
+      <a class="work rv d1" href="/razbor/" target="_blank" rel="noopener">
+        <img src="img/site-razbor.jpg" alt="Сайт разбора переписок" loading="lazy" width="900" height="562">
+        <div class="w-body"><small>Сайт</small><h4>Разбор переписок для экспертов</h4><p>Лендинг с записью в Telegram в один клик.</p></div>
+      </a>
+    </div>
+    <div class="deck rv">
+      <div class="deck-head"><small>Презентация</small><h4>Презентация для консультации</h4><p>Несколько слайдов из 44. Остальное — только на встрече.</p></div>
+      <div class="deck-grid">
+        <img src="img/deck-1.jpg" alt="Слайд: обложка" loading="lazy" width="700" height="700">
+        <img src="img/deck-2.jpg" alt="Слайд: немного о себе" loading="lazy" width="700" height="700">
+        <img src="img/deck-3.jpg" alt="Слайд: давайте разберём Вашу ситуацию" loading="lazy" width="700" height="700">
+        <img src="img/deck-4.jpg" alt="Слайд: путь клиента" loading="lazy" width="700" height="700">
+      </div>
+    </div>
+    <div class="deck rv">
+      <div class="deck-head"><small>Рилсы</small><h4>Рилсы: мультик, микс, инфографика</h4><p>Последние ролики в Instagram и TikTok. Просмотры за обе площадки.</p></div>
+      <div class="reels">
+        <a href="https://www.instagram.com/constantine.kan/reel/DfMmCUuzzHt/" target="_blank" rel="noopener"><img src="img/reel-offer.jpg" alt="Рилс: что такое оффер" loading="lazy" width="524" height="816"><b>2 617</b><span>Оффер · мультик</span></a>
+        <a href="https://www.instagram.com/constantine.kan/reel/DfUeiopTbsC/" target="_blank" rel="noopener"><img src="img/reel-lid.jpg" alt="Рилс: кто такой лид" loading="lazy" width="524" height="816"><b>2 463</b><span>Лид · мультик</span></a>
+        <a href="https://www.instagram.com/constantine.kan/reel/DfMcDuOzske/" target="_blank" rel="noopener"><img src="img/reel-60dney.jpg" alt="Рилс: 60 дней закончились" loading="lazy" width="524" height="816"><b>938</b><span>60 дней · микс</span></a>
+        <a href="https://www.instagram.com/constantine.kan/reel/DfSIMCGzFsk/" target="_blank" rel="noopener"><img src="img/reel-otkaz.jpg" alt="Рилс: боишься отказов" loading="lazy" width="524" height="816"><b>899</b><span>Отказы · микс</span></a>
+        <a href="https://www.instagram.com/constantine.kan/reel/DfbvPb8TEv7/" target="_blank" rel="noopener"><img src="img/reel-voronka.jpg" alt="Рилс: что такое воронка продаж" loading="lazy" width="524" height="816"><b>711</b><span>Воронка · мультик</span></a>
+        <a href="https://www.instagram.com/constantine.kan/reel/DfeKpAQT0gP/" target="_blank" rel="noopener"><img src="img/reel-agent.jpg" alt="Рилс: страховой агент, 4 из 10" loading="lazy" width="524" height="816"><b>587</b><span>4 из 10 · инфографика</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Финал -->
+<section class="final" id="contacts">
+  <div class="hero-bg" aria-hidden="true">
+    <svg class="flow" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMid slice">
+      <path d="M-50 600 C 400 560, 600 300, 1000 320 S 1400 160, 1500 80"/>
+      <path class="glow" d="M-50 600 C 400 560, 600 300, 1000 320 S 1400 160, 1500 80"/>
+    </svg>
+  </div>
+  <div class="wrap" style="position:relative">
+    <div class="kicker rv">Контакты</div>
+    <h2 class="rv d1">Ваши продажи за Вас никто не сделает</h2>
+    <p class="rv d2">Напишите мне, и решим, с чего начать именно Вам.</p>
+    <div class="hero-btns rv d3">
+      <a class="btn btn-main js-tg" href="https://t.me/Constantine_Kan?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%AF%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0" target="_blank" rel="noopener">Написать мне</a>
+    </div>
+    <div class="socials rv d3">
+      <div class="soc-wrap"><a class="soc js-lead" href="https://wa.me/821068871912?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%AF%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>WhatsApp</div>
+      <div class="soc-wrap"><a class="soc js-tg" href="https://t.me/Constantine_Kan?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%AF%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0" target="_blank" rel="noopener" aria-label="Telegram">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>Telegram</div>
+      <div class="soc-wrap"><a class="soc" href="https://instagram.com/constantine.kan" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.6" cy="6.4" r="1.2" fill="currentColor" stroke="none"/></svg></a>Instagram</div>
+      <div class="soc-wrap"><a class="soc" href="https://www.tiktok.com/@kkan.kr" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.840-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.080-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>TikTok</div>
+      <div class="soc-wrap"><a class="soc" href="https://t.me/sales_by_kos" target="_blank" rel="noopener" aria-label="Telegram-канал">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10v4a1 1 0 0 0 1 1h3l6 4V5L7 9H4a1 1 0 0 0-1 1z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></a>Канал</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Константин Кан</span>
+    <a href="/razbor/privacy.html">Политика конфиденциальности</a>
+  </div>
+</footer>
+
+<script>
+// шапка темнеет при прокрутке
+var hd=document.getElementById('top');
+function onScroll(){hd.classList.toggle('solid',scrollY>40)}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+// меню на телефоне
+var menu=document.getElementById('menu');
+document.getElementById('burger').onclick=function(){menu.classList.toggle('open')};
+menu.querySelectorAll('a').forEach(function(a){a.onclick=function(){menu.classList.remove('open')}});
+// появление блоков
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+}else{document.querySelectorAll('.rv').forEach(function(el){el.classList.add('in')})}
+// заявка в пиксель: первый клик по Telegram или WhatsApp
+var sent=false;
+document.querySelectorAll('.js-tg,.js-lead').forEach(function(a){a.addEventListener('click',function(){
+  if(!sent&&window.fbq){fbq('track','Lead',{content_category:'main'});sent=true}
+})});
+</script>
 </body>
 </html>
