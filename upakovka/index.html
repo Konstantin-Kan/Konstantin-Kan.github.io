@@ -172,7 +172,14 @@ header.solid{background:rgba(21,16,12,.82);backdrop-filter:blur(14px);-webkit-ba
 .pull b{font-weight:700}
 
 /* Состав упаковки */
-.svc{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:20px}
+.svc{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:20px}
+.adsbox{position:absolute;left:22px;right:22px;top:30px;bottom:-12px;border-radius:14px 14px 0 0;background:#0e0b09;border:1px solid rgba(255,255,255,.08);padding:16px 16px 0;box-shadow:0 20px 40px rgba(0,0,0,.5)}
+.adsbox .ah{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.adsbox .ar{display:grid;grid-template-columns:1fr 70px 46px;gap:10px;align-items:center;margin-top:12px;font-size:12px;color:var(--text)}
+.adsbox .ar i{display:block;height:8px;border-radius:4px;background:linear-gradient(90deg,#ffb34d,#ffd59a);transform-origin:left;animation:grow 4s var(--out) infinite}
+.adsbox .ar:nth-child(3) i{animation-delay:.3s;width:70%}.adsbox .ar:nth-child(4) i{animation-delay:.6s;width:45%}
+.adsbox .ar b{text-align:right;color:#ffb34d}
+@keyframes grow{0%{transform:scaleX(0)}40%,100%{transform:scaleX(1)}}
 .sv{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,border-color .3s}
 .sv:hover{transform:translateY(-6px);border-color:rgba(217,160,91,.5)}
 .stage{position:relative;height:250px;background:radial-gradient(120% 90% at 50% 0%,#3a2b1f,#1b140f);overflow:hidden;border-bottom:1px solid var(--line)}
@@ -267,7 +274,8 @@ header.solid{background:rgba(21,16,12,.82);backdrop-filter:blur(14px);-webkit-ba
 .honest .app-ico{width:44px;height:44px;border-radius:12px;animation:none;flex:none}
 
 /* Цены */
-.prices{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.prices{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.full .save span{display:block;max-width:230px}
 .pr{background:#fff;border:1px solid rgba(27,20,15,.1);border-radius:var(--r);padding:32px 30px;display:flex;flex-direction:column}
 .pr .ph{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .pr h3{font-size:22px;font-weight:800}
@@ -569,6 +577,27 @@ footer a{text-decoration:underline}
           </ul>
         </div>
       </div>
+      <div class="sv rv d3">
+        <div class="stage">
+          <div class="adsbox">
+            <div class="ah">Реклама · заявки</div>
+            <div class="ar"><i></i><span>Показы</span><b>4 112</b></div>
+            <div class="ar"><i></i><span>Сайт</span><b>126</b></div>
+            <div class="ar"><i></i><span>Заявки</span><b>21</b></div>
+          </div>
+          <div class="toast"><div class="app-ico" style="--bg-c:linear-gradient(180deg,#2AABEE,#229ED9);--fg-c:#fff"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></div><div><b>Новая заявка</b>Пришла с рекламы</div></div>
+        </div>
+        <div class="body">
+          <h3>Реклама</h3>
+          <div class="what">Вашу страницу и ролики видят те, кому нужна Ваша услуга</div>
+          <ul>
+            <li>Настройка рекламного кабинета и пикселя</li>
+            <li>Аудитория и бюджет под Вашу услугу</li>
+            <li>Запуск рекламы на Вашу страницу или в директ</li>
+            <li>Отчёт: сколько стоит одна заявка</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div class="key rv">
@@ -665,22 +694,28 @@ footer a{text-decoration:underline}
         <div class="won">400 000 ₩</div><div class="tg">120 000 ₸</div>
         <ul><li>8 рилсов: Ваши видео или 2D-мультик</li><li>Мультик — под Вашу озвучку</li><li>2 карусели для ленты</li><li>Обложки, субтитры и плашки</li><li>1 правка на каждый рилс</li></ul>
       </div>
+      <div class="pr rv d3">
+        <div class="ph"><h3>Реклама</h3><span class="per">разово</span></div>
+        <div class="won">500 000 ₩</div><div class="tg">150 000 ₸</div>
+        <ul><li>Настройка рекламного кабинета и пикселя</li><li>Аудитория и бюджет под Вашу услугу</li><li>Запуск на Вашу страницу или в директ</li><li>Отчёт: сколько стоит одна заявка</li><li>Бюджет на рекламу оплачиваете Вы</li></ul>
+      </div>
     </div>
     <div class="full rv">
       <div class="tag">Всё сразу</div>
       <div>
         <h3>Под ключ</h3>
         <div class="sub">первый месяц, 3 круга правок по странице и презентации</div>
-        <div class="won">1 000 000 ₩</div><div class="tg">300 000 ₸</div>
+        <div class="won">1 300 000 ₩</div><div class="tg">390 000 ₸</div>
       </div>
       <div class="rows">
         <div><span>Страница</span><b>300 000 ₩</b></div>
         <div><span>Презентация</span><b>300 000 ₩</b></div>
         <div><span>Контент: 8 рилсов + 2 карусели</span><b>400 000 ₩</b></div>
+        <div><span>Настройка и запуск рекламы <small style="opacity:.7">(в пакете 300 000 ₩)</small></span><b>500 000 ₩</b></div>
         <div class="gift"><span>Ещё 2 рилса + 1 карусель</span><b>120 000 ₩</b></div>
-        <div class="sum"><span>Если брать всё по отдельности</span><b>1 120 000 ₩</b></div>
+        <div class="sum"><span>Если брать всё по отдельности</span><b>1 620 000 ₩</b></div>
       </div>
-      <div class="save"><small>Ваша экономия</small><b>120 000 ₩</b><span>2 рилса и карусель в подарок</span></div>
+      <div class="save"><small>Ваша экономия</small><b>320 000 ₩</b><span>Реклама в пакете — 300 000 ₩ вместо 500 000 ₩. Плюс 2 рилса и карусель в подарок</span></div>
     </div>
     <p class="note">Круг правок — это один список изменений, который Вы присылаете за раз. Цены в вонах — для Кореи, в тенге — для Казахстана.</p>
 
@@ -707,8 +742,8 @@ footer a{text-decoration:underline}
         </div>
         <div class="pr"><span class="off">−30%</span>
           <h3>Под ключ</h3><span class="per">первый месяц</span>
-          <div class="old">1 000 000 ₩</div><div class="won">700 000 ₩</div><div class="tg">210 000 ₸</div>
-          <ul><li>Лендинг и домен на год</li><li>Презентация для консультации</li><li>10 рилсов и 3 карусели</li></ul>
+          <div class="old">1 300 000 ₩</div><div class="won">910 000 ₩</div><div class="tg">273 000 ₸</div>
+          <ul><li>Лендинг и домен на год</li><li>Презентация для консультации</li><li>10 рилсов и 3 карусели</li><li>Настройка и запуск рекламы</li></ul>
         </div>
       </div>
       <p class="note">Со второго месяца контент идёт по обычной цене. Если сомневаетесь, начните с пробного монтажа и посмотрите, как я работаю.</p>
