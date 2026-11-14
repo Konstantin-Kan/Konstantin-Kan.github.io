@@ -322,6 +322,23 @@ footer a{text-decoration:underline;text-underline-offset:3px}
 .sticky-cta.show{transform:none}
 .sticky-cta .btn{width:100%}
 @media(min-width:900px){.sticky-cta{display:none}}
+/* окно выбора мессенджера (14.11.2026) */
+.pick{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;justify-content:center;visibility:hidden;pointer-events:none}
+.pick.open{visibility:visible;pointer-events:auto}
+.pick-bg{position:absolute;inset:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:opacity .3s}
+.pick.open .pick-bg{opacity:1}
+.pick-card{position:relative;width:100%;max-width:440px;background:var(--white);color:var(--ink);border-radius:28px 28px 0 0;padding:14px 22px calc(24px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .45s var(--ease);text-align:center}
+.pick.open .pick-card{transform:none}
+.pick-grab{width:40px;height:5px;border-radius:3px;background:#d1d1d6;margin:0 auto 18px}
+.pick-x{position:absolute;top:12px;right:14px;width:34px;height:34px;border-radius:50%;border:0;background:#f2f2f7;color:var(--ink2);font-size:20px;line-height:34px;cursor:pointer}
+.pick h3{font-size:1.35rem;font-weight:700;letter-spacing:-.02em;margin-bottom:.4rem}
+.pick p{color:var(--ink2);font-size:.98rem;line-height:1.4;margin-bottom:1.3rem}
+.pick .btn{width:100%;margin-top:.7rem;color:#fff}
+.pick .btn svg{width:22px;height:22px}
+.btn-wa{background:#25d366;box-shadow:0 10px 30px -10px rgba(37,211,102,.6)}
+.btn-wa:hover{background:#1ebe5b;transform:translateY(-2px)}
+@media(min-width:600px){.pick{align-items:center}.pick-card{border-radius:28px;padding:22px 28px 28px;transform:translateY(30px) scale(.96);opacity:0;transition:transform .45s var(--spring),opacity .25s}.pick.open .pick-card{transform:none;opacity:1}.pick-grab{display:none}}
+body.pick-lock{overflow:hidden}
 
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -371,12 +388,14 @@ document.addEventListener('DOMContentLoaded',function(){
     if(h.indexOf(key+'%20'+AD_TAG)===-1){a.setAttribute('href',h.replace(key,key+'%20'+AD_TAG));}
   });
 });
-/* нажал любую кнопку «АГЕНТ» → событие Lead (один раз за визит) */
-document.addEventListener('click',function(e){
-  var a=e.target.closest&&e.target.closest('a[href*="t.me/Constantine_Kan"]');
-  if(!a||window.__leadSent)return; window.__leadSent=true;
-  fbq('track','Lead',{content_name:'insurance',content_category:AD_TAG||'no_ad'});
-},true);
+/* 14.11.2026: любая кнопка «Написать» открывает окно выбора Telegram / WhatsApp.
+   Lead — только когда человек выбрал мессенджер, один раз за визит.
+   content_name = telegram / whatsapp, content_category = метка ролика. */
+var WA_PHONE='821068871912';
+function sendLead(channel){
+  if(window.__leadSent)return; window.__leadSent=true;
+  try{fbq('track','Lead',{content_name:channel,content_category:AD_TAG||'no_ad'});}catch(e){}
+}
 </script>
 <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1118977800855176&ev=PageView&noscript=1"/></noscript>
 <!-- /Meta Pixel -->
@@ -912,6 +931,50 @@ document.addEventListener('click',function(e){
 
   /* в вопросах открыт только один ответ */
   $$('.faq details').forEach(d => d.addEventListener('toggle', () => { if (d.open) $$('.faq details').forEach(o => o !== d && (o.open = false)); }));
+})();
+</script>
+<!-- окно выбора мессенджера (14.11.2026) -->
+<div class="pick" id="pick" role="dialog" aria-modal="true" aria-labelledby="pickTitle" aria-hidden="true">
+  <div class="pick-bg" data-close></div>
+  <div class="pick-card">
+    <div class="pick-grab"></div>
+    <button class="pick-x" type="button" aria-label="Закрыть" data-close>×</button>
+    <h3 id="pickTitle">Где Вам удобнее написать?</h3>
+    <p>Сообщение уже готово. Откроется чат, останется только нажать «Отправить».</p>
+    <a class="btn btn-tg" id="pickTg" href="https://t.me/Constantine_Kan" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3 18.6 20c-.2 1.1-.9 1.4-1.8.9l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.3-5.1 9.3-8.4c.4-.4-.1-.6-.6-.2L5.9 13.5 1 12c-1.1-.3-1.1-1.1.2-1.6L20.4 3c.9-.3 1.7.2 1.5 1.3z"/></svg>Telegram</a>
+    <a class="btn btn-wa" id="pickWa" href="https://wa.me/821068871912" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp</a>
+  </div>
+</div>
+<script>
+(function(){
+  var pick=document.getElementById('pick'),tg=document.getElementById('pickTg'),wa=document.getElementById('pickWa');
+  if(!pick)return;
+  function textOf(href){
+    try{return new URL(href).searchParams.get('text')||'';}catch(e){return '';}
+  }
+  function open(href){
+    var txt=textOf(href);
+    tg.href=href;
+    wa.href='https://wa.me/'+WA_PHONE+(txt?'?text='+encodeURIComponent(txt):'');
+    pick.classList.add('open');pick.setAttribute('aria-hidden','false');
+    document.body.classList.add('pick-lock');
+    setTimeout(function(){tg.focus({preventScroll:true});},60);
+  }
+  function close(){
+    pick.classList.remove('open');pick.setAttribute('aria-hidden','true');
+    document.body.classList.remove('pick-lock');
+  }
+  /* любая кнопка «Написать» на странице → окно выбора */
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href*="t.me/Constantine_Kan"]');
+    if(!a||pick.contains(a))return;
+    e.preventDefault();
+    open(a.href);
+  });
+  tg.addEventListener('click',function(){sendLead('telegram');setTimeout(close,300);});
+  wa.addEventListener('click',function(){sendLead('whatsapp');setTimeout(close,300);});
+  pick.querySelectorAll('[data-close]').forEach(function(el){el.addEventListener('click',close);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&pick.classList.contains('open'))close();});
 })();
 </script>
 </body>
