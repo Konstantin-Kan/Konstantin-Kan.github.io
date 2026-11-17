@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sky — обучение продажам · Константин Кан</title>
+<meta name="description" content="Обучение продажам на 2 месяца: продаёте тем, кто уже пишет, и знаете, откуда брать новых. Три пакета: видеоуроки, группа со мной, команда. Набор открыт.">
+<meta property="og:title" content="Sky — обучение продажам · Константин Кан">
+<meta property="og:description" content="Три пакета: видеоуроки, группа со мной, команда до 4 человек. Набор открыт.">
+<meta property="og:image" content="https://constantinekan.com/sky/img/hero.jpg">
+<meta name="theme-color" content="#15100c">
+<link rel="icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/hero.jpg">
+
+<!-- Meta Pixel (тот же, что на главной и /insurance) -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('set','autoConfig',false,'1118977800855176');
+fbq('init','1118977800855176');
+fbq('track','PageView');
+</script>
+
+<style>
+:root{
+  --bg:#15100c;--bg2:#1e1712;--card:#271e17;--line:rgba(241,230,214,.12);
+  --cream:#f3e9db;--cream2:#e9dbc6;--ink:#1b140f;--text:#f3e9db;
+  --muted:#b8a690;--muted-dark:#6d5a48;--gold:#d9a05b;--gold-dark:#a8692a;
+  --btn:#ffb34d;--btn-hover:#ffc472;--red:#e0765f;
+  --r:22px;--wrap:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:Montserrat,system-ui,-apple-system,sans-serif;font-size:17px;line-height:1.6;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+section{position:relative;padding:110px 0}
+.light{background:var(--cream);color:var(--ink)}
+.kicker{font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.light .kicker{color:var(--gold-dark)}
+h2{font-size:clamp(30px,4.4vw,52px);line-height:1.08;font-weight:800;text-transform:uppercase;letter-spacing:-.01em;margin:14px 0 26px}
+.intro{max-width:720px;font-size:18px;color:var(--muted);margin-top:-8px;margin-bottom:40px}
+.light .intro{color:var(--muted-dark)}
+p+p{margin-top:14px}
+
+/* Кнопки */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:18px 30px;border-radius:999px;font-weight:700;font-size:16px;transition:transform .2s,background .2s,box-shadow .2s;cursor:pointer;border:0;text-align:center}
+.btn-main{background:var(--btn);color:#1a110a;box-shadow:0 10px 30px rgba(255,179,77,.28)}
+.btn-main:hover{background:var(--btn-hover);transform:translateY(-2px)}
+.btn-ghost{border:1.5px solid rgba(243,233,219,.35);color:var(--text)}
+.btn-ghost:hover{border-color:var(--text);transform:translateY(-2px)}
+.light .btn-ghost{border-color:rgba(27,20,15,.3);color:var(--ink)}
+
+/* Шапка */
+header{position:fixed;inset:0 0 auto 0;z-index:50;transition:background .3s}
+header.solid{background:rgba(21,16,12,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+.logo{font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:15px}
+.logo span{color:var(--gold)}
+.menu{display:flex;gap:30px;font-size:14px;font-weight:500}
+.menu a{opacity:.8;transition:opacity .2s}
+.menu a:hover{opacity:1;color:var(--gold)}
+.nav .btn{padding:11px 20px;font-size:14px}
+.burger{display:none;width:44px;height:44px;border:0;background:none;color:var(--text);cursor:pointer}
+.burger span{display:block;width:22px;height:2px;background:currentColor;margin:5px auto}
+
+/* Первый экран */
+.hero{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:120px 0 80px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hero-bg::before{content:"";position:absolute;width:900px;height:900px;right:-200px;top:-150px;background:radial-gradient(closest-side,rgba(217,160,91,.22),transparent)}
+.flow{position:absolute;inset:0;width:100%;height:100%}
+.flow path{fill:none;stroke:rgba(217,160,91,.22);stroke-width:1}
+.flow .glow{stroke:url(#g1);stroke-width:1.6;stroke-dasharray:140 1400;animation:run 9s linear infinite}
+.flow .glow.d2{animation-delay:-3s;animation-duration:11s}
+@keyframes run{from{stroke-dashoffset:1540}to{stroke-dashoffset:0}}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center}
+.hero h1{font-size:clamp(40px,6vw,78px);line-height:1;font-weight:800;text-transform:uppercase;letter-spacing:-.02em;margin:20px 0 14px}
+.hero .sub-h{font-size:clamp(21px,2.4vw,30px);font-weight:500;color:var(--gold);margin-bottom:24px;line-height:1.3}
+.ticks{list-style:none;display:grid;gap:10px;color:var(--muted);font-size:17px}
+.ticks li{display:flex;gap:12px;align-items:flex-start}
+.ticks li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:10px}
+.hero-btns{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.photo-box{position:relative;justify-self:end;width:100%;max-width:440px}
+.photo-box img{border-radius:28px;aspect-ratio:4/5;object-fit:cover;object-position:50% 25%;width:100%;position:relative;z-index:2;box-shadow:0 40px 80px rgba(0,0,0,.5)}
+.shape{position:absolute;inset:-14%;z-index:1;animation:spin 60s linear infinite}
+.shape i{position:absolute;inset:0;border:1px solid rgba(217,160,91,.28);border-radius:38% 62% 55% 45%/45% 40% 60% 55%}
+.shape i:nth-child(2){inset:6%;transform:rotate(40deg);border-color:rgba(217,160,91,.18)}
+.shape i:nth-child(3){inset:12%;transform:rotate(80deg);border-color:rgba(243,233,219,.12)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.badge{position:absolute;z-index:3;left:-34px;bottom:46px;background:rgba(39,30,23,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:18px;padding:14px 18px;animation:float 6s ease-in-out infinite}
+.badge b{display:block;font-size:26px;font-weight:800;color:var(--gold);line-height:1.1}
+.badge span{font-size:13px;color:var(--muted)}
+.badge.b2{left:auto;right:-26px;top:40px;bottom:auto;animation-delay:-3s}
+@keyframes float{50%{transform:translateY(-10px)}}
+
+/* Для кого */
+.who{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
+.who .big{font-size:clamp(22px,2.4vw,30px);font-weight:700;line-height:1.3}
+.who .txt{font-size:18px;color:#3b2e24}
+.pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.pills span{border:1px solid rgba(27,20,15,.18);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600}
+
+/* Карточки */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.cards.c2{grid-template-columns:repeat(2,1fr)}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:32px 28px;display:flex;flex-direction:column;overflow:hidden;transition:transform .3s,border-color .3s}
+.card:hover{transform:translateY(-6px);border-color:rgba(217,160,91,.5)}
+.card::after{content:"";position:absolute;width:260px;height:260px;right:-120px;top:-120px;background:radial-gradient(closest-side,rgba(217,160,91,.16),transparent);pointer-events:none}
+.card .num{font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.card h3{font-size:21px;line-height:1.25;font-weight:800;margin:14px 0 14px;text-transform:uppercase}
+.card p{color:var(--muted);font-size:16px}
+.card .lbl{display:block;margin-top:18px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.card .lbl+p{margin-top:6px}
+.light .card{background:#fff;border-color:rgba(27,20,15,.1)}
+.light .card p{color:var(--muted-dark)}
+.light .card .num,.light .card .lbl{color:var(--gold-dark)}
+.note{margin-top:30px;font-size:18px;font-weight:600;color:var(--text)}
+.light .note{color:var(--ink)}
+
+/* Калькулятор */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.calc-in,.calc-out{background:#fff;border:1px solid rgba(27,20,15,.1);border-radius:var(--r);padding:32px}
+.cur{display:inline-flex;background:var(--cream2);border-radius:999px;padding:4px;margin-bottom:26px}
+.cur button{border:0;background:none;font:600 14px Montserrat,sans-serif;padding:9px 18px;border-radius:999px;cursor:pointer;color:var(--ink)}
+.cur button[aria-pressed="true"]{background:var(--ink);color:var(--cream)}
+.field{margin-bottom:22px}
+.field label{display:flex;justify-content:space-between;gap:12px;font-size:15px;font-weight:600;margin-bottom:10px}
+.field output{color:var(--gold-dark);font-weight:800}
+input[type=range]{width:100%;accent-color:#a8692a;height:28px}
+.calc-out{background:var(--ink);color:var(--cream);display:flex;flex-direction:column;justify-content:center}
+.calc-out .big{font-size:clamp(36px,4.6vw,56px);font-weight:800;color:var(--btn);line-height:1.05;margin:12px 0}
+.calc-out span{color:var(--muted)}
+.calc-out b{color:var(--gold)}
+.calc-out small{display:block;margin-top:18px;font-size:14px;color:var(--muted)}
+
+/* Было → стало */
+.ba{margin-top:40px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.ba-row{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.ba-row:first-child{border-top:0;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.ba-row div{padding:16px 24px}
+.ba-row div:first-child{color:var(--muted)}
+.ba-row div:last-child{background:rgba(217,160,91,.07);font-weight:600}
+.ba-row:first-child div:last-child{color:var(--gold)}
+
+/* Кто ведёт */
+.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:70px;align-items:center}
+.about-photo img{border-radius:var(--r);aspect-ratio:4/5;object-fit:cover;object-position:50% 20%;width:100%}
+.tl{list-style:none;margin-top:24px;display:grid;gap:14px}
+.tl li{display:grid;grid-template-columns:110px 1fr;gap:16px;padding-bottom:14px;border-bottom:1px solid rgba(27,20,15,.12);font-size:16px}
+.tl b{color:var(--gold-dark);font-weight:800}
+.quote{margin-top:26px;padding:22px 26px;border-left:3px solid var(--gold-dark);background:var(--cream2);border-radius:0 16px 16px 0;font-weight:600}
+
+/* Как проходит */
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.day{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 20px}
+.day b{display:block;font-size:15px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.day span{font-size:15px;color:var(--muted)}
+.day small{display:block;margin-top:10px;font-size:13px;color:var(--muted);opacity:.85}
+.rule{margin-top:26px;padding:20px 24px;border:1.5px dashed rgba(217,160,91,.45);border-radius:18px;font-weight:600}
+
+/* Программа */
+.prog{display:grid;gap:12px}
+.prog details{background:#fff;border:1px solid rgba(27,20,15,.1);border-radius:18px;overflow:hidden}
+.prog summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:18px;padding:20px 24px}
+.prog summary::-webkit-details-marker{display:none}
+.prog summary::after{content:"+";margin-left:auto;font-size:26px;font-weight:500;color:var(--gold-dark);transition:transform .25s}
+.prog details[open] summary::after{transform:rotate(45deg)}
+.bn{flex:none;width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--btn);display:grid;place-items:center;font-weight:800}
+.bt b{display:block;font-size:18px;font-weight:800}
+.bt span{font-size:14px;color:var(--muted-dark)}
+.prog ul{list-style:none;padding:0 24px 20px 86px;display:grid;gap:10px}
+.prog li{display:grid;grid-template-columns:96px 1fr;gap:12px;font-size:15px}
+.prog li i{font-style:normal;font-weight:700;color:var(--gold-dark);font-size:13px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
+.prog em{font-style:normal;font-weight:700}
+
+/* Трафик */
+.chain{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-weight:700;font-size:clamp(17px,1.8vw,22px);margin-bottom:34px}
+.chain em{font-style:normal;color:var(--gold)}
+.chain i{font-style:normal;opacity:.5}
+.weeks{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.wk{border:1px solid var(--line);border-radius:18px;padding:22px;background:linear-gradient(160deg,var(--card),var(--bg2))}
+.wk b{display:block;color:var(--gold);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.wk span{font-size:15px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.duo div{border:1.5px dashed rgba(217,160,91,.35);border-radius:18px;padding:22px;font-size:15px;color:var(--muted)}
+.duo b{color:var(--text)}
+
+/* Что нужно от Вас */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.stat{border:1px solid var(--line);border-radius:var(--r);padding:28px;background:linear-gradient(160deg,var(--card),var(--bg2))}
+.stat b{display:block;font-size:clamp(30px,3.4vw,42px);font-weight:800;color:var(--gold);line-height:1}
+.stat span{display:block;margin-top:12px;color:var(--muted);font-size:15px}
+
+/* Отзыв */
+.review{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;align-items:start}
+.shots{display:grid;gap:14px}
+.shots img,.pay img{border-radius:18px;border:1px solid rgba(27,20,15,.12);box-shadow:0 14px 34px rgba(27,20,15,.12);width:100%}
+.pay{background:#fff;border:1px solid rgba(27,20,15,.1);border-radius:var(--r);padding:26px}
+.pay h3{font-size:20px;font-weight:800;text-transform:uppercase;margin:6px 0 10px}
+.pay p{font-size:15px;color:var(--muted-dark);margin-bottom:16px}
+.pay small{display:block;margin-top:10px;font-size:12px;color:var(--muted-dark)}
+
+/* Пакеты */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
+.plan{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:32px 28px;display:flex;flex-direction:column}
+.plan.main{background:var(--cream);color:var(--ink);border-color:transparent;box-shadow:0 30px 70px rgba(0,0,0,.45)}
+.plan .tag{position:absolute;top:-14px;left:28px;background:var(--btn);color:#1a110a;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;border-radius:999px}
+.plan h3{font-size:26px;font-weight:800;text-transform:uppercase}
+.plan .for{font-size:15px;color:var(--muted);margin-top:4px}
+.plan.main .for{color:var(--muted-dark)}
+.price{margin:22px 0 4px;font-size:34px;font-weight:800;line-height:1.1;color:var(--gold)}
+.plan.main .price{color:var(--gold-dark)}
+.price small{display:block;font-size:18px;font-weight:700;opacity:.85;margin-top:4px}
+.pay-way{font-size:14px;color:var(--muted);min-height:44px}
+.plan.main .pay-way{color:var(--muted-dark)}
+.plan ul{list-style:none;display:grid;gap:10px;margin:22px 0 26px;font-size:15px;flex:1}
+.plan li{display:flex;gap:10px}
+.plan li::before{content:"✓";color:var(--gold);font-weight:800;flex:none}
+.plan.main li::before{color:var(--gold-dark)}
+.plan li.top{font-weight:700}
+.plan li.top::before{content:"＋"}
+.plan .btn{width:100%}
+.plan-note{margin-top:14px;font-size:13px;color:var(--muted);text-align:center}
+.plan.main .plan-note{color:var(--muted-dark)}
+.up{margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.up div{border:1px solid var(--line);border-radius:18px;padding:22px 24px;font-size:15px;color:var(--muted)}
+.up b{display:block;color:var(--text);font-size:16px;margin-bottom:6px}
+
+/* Шаги и возврат */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.step{background:#fff;border:1px solid rgba(27,20,15,.1);border-radius:var(--r);padding:28px}
+.step b{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--btn);font-weight:800;font-size:18px;margin-bottom:16px}
+.step p{font-size:16px}
+.step small{display:block;margin-top:10px;font-size:14px;color:var(--muted-dark)}
+.refund{margin-top:22px;display:flex;gap:26px;align-items:center;background:var(--ink);color:var(--cream);border-radius:var(--r);padding:28px 32px}
+.refund b{font-size:44px;font-weight:800;color:var(--btn);line-height:1;flex:none}
+.refund b small{display:block;font-size:14px;color:var(--muted);font-weight:600;margin-top:6px}
+.refund p{font-size:15px;color:var(--muted)}
+.refund p strong{color:var(--cream)}
+
+/* Вопросы */
+.faq{display:grid;gap:12px;max-width:880px}
+.faq details{border:1px solid var(--line);border-radius:18px;background:var(--card)}
+.faq summary{list-style:none;cursor:pointer;padding:20px 24px;font-weight:700;display:flex;gap:16px;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";margin-left:auto;font-size:24px;color:var(--gold);transition:transform .25s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details div{padding:0 24px 22px;color:var(--muted);font-size:16px}
+
+/* Мостик к разбору */
+.bridge{display:flex;align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.bridge h2{margin:10px 0 8px;font-size:clamp(26px,3.2vw,38px)}
+.bridge p{color:var(--muted-dark)}
+
+/* Финал */
+.final{text-align:center;overflow:hidden}
+.final h2{max-width:900px;margin:18px auto 20px}
+.final p{color:var(--muted);font-size:18px}
+.final .hero-btns{justify-content:center}
+.final small{display:block;margin-top:16px;font-size:14px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:30px 0;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+footer a{text-decoration:underline}
+
+/* Появление при прокрутке */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}
+
+/* Планшет */
+@media (max-width:980px){
+  section{padding:84px 0}
+  .menu{display:none}
+  .burger{display:block}
+  .menu.open{display:flex;position:absolute;top:72px;left:0;right:0;flex-direction:column;gap:0;background:rgba(21,16,12,.97);border-bottom:1px solid var(--line);padding:8px 24px 20px}
+  .menu.open a{padding:14px 0;border-bottom:1px solid var(--line);font-size:16px}
+  .hero-grid,.about-grid,.who,.calc,.review{grid-template-columns:1fr;gap:40px}
+  .cards,.cards.c2,.plans,.steps{grid-template-columns:1fr}
+  .plans{gap:34px}
+  .days{grid-template-columns:1fr 1fr}
+  .weeks{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .about-photo{max-width:460px}
+}
+/* Телефон */
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 16px}
+  section{padding:64px 0}
+  .nav .btn{display:none}
+  .hero{padding:0;min-height:auto;display:block}
+  .hero-grid{display:flex;flex-direction:column;gap:0}
+  .photo-box{order:-1;position:relative;max-width:none;width:auto;margin:0 -16px;padding-top:64px}
+  .photo-box img{border-radius:0;aspect-ratio:auto;height:62svh;min-height:400px;object-position:50% 10%;box-shadow:none}
+  .photo-box::after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(21,16,12,0) 45%,rgba(21,16,12,.85) 82%,var(--bg))}
+  .shape,.badge{display:none}
+  .hero-text{position:relative;z-index:4;margin-top:-110px;padding-bottom:56px}
+  .hero h1{font-size:40px}
+  .hero-btns .btn{width:100%}
+  .days,.weeks,.duo,.up{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr;gap:14px}
+  .stat{padding:20px}
+  .ba-row div{padding:12px 14px;font-size:14px}
+  .tl li{grid-template-columns:80px 1fr}
+  .prog summary{padding:16px;gap:12px}
+  .prog ul{padding:0 16px 18px 16px}
+  .prog li{grid-template-columns:1fr;gap:2px}
+  .calc-in,.calc-out{padding:22px}
+  .refund{flex-direction:column;align-items:flex-start;gap:14px;padding:24px}
+  .plan{padding:30px 22px}
+  .about-photo img{aspect-ratio:16/11;object-position:50% 15%}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<header id="top">
+  <div class="wrap nav">
+    <a href="/" class="logo">Константин <span>Кан</span></a>
+    <nav class="menu" id="menu">
+      <a href="/">Главная</a>
+      <a href="#problems">Для кого</a>
+      <a href="#program">Программа</a>
+      <a href="#price">Пакеты</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <a class="btn btn-main js-tg" href="https://t.me/Constantine_Kan?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%20Sky" target="_blank" rel="noopener">Написать мне</a>
+    <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- 1. Первый экран -->
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true">
+    <svg class="flow" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+      <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#ffb34d" stop-opacity="0"/><stop offset=".5" stop-color="#ffd59a"/><stop offset="1" stop-color="#ffb34d" stop-opacity="0"/></linearGradient></defs>
+      <path d="M-50 760 C 300 700, 520 420, 900 430 S 1400 260, 1500 120"/>
+      <path d="M-50 840 C 360 780, 640 560, 990 560 S 1430 420, 1500 320"/>
+      <path class="glow" d="M-50 760 C 300 700, 520 420, 900 430 S 1400 260, 1500 120"/>
+      <path class="glow d2" d="M-50 840 C 360 780, 640 560, 990 560 S 1430 420, 1500 320"/>
+    </svg>
+  </div>
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <div class="kicker rv">Sky · обучение продажам · набор открыт</div>
+      <h1 class="rv d1">Обучение продажам</h1>
+      <div class="sub-h rv d2">2 месяца, после которых Вы продаёте тем, кто уже пишет, и знаете, откуда брать новых</div>
+      <ul class="ticks rv d2">
+        <li>Учимся на Ваших живых клиентах, а не на теории</li>
+        <li>Без впаривания и без «большого блога»</li>
+        <li>Три пакета: видеоуроки, группа со мной или работа с Вашей командой</li>
+      </ul>
+      <div class="hero-btns rv d3">
+        <a class="btn btn-main" href="#price">Выбрать пакет ↓</a>
+        <a class="btn btn-ghost" href="#problems">Сначала разобраться</a>
+      </div>
+    </div>
+    <div class="photo-box">
+      <div class="shape" aria-hidden="true"><i></i><i></i><i></i></div>
+      <img src="img/hero.jpg" alt="Константин Кан" width="1050" height="1400" fetchpriority="high">
+      <div class="badge"><b>с 2002</b><span>в продажах</span></div>
+      <div class="badge b2"><b>3 пакета</b><span>от 500 000 ₩</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Для кого -->
+<section class="light" id="problems">
+  <div class="wrap who">
+    <div>
+      <div class="kicker rv">Для кого Sky</div>
+      <h2 class="rv d1">Для тех, кто продаёт сам</h2>
+      <div class="pills rv d2"><span>страховые агенты</span><span>психологи</span><span>коучи</span><span>наставники</span><span>репетиторы</span><span>нутрициологи</span><span>стилисты</span><span>мастера</span><span>малый бизнес</span></div>
+    </div>
+    <div class="txt">
+      <p class="big rv">Вы хорошо делаете своё дело. Клиенты пишут. А покупают меньше, чем могли бы.</p>
+      <p class="rv d1">На «сколько стоит?» сразу звучит цифра. Не узнают, зачем человек пришёл. Неловко сделать следующий шаг. На «дорого» и «подумаю» клиента просто отпускают.</p>
+      <p class="rv d2"><b>Больше подписчиков тут не поможет.</b> Теряются те, кто уже написал.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Три проблемы -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">Где уходят деньги</div>
+    <h2 class="rv d1">3 проблемы, из-за которых теряются клиенты</h2>
+    <p class="intro rv d1">По каждой: откуда она берётся, что за ней стоит и как мы её решаем на курсе.</p>
+    <div class="cards">
+      <div class="card rv">
+        <div class="num">Проблема 1</div>
+        <h3>Пишут «сколько стоит?» и пропадают после цены</h3>
+        <span class="lbl">Причина</span>
+        <p>Цена звучит раньше, чем человек понял, что Вы решите именно его проблему. Для него это просто цифра, и он идёт сравнивать.</p>
+        <span class="lbl">Что за этим стоит</span>
+        <p>Кажется, что дело в нём: «не мой клиент», «денег нет». А он ушёл, потому что разговора не было. Был прайс.</p>
+        <span class="lbl">Как решаем</span>
+        <p>Первое сообщение, вопросы, которые выводят на его боль, и презентация под конкретного человека. Блок 3 «Путь клиента».</p>
+      </div>
+      <div class="card rv d1">
+        <div class="num">Проблема 2</div>
+        <h3>Неловко предлагать. Кажется, что навязываетесь</h3>
+        <span class="lbl">Причина</span>
+        <p>В голове продажа — это впаривание. Плюс непонятно, сколько на самом деле стоит Ваш продукт, поэтому цену называть неловко.</p>
+        <span class="lbl">Что за этим стоит</span>
+        <p>Вы молчите там, где клиент ждёт следующего шага. Он не понимает, что делать дальше, и уходит думать.</p>
+        <span class="lbl">Как решаем</span>
+        <p>Блок 1 «Голова продавца»: деньги и стыд, уверенность, своя цена. Блок 2: кто Ваш клиент и как говорить о себе фактами.</p>
+      </div>
+      <div class="card rv d2">
+        <div class="num">Проблема 3</div>
+        <h3>«Я подумаю» — и тишина</h3>
+        <span class="lbl">Причина</span>
+        <p>На «дорого» и «подумаю» нечего ответить. А второй раз написать неловко, и клиента просто отпускают.</p>
+        <span class="lbl">Что за этим стоит</span>
+        <p>Человеку было интересно, раз он дошёл до цены. Но решение отдали ему, и никто не предложил следующий шаг.</p>
+        <span class="lbl">Как решаем</span>
+        <p>Ответы на 13 возражений, закрытие и дожим без давления: своя цепочка на 7 дней. Пишем всем, кто сказал «подумаю» за последние 2 месяца.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Калькулятор -->
+<section class="light">
+  <div class="wrap">
+    <div class="kicker rv">Сколько это стоит Вам</div>
+    <h2 class="rv d1">Посчитайте на своих цифрах</h2>
+    <div class="calc rv d2">
+      <div class="calc-in">
+        <div class="cur" role="group" aria-label="Валюта">
+          <button type="button" data-cur="won" aria-pressed="true">₩ вона</button>
+          <button type="button" data-cur="tenge" aria-pressed="false">₸ тенге</button>
+        </div>
+        <div class="field"><label for="leads">Пишут в месяц, человек <output id="o-leads">20</output></label><input id="leads" type="range" min="5" max="150" step="1" value="20"></div>
+        <div class="field"><label for="buy">Из них покупают <output id="o-buy">2</output></label><input id="buy" type="range" min="0" max="50" step="1" value="2"></div>
+        <div class="field"><label for="check">Средний чек <output id="o-check">600 000 ₩</output></label><input id="check" type="range" min="50000" max="3000000" step="50000" value="600000"></div>
+      </div>
+      <div class="calc-out">
+        <span>Если из 10 написавших будут покупать 3, это ещё</span>
+        <div class="big" id="res">2 400 000 ₩</div>
+        <span>в месяц. За год — <b id="res-yr">28 800 000 ₩</b></span>
+        <small>«3 из 10» — цель курса, а не обещание. Из тех же заявок, без увеличения рекламного бюджета.</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. 4 задачи -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">Как это решается</div>
+    <h2 class="rv d1">4 задачи, которые мы закрываем за 2 месяца</h2>
+    <div class="cards c2">
+      <div class="card rv"><div class="num">01</div><h3>Убрать неловкость</h3><p>Перестать бояться цены, отказа и «навязаться». Вы спокойно называете цену и предлагаете.</p></div>
+      <div class="card rv d1"><div class="num">02</div><h3>Понять своего клиента и свой продукт</h3><p>Кто покупает, за что платит, как говорить о себе фактами. Клиент слышит: «это про меня».</p></div>
+      <div class="card rv"><div class="num">03</div><h3>Провести клиента до оплаты</h3><p>Первое сообщение → вопросы → предложение под человека → возражения → закрытие. Покупают из тех, кто уже пишет.</p></div>
+      <div class="card rv d1"><div class="num">04</div><h3>Поставить на систему</h3><p>Дожим без давления, учёт клиентов, повторные покупки, откуда брать новые заявки. Продажи не зависят от настроения.</p></div>
+    </div>
+    <div class="ba rv">
+      <div class="ba-row"><div>Сейчас</div><div>Через 2 месяца</div></div>
+      <div class="ba-row"><div>После цены пропадают</div><div>Цель: из 10 написавших покупают 3</div></div>
+      <div class="ba-row"><div>«Дорого», «подумаю», дожимать неловко</div><div>Знаете, что ответить, и спокойно ведёте дальше</div></div>
+      <div class="ba-row"><div>«Подумаю» — и человек не возвращается</div><div>Своя цепочка дожима на 7 дней, без давления</div></div>
+      <div class="ba-row"><div>Кажется, нужно больше подписчиков</div><div>Доход растёт из тех же заявок, и есть план, откуда брать новые</div></div>
+      <div class="ba-row"><div>Продавать стыдно</div><div>Продажа звучит как забота о клиенте</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Кто ведёт -->
+<section class="light" id="about">
+  <div class="wrap about-grid">
+    <div class="about-photo rv"><img src="img/author.jpg" alt="Константин Кан" loading="lazy" width="787" height="1400"></div>
+    <div>
+      <div class="kicker rv">Кто ведёт</div>
+      <h2 class="rv d1">Я продаю с 17 лет</h2>
+      <p class="rv d1">Всё, что есть в программе, я сам делал на живых клиентах.</p>
+      <ul class="tl rv d2">
+        <li><b>2002</b><span>Промоутер в Ростове, 17 лет. Премия в первый же день.</span></li>
+        <li><b>Marriott</b><span>Renaissance Aktau: корпоративные продажи с международными компаниями. Best Associate of the Year 2011.</span></li>
+        <li><b>Kraft Foods</b><span>Супервайзер ключевых клиентов (сейчас Mondelēz): около 252% к продажам прошлого года.</span></li>
+        <li><b>Holiday Inn</b><span>Корпоративные клиенты и мероприятия.</span></li>
+        <li><b>2025</b><span>Воронка для юристов: 5 рилсов → больше 30 платных консультаций и больше 10 проектов за месяц.</span></li>
+      </ul>
+      <div class="quote rv d3">В Sky собрал свои продажи с 2002 года, книги, которые меня учили, и то, что работает у экспертов сейчас.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Как проходит -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">Как проходит обучение</div>
+    <h2 class="rv d1">Продажам не научиться, просто посмотрев</h2>
+    <p class="intro rv d1">Нужно попробовать, ошибиться и поправить. Лучше со мной, а не на дорогом клиенте. Так устроен пакет «Стандарт»:</p>
+    <div class="days">
+      <div class="day rv"><b>После оплаты</b><span>В тот же день добавляю Вас в закрытую группу.</span><small>Когда закончится срок на возврат, присылаю материалы и первый шаг подготовки. Ждать старта не нужно: собираете свою точку А, базу клиентов и своё предложение. 30–40 минут в день.</small></div>
+      <div class="day rv d1"><b>Вт и чт</b><span>Групповой созвон в Zoom, 2–3 часа. Проверка заданий, новая тема, отработка в парах.</span><small>Корея — 20:00 по Корее. Казахстан — 19:00 по Казахстану.</small></div>
+      <div class="day rv d2"><b>По четвергам</b><span>Откуда брать заявки: профиль, хайлайт, ролики, реклама.</span></div>
+      <div class="day rv d3"><b>Раз в 2 недели</b><span>Личный созвон со мной, 30–40 минут. Смотрим Ваши цифры и разбираем Ваших клиентов.</span></div>
+      <div class="day rv d3"><b>Воскресенье</b><span>Отчёт за неделю: что получилось и где застряли.</span></div>
+    </div>
+    <div class="rule rv">Правило: урок → отработка в группе и в парах → живые клиенты. Сначала тренируемся там, где ошибка ничего не стоит.</div>
+  </div>
+</section>
+
+<!-- 8. Программа -->
+<section class="light" id="program">
+  <div class="wrap">
+    <div class="kicker rv">Программа</div>
+    <h2 class="rv d1">Что проходим</h2>
+    <p class="intro rv d1">Нажмите на блок, чтобы раскрыть темы. Видеоуроки идут по тем же блокам.</p>
+    <div class="prog rv d2">
+      <details>
+        <summary><span class="bn">0</span><span class="bt"><b>Подготовка</b><span>от оплаты до старта</span></span></summary>
+        <ul>
+          <li><i>Шаг 1–3</i><span>Вход в группу. Точка А: где Вы сейчас в цифрах. База: все, кто за последний год писал, спрашивал, покупал</span></li>
+          <li><i>Шаг 4–5</i><span>Один клиент, одна боль. Адресное предложение — основа для профиля, хайлайта и роликов</span></li>
+          <li><i>Шаг 6</i><span>Первые техники из книги техник продаж</span></li>
+        </ul>
+      </details>
+      <details>
+        <summary><span class="bn">1</span><span class="bt"><b>Голова продавца</b><span>недели 1–2</span></span></summary>
+        <ul>
+          <li><i>Созвон</i><span>Знакомство, правила, пары. Что Вы думаете о продажах</span></li>
+          <li><i>Созвон</i><span>Деньги и стыд. Уверенность. <em>Трафик:</em> шапка профиля из адресного предложения</span></li>
+          <li><i>Созвон</i><span>Своя цена. Где Вы теряете клиентов: разбор точек А по таблицам</span></li>
+        </ul>
+      </details>
+      <details>
+        <summary><span class="bn">2</span><span class="bt"><b>Вы и Ваш продукт</b><span>недели 2–3</span></span></summary>
+        <ul>
+          <li><i>Созвон</i><span>Кто Ваш клиент. Сколько стоит продукт на самом деле. <em>Трафик:</em> хайлайт, который продаёт, и кодовое слово</span></li>
+          <li><i>Личный №1</i><span>Самопрезентация, продукт, откуда клиенты</span></li>
+          <li><i>Созвон</i><span>Говорите о себе фактами. Продукт глазами клиента</span></li>
+          <li><i>Созвон</i><span>Тренировка презентации — весь созвон практика. <em>Трафик:</em> ролики, 6 заходов</span></li>
+        </ul>
+      </details>
+      <details>
+        <summary><span class="bn">3</span><span class="bt"><b>Путь клиента</b><span>недели 4–5 · с этого блока живые клиенты</span></span></summary>
+        <ul>
+          <li><i>Созвон</i><span>Первое сообщение и цена в первом вопросе. Вопросы, которые выводят на боль</span></li>
+          <li><i>Созвон</i><span>Презентация под человека. Возражения. <em>Трафик:</em> человек написал кодовое слово — запись на консультацию</span></li>
+          <li><i>Личный №2</i><span>Промежуточный итог против точки А, разбор сорванных закрытий</span></li>
+          <li><i>Созвон</i><span>Закрытие. Переписка, голосовое или созвон: что когда</span></li>
+        </ul>
+      </details>
+      <details>
+        <summary><span class="bn">4</span><span class="bt"><b>Практика и система</b><span>недели 5–7</span></span></summary>
+        <ul>
+          <li><i>Созвон</i><span>Дожим без давления. <em>Трафик:</em> реклама — продвигаем лучший ролик или хайлайт</span></li>
+          <li><i>Созвон</i><span>Поток клиентов: все каналы. День продажника: норма, учёт, время</span></li>
+          <li><i>Созвон</i><span>Продажа на созвоне. <em>Трафик:</em> эфиры и Threads</span></li>
+          <li><i>Личный №3</i><span>Разбор записи Вашего созвона с клиентом, узкое место в цифрах</span></li>
+          <li><i>Созвон</i><span>Допродажи, повторные покупки, рекомендации</span></li>
+        </ul>
+      </details>
+      <details>
+        <summary><span class="bn">5</span><span class="bt"><b>Закрепление</b><span>недели 7–8</span></span></summary>
+        <ul>
+          <li><i>Созвон</i><span>Тренажёр сложных клиентов. Ваш скрипт. <em>Трафик:</em> что сработало — по столбцу «Откуда пришёл»</span></li>
+          <li><i>Созвон</i><span>Экзамен: продажа от начала до конца. Я играю самого вредного клиента</span></li>
+        </ul>
+      </details>
+      <details>
+        <summary><span class="bn">6</span><span class="bt"><b>Итоги</b><span>неделя 8</span></span></summary>
+        <ul>
+          <li><i>Созвон</i><span>Точка Б: было → стало в цифрах. План на 3 месяца, в том числе по заявкам</span></li>
+          <li><i>Личный №4</i><span>Итог и следующие шаги</span></li>
+          <li><i>Созвон</i><span>Выпускной. Чат группы остаётся</span></li>
+        </ul>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- 9. Трафик -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">Трафик и соцсети</div>
+    <h2 class="rv d1">«Хорошо, продавать научусь. А кому?»</h2>
+    <p class="intro rv d1">Поэтому заявки строим параллельно с продажами, с первой недели. К практике на живых клиентах они уже должны идти. Большой блог не нужен.</p>
+    <div class="chain rv d2"><em>Ролики</em><i>→</i>Хайлайт с кодовым словом<i>→</i>Директ<i>→</i>Консультация<i>→</i><em>Продажа</em></div>
+    <div class="weeks">
+      <div class="wk rv"><b>Неделя 1</b><span>Шапка профиля из Вашего адресного предложения</span></div>
+      <div class="wk rv d1"><b>Неделя 2</b><span>Хайлайт, который продаёт, и кодовое слово</span></div>
+      <div class="wk rv d2"><b>Неделя 3</b><span>Первые 3 ролика, дальше по 3 в неделю</span></div>
+      <div class="wk rv"><b>Неделя 4</b><span>Человек написал кодовое слово: что отвечать и как записать на консультацию</span></div>
+      <div class="wk rv d1"><b>Неделя 5</b><span>Реклама: продвигаем то, что уже дало заявки. Смотрим цену одной заявки</span></div>
+      <div class="wk rv d2"><b>Неделя 6</b><span>Другие каналы: база и сарафан, сообщения, чаты, партнёры, эфиры и Threads</span></div>
+    </div>
+    <div class="duo">
+      <div class="rv"><b>Это моя схема.</b> Так я строил воронку для юристов летом 2025: 5 рилсов, закреп и хайлайт — больше 30 платных консультаций за месяц.</div>
+      <div class="rv d1"><b>Соцсетей совсем нет?</b> Делаете минимум: шапка, хайлайт, 3 ролика. Основной упор — база, рекомендации и сообщения.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. Что получаете -->
+<section class="light">
+  <div class="wrap">
+    <div class="kicker rv">Что Вы получаете</div>
+    <h2 class="rv d1">Всё, с чем Вы работаете на курсе и после</h2>
+    <div class="cards">
+      <div class="card rv"><div class="num">Все пакеты</div><h3>Видеоуроки на платформе</h3><p>Все блоки программы в записи. Смотрите в своём темпе, с телефона или компьютера.</p></div>
+      <div class="card rv d1"><div class="num">Все пакеты</div><h3>Шаблоны и шпаргалка</h3><p>Шаблоны фраз и вопросов из уроков. Ответы на «дорого», «подумаю», «у других дешевле».</p></div>
+      <div class="card rv d2"><div class="num">Все пакеты</div><h3>Книга техник продаж</h3><p>21 техника по ходу сделки. Справочник на всё обучение и после.</p></div>
+      <div class="card rv"><div class="num">Стандарт и Премиум</div><h3>Таблица учёта клиентов</h3><p>Сама считает, где Вы теряете людей и откуда приходят заявки.</p></div>
+      <div class="card rv d1"><div class="num">Стандарт и Премиум</div><h3>Разбор Ваших переписок</h3><p>И записи Вашего созвона с клиентом. Где ушёл человек и что надо было сказать.</p></div>
+      <div class="card rv d2"><div class="num">Стандарт и Премиум</div><h3>Аудит профиля и хайлайта</h3><p>Чтобы люди, которые зашли, понимали, что Вы решите их проблему.</p></div>
+    </div>
+    <p class="note rv">К концу курса у Вас свой скрипт, ответы на свои возражения, цепочка дожима, план заявок и цифры «было → стало».</p>
+  </div>
+</section>
+
+<!-- 11. Что нужно от Вас -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">Что нужно от Вас</div>
+    <h2 class="rv d1">Без этого не будет результата</h2>
+    <div class="stats">
+      <div class="stat rv"><b>4–6 ч</b><span>в неделю — созвоны (в Стандарте)</span></div>
+      <div class="stat rv d1"><b>2–3 ч</b><span>в неделю — уроки и задания</span></div>
+      <div class="stat rv d2"><b>15–30 мин</b><span>каждый день — продажи</span></div>
+      <div class="stat rv d3"><b>Вс</b><span>каждый клиент — в таблицу, отчёт по воскресеньям</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12. Отзыв -->
+<section class="light">
+  <div class="wrap">
+    <div class="kicker rv">Первый отзыв</div>
+    <h2 class="rv d1">Пришли на разбор. Вот что написали после</h2>
+    <div class="review">
+      <div class="shots rv d1">
+        <img src="img/otzyv-1.jpg" alt="Отзыв после разбора, часть 1" loading="lazy" width="920" height="1040">
+        <img src="img/otzyv-2.jpg" alt="Отзыв после разбора, часть 2" loading="lazy" width="920" height="610">
+      </div>
+      <div class="pay rv d2">
+        <div class="kicker">Чем закончилось</div>
+        <h3>Место в группе оплачено</h3>
+        <p>После разбора я всегда говорю: подумайте, решения на горячую голову мне не нужны. Утром пришёл отзыв, а вечером — оплата.</p>
+        <img src="img/oplata.jpg" alt="Чек об оплате, данные скрыты" loading="lazy" width="828" height="1356">
+        <small>Имена и контакты скрыты, данные чека закрыты</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. Пакеты -->
+<section id="price">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="wrap" style="position:relative">
+    <div class="kicker rv">Пакеты</div>
+    <h2 class="rv d1">Выберите, как учиться</h2>
+    <p class="intro rv d1">Сколько стоит Вам один клиент, который ушёл после цены? А все, кто сказал «подумаю» за последние 2 месяца? Сколько это за год, Вы уже посчитали выше.</p>
+    <div class="plans">
+      <div class="plan rv">
+        <h3>Базовый</h3>
+        <div class="for">Учитесь сами по видеоурокам</div>
+        <div class="price">500 000 ₩<small>150 000 ₸</small></div>
+        <div class="pay-way">Одним платежом</div>
+        <ul>
+          <li>Видеоуроки на платформе по всей программе</li>
+          <li>Домашние задания (без проверки)</li>
+          <li>Шаблоны фраз и вопросов из уроков</li>
+          <li>Шпаргалка ответов на возражения</li>
+          <li>Созвон вопрос-ответ раз в неделю: воскресенье, 12:00 по Корее</li>
+          <li>Одна общая группа для Кореи и Казахстана</li>
+          <li>Доступ к урокам на 3 месяца</li>
+        </ul>
+        <a class="btn btn-ghost js-tg" href="https://t.me/Constantine_Kan?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%C2%AB%D0%91%D0%B0%D0%B7%D0%BE%D0%B2%D1%8B%D0%B9%C2%BB%20Sky" target="_blank" rel="noopener">Хочу Базовый</a>
+      </div>
+      <div class="plan main rv d1">
+        <span class="tag">Основной</span>
+        <h3>Стандарт</h3>
+        <div class="for">Учитесь со мной в группе</div>
+        <div class="price">1 000 000 ₩<small>300 000 ₸</small></div>
+        <div class="pay-way">Или двумя платежами: 500 000 ₩ + 500 000 ₩ / 150 000 ₸ + 150 000 ₸</div>
+        <ul>
+          <li class="top">Всё из Базового</li>
+          <li>Групповые созвоны 2 раза в неделю, отдельно Корея и Казахстан</li>
+          <li>Проверка домашних заданий</li>
+          <li>Личный созвон со мной раз в 2 недели</li>
+          <li>Разбор Ваших живых переписок</li>
+          <li>Разбор записи Вашего созвона или голосового с клиентом</li>
+          <li>Аудит профиля и хайлайта</li>
+          <li>Доступ к урокам навсегда</li>
+        </ul>
+        <a class="btn btn-main js-tg" href="https://t.me/Constantine_Kan?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%C2%AB%D0%A1%D1%82%D0%B0%D0%BD%D0%B4%D0%B0%D1%80%D1%82%C2%BB%20Sky" target="_blank" rel="noopener">Хочу Стандарт</a>
+        <div class="plan-note">Набор открыт. Старт объявлю за неделю в закрытой группе.</div>
+      </div>
+      <div class="plan rv d2">
+        <h3>Премиум</h3>
+        <div class="for">Ваша команда до 4 человек</div>
+        <div class="price">3 000 000 ₩<small>900 000 ₸</small></div>
+        <div class="pay-way">Или помесячно: 1 500 000 ₩ / 450 000 ₸ в месяц. На человека выходит 750 000 ₩</div>
+        <ul>
+          <li class="top">Всё из Стандарта для каждого участника</li>
+          <li>Работаю на Ваш проект: продукт, цена, воронка</li>
+          <li>Скрипты и фразы под Ваш продукт</li>
+          <li>Разбор переписок каждого участника</li>
+          <li>Личный созвон с руководителем раз в неделю</li>
+          <li>Личный чат со мной, ответ в течение дня</li>
+          <li>Регламент продаж для отдела и аудит воронки</li>
+        </ul>
+        <a class="btn btn-ghost js-tg" href="https://t.me/Constantine_Kan?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%C2%AB%D0%9F%D1%80%D0%B5%D0%BC%D0%B8%D1%83%D0%BC%C2%BB%20Sky" target="_blank" rel="noopener">Хочу Премиум</a>
+        <div class="plan-note">Только 2 места на поток</div>
+      </div>
+    </div>
+    <div class="up">
+      <div class="rv"><b>Начали с Базового и поняли, что нужна группа?</b>В первые 2 недели переходите в Стандарт с доплатой 500 000 ₩ / 150 000 ₸. Позже — только по полной цене.</div>
+      <div class="rv d1"><b>Для кого Премиум</b>Владелец с отделом продаж, небольшая компания или руководитель с коллегами из одной ниши. Работаю на проект руководителя.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 14. Как зайти -->
+<section class="light">
+  <div class="wrap">
+    <div class="kicker rv">Как зайти</div>
+    <h2 class="rv d1">Три шага</h2>
+    <div class="steps">
+      <div class="step rv"><b>1</b><p>Пишете мне в Telegram. Задам пару вопросов, чтобы убедиться, что курс Вам подходит, и вместе выберем пакет.</p></div>
+      <div class="step rv d1"><b>2</b><p>Присылаю сумму и реквизиты. Оплачиваете, скидываете чек.</p></div>
+      <div class="step rv d2"><b>3</b><p>В тот же день добавляю Вас в закрытую группу.</p><small>Когда закончится срок на возврат, присылаю материалы и первый шаг подготовки.</small></div>
+    </div>
+    <div class="refund rv">
+      <b>2 дня<small>на возврат</small></b>
+      <p><strong>Передумали — верну деньги.</strong> В течение 2 дней после оплаты, пока Вы не получили материалы курса. Если до старта меньше 2 дней — в течение 1 дня, чтобы не терять время.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 15. Вопросы -->
+<section id="faq">
+  <div class="wrap">
+    <div class="kicker rv">Вопросы</div>
+    <h2 class="rv d1">У Вас могли возникнуть вопросы</h2>
+    <div class="faq rv d2">
+      <details><summary>Чем Базовый отличается от Стандарта?</summary><div>В Базовом Вы учитесь сами: смотрите видеоуроки, делаете задания и раз в неделю задаёте вопросы на общем созвоне. В Стандарте я веду Вас 2 месяца: проверяю задания, разбираю Ваши переписки и созвоны, вы отрабатываете продажи в парах на созвонах 2 раза в неделю. Продажам не научиться, просто посмотрев, поэтому основной пакет — Стандарт.</div></details>
+      <details><summary>У меня нет блога. Подойдёт?</summary><div>Да. Блог для курса не нужен. В трафике делаете минимум: шапка, хайлайт, 3 ролика. Основной упор — база, рекомендации и сообщения. Клиенты по сарафану уже знают, к кому идут, и терять их в переписке обиднее всего.</div></details>
+      <details><summary>Я в Казахстане (или в Корее). Во сколько созвоны?</summary><div>В Стандарте группы отдельные. Корея — вторник и четверг в 20:00 по Корее. Казахстан — вторник и четверг в 19:00 по Казахстану. В Базовом одна общая группа, созвон в воскресенье в 12:00 по Корее.</div></details>
+      <details><summary>Когда старт?</summary><div>Набор открыт. Старт объявлю за неделю в закрытой группе. После оплаты Вы сразу получаете первый шаг подготовки, так что ждать без дела не придётся.</div></details>
+      <details><summary>А если пропущу созвон?</summary><div>Запись каждого созвона появляется в группе в тот же вечер. Но лучше быть вживую: там я разбираю ситуации участников и отвечаю на Ваши вопросы. В записи Вы увидите чужие разборы, а свой момент упустите.</div></details>
+      <details><summary>Сколько времени нужно?</summary><div>В Стандарте созвоны 4–6 часов в неделю, задания 2–3 часа и 15–30 минут продаж каждый день. В Базовом — уроки и задания в своём темпе плюс один созвон в неделю.</div></details>
+    </div>
+  </div>
+</section>
+
+<!-- 16. Мостик к разбору -->
+<section class="light" style="padding:70px 0">
+  <div class="wrap bridge">
+    <div>
+      <div class="kicker rv">Пока не готовы к курсу?</div>
+      <h2 class="rv d1">Начните с разбора Ваших переписок</h2>
+      <p class="rv d2">Покажу, на каком сообщении у Вас уходят клиенты и что писать вместо этого.</p>
+    </div>
+    <a class="btn btn-ghost rv d2" href="/razbor/">Про разбор →</a>
+  </div>
+</section>
+
+<!-- 17. Финал -->
+<section class="final" id="contacts">
+  <div class="hero-bg" aria-hidden="true">
+    <svg class="flow" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMid slice">
+      <path d="M-50 600 C 400 560, 600 300, 1000 320 S 1400 160, 1500 80"/>
+      <path class="glow" d="M-50 600 C 400 560, 600 300, 1000 320 S 1400 160, 1500 80"/>
+    </svg>
+  </div>
+  <div class="wrap" style="position:relative">
+    <div class="kicker rv">Sky · набор открыт</div>
+    <h2 class="rv d1">Клиенты Вам уже пишут. Осталось научиться их не терять</h2>
+    <p class="rv d2">Напишите мне, и вместе выберем пакет под Вашу ситуацию.</p>
+    <div class="hero-btns rv d3">
+      <a class="btn btn-main js-tg" href="https://t.me/Constantine_Kan?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%20%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%20Sky" target="_blank" rel="noopener">Написать мне в Telegram</a>
+    </div>
+    <small class="rv d3">Откроется моя личка, сообщение уже набрано. Отвечаю сам, лично.</small>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Константин Кан · Sky — обучение продажам</span>
+    <span><a href="/">Главная</a> · <a href="privacy.html">Политика конфиденциальности</a> · <a href="https://instagram.com/constantine.kan" target="_blank" rel="noopener">Instagram</a> · <a href="https://t.me/sales_by_kos" target="_blank" rel="noopener">Telegram-канал</a></span>
+  </div>
+</footer>
+
+<script>
+// шапка темнеет при прокрутке
+var hd=document.getElementById('top');
+function onScroll(){hd.classList.toggle('solid',scrollY>40)}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+// меню на телефоне
+var menu=document.getElementById('menu');
+document.getElementById('burger').onclick=function(){menu.classList.toggle('open')};
+menu.querySelectorAll('a').forEach(function(a){a.onclick=function(){menu.classList.remove('open')}});
+// калькулятор
+var cur={won:{sign:'₩',min:50000,max:3000000,step:50000,def:600000},tenge:{sign:'₸',min:10000,max:1000000,step:10000,def:180000}};
+var c='won';
+function $(id){return document.getElementById(id)}
+function fmt(n){return Math.round(n).toLocaleString('ru-RU').replace(/ |,/g,' ')}
+function calc(){
+  var leads=+$('leads').value,buy=+$('buy').value;
+  if(buy>leads){buy=leads;$('buy').value=leads}
+  $('buy').max=leads;
+  var check=+$('check').value,s=cur[c].sign;
+  var extra=Math.max(0,Math.round(leads*.3)-buy)*check; // цель: 3 из 10
+  $('o-leads').textContent=leads;$('o-buy').textContent=buy;
+  $('o-check').textContent=fmt(check)+' '+s;
+  $('res').textContent=fmt(extra)+' '+s;
+  $('res-yr').textContent=fmt(extra*12)+' '+s;
+}
+['leads','buy','check'].forEach(function(id){$(id).addEventListener('input',calc)});
+document.querySelectorAll('[data-cur]').forEach(function(b){b.addEventListener('click',function(){
+  c=b.dataset.cur;
+  document.querySelectorAll('[data-cur]').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+  var k=$('check');k.min=cur[c].min;k.max=cur[c].max;k.step=cur[c].step;k.value=cur[c].def;
+  calc();
+})});
+calc();
+// появление блоков
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+}else{document.querySelectorAll('.rv').forEach(function(el){el.classList.add('in')})}
+// заявка в пиксель: первый клик по Telegram
+var sent=false;
+document.querySelectorAll('.js-tg').forEach(function(a){a.addEventListener('click',function(){
+  if(!sent&&window.fbq){fbq('track','Lead',{content_category:'sky'});sent=true}
+})});
+</script>
+</body>
+</html>
